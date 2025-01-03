@@ -11,7 +11,7 @@ Automate Upgrade Assistant
     Log To Console    Starting upgrade-assistant automation...
     
     # Run the upgrade-assistant command
-    Start Process    powershell.exe    -ArgumentList upgrade-assistant upgrade "${PROJECT_PATH}" --target-framework "${TARGET_FRAMEWORK}"    stdout=${OUTPUT}    stderr=${ERROR}    shell=True
+    ${result}=    Run Process    powershell.exe    -ArgumentList upgrade-assistant upgrade "${PROJECT_PATH}" --target-framework "${TARGET_FRAMEWORK}"    shell=True
 
     # Wait for the upgrade-assistant prompt
     Sleep    5s
@@ -19,9 +19,11 @@ Automate Upgrade Assistant
     # Simulate selecting the "In-place project upgrade" option
     Log To Console    Selecting upgrade option...
     Press Keys    DOWN
+    Sleep         1s
     Press Keys    ENTER
 
-    # Wait for the process to finish
+    # Verify that the process completed successfully
     Log To Console    Waiting for the process to complete...
-    Wait Until Process Is Finished
-    Log To Console    Upgrade completed.
+    ${return_code}=  Get Process Result    ${result}
+    Run Keyword If    '${return_code}' == '0'    Log To Console    Upgrade completed successfully!
+    Run Keyword If    '${return_code}' != '0'    Fail    Upgrade failed!
