@@ -1,1 +1,27 @@
-hi
+*** Settings ***
+Library           Process
+Library           OperatingSystem
+
+*** Variables ***
+${PROJECT_PATH}    C:/GOBI/FCL/webapi_fioscl_v2.dvr.get/vz.fioscl.dvr.get.csproj
+${TARGET_FRAMEWORK}    net8.0
+
+*** Test Cases ***
+Automate Upgrade Assistant
+    Log To Console    Starting upgrade-assistant automation...
+    
+    # Run the upgrade-assistant command
+    Start Process    powershell.exe    -ArgumentList upgrade-assistant upgrade "${PROJECT_PATH}" --target-framework "${TARGET_FRAMEWORK}"    stdout=${OUTPUT}    stderr=${ERROR}    shell=True
+
+    # Wait for the upgrade-assistant prompt
+    Sleep    5s
+
+    # Simulate selecting the "In-place project upgrade" option
+    Log To Console    Selecting upgrade option...
+    Press Keys    DOWN
+    Press Keys    ENTER
+
+    # Wait for the process to finish
+    Log To Console    Waiting for the process to complete...
+    Wait Until Process Is Finished
+    Log To Console    Upgrade completed.
