@@ -1,6 +1,6 @@
 *** Settings ***
-Library           keyboard_control.py
 Library           Process
+Library           keyboard_control.py
 Library           OperatingSystem
 
 *** Variables ***
@@ -12,18 +12,19 @@ Automate Upgrade Assistant
     Log To Console    Starting upgrade-assistant automation...
 
     # Run the upgrade-assistant command
-    ${process}=    Run Process    powershell.exe    -ArgumentList upgrade-assistant upgrade "${PROJECT_PATH}" --target-framework "${TARGET_FRAMEWORK}"    shell=True
+    ${process}=    Start Process    powershell.exe    -ArgumentList upgrade-assistant upgrade "${PROJECT_PATH}" --target-framework "${TARGET_FRAMEWORK}"    shell=True
+    Sleep    3s    # Wait for the process to open the UI
 
-    # Wait for the upgrade-assistant prompt
-    Sleep    5s
-
-    # Simulate selecting the "In-place project upgrade" option
+    # Simulate key presses for selecting "In-place project upgrade"
     Log To Console    Simulating key presses...
     Press Down
     Sleep    1s
     Press Enter
 
-    # Verify the result of the process
-    ${return_code}=    Get Process Result    ${process}
-    Run Keyword If    '${return_code}' == '0'    Log To Console    Upgrade completed successfully!
-    Run Keyword If    '${return_code}' != '0'    Fail    Upgrade failed!
+    # Wait for the process to complete
+    Wait For Process    ${process}    timeout=60s
+    ${rc}=    Get Process Result    ${process}
+    Log To Console    Return Code: ${rc}
+
+    Run Keyword If    '${rc}' == '0'    Log To Console    Upgrade completed successfully!
+    Run Keyword If    '${rc}' != '0'    Fail    Upgrade failed!
