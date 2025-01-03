@@ -1,4 +1,5 @@
 *** Settings ***
+Library           SeleniumLibrary
 Library           Process
 Library           OperatingSystem
 
@@ -11,19 +12,18 @@ Automate Upgrade Assistant
     Log To Console    Starting upgrade-assistant automation...
     
     # Run the upgrade-assistant command
-    ${result}=    Run Process    powershell.exe    -ArgumentList upgrade-assistant upgrade "${PROJECT_PATH}" --target-framework "${TARGET_FRAMEWORK}"    shell=True
+    ${process}=    Run Process    powershell.exe    -ArgumentList upgrade-assistant upgrade "${PROJECT_PATH}" --target-framework "${TARGET_FRAMEWORK}"    shell=True
 
     # Wait for the upgrade-assistant prompt
     Sleep    5s
 
     # Simulate selecting the "In-place project upgrade" option
-    Log To Console    Selecting upgrade option...
-    Press Keys    DOWN
-    Sleep         1s
-    Press Keys    ENTER
+    Log To Console    Simulating key presses...
+    Simulate Key Press    {DOWN}
+    Sleep    1s
+    Simulate Key Press    {ENTER}
 
-    # Verify that the process completed successfully
-    Log To Console    Waiting for the process to complete...
-    ${return_code}=  Get Process Result    ${result}
+    # Verify the result of the process
+    ${return_code}=    Get Process Result    ${process}
     Run Keyword If    '${return_code}' == '0'    Log To Console    Upgrade completed successfully!
     Run Keyword If    '${return_code}' != '0'    Fail    Upgrade failed!
