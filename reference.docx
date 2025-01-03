@@ -1,5 +1,5 @@
 *** Settings ***
-Library           SeleniumLibrary
+Library           keyboard_control.py
 Library           Process
 Library           OperatingSystem
 
@@ -10,7 +10,7 @@ ${TARGET_FRAMEWORK}    net8.0
 *** Test Cases ***
 Automate Upgrade Assistant
     Log To Console    Starting upgrade-assistant automation...
-    
+
     # Run the upgrade-assistant command
     ${process}=    Run Process    powershell.exe    -ArgumentList upgrade-assistant upgrade "${PROJECT_PATH}" --target-framework "${TARGET_FRAMEWORK}"    shell=True
 
@@ -19,9 +19,9 @@ Automate Upgrade Assistant
 
     # Simulate selecting the "In-place project upgrade" option
     Log To Console    Simulating key presses...
-    Simulate Key Press    {DOWN}
+    Press Down
     Sleep    1s
-    Simulate Key Press    {ENTER}
+    Press Enter
 
     # Verify the result of the process
     ${return_code}=    Get Process Result    ${process}
