@@ -1,0 +1,12 @@
+from pynput.keyboard import Key, Controller
+
+def press_key(key):
+    keyboard = Controller()
+    keyboard.press(key)
+    keyboard.release(key)
+
+def press_enter():
+    press_key(Key.enter)
+
+def press_down():
+    press_key(Key.down)
