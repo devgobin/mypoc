@@ -1,0 +1,115 @@
+<div class="content-body">
+    <div class="container-fluid h-100 p-0">
+        <div class="row h-100">
+            <div class="col-md-4 h-100">
+                <div class="row">
+                    <div class="col-md-12 text-end d-flex">
+                        <div class="btn-inline btn-inline-edit ms-auto" mat-ripple (click)="doEdit()">
+                            Edit
+                        </div>
+                        <div class="btn-inline btn-inline-delete" mat-ripple>
+                            Delete
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="readonly-field">
+                            <label>Issue Reference No.</label>
+                            <div class="readonly-field-value">{{issueDetail.refNo}}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="readonly-field">
+                            <label>Status</label>
+                            <div class="circle-content">
+                                <ng-container *ngIf="issueDetail.status === 'Open'">
+                                    <div class="circle-icon c-open"></div>
+                                    <div class="circle-text c-text-open">Open</div>
+                                </ng-container>
+                                <ng-container *ngIf="issueDetail.status === 'Rejected'">
+                                </ng-container>
+                                <ng-container *ngIf="issueDetail.status === 'In-Progress'">
+                                </ng-container>
+                                <ng-container *ngIf="issueDetail.status === 'Closed'">
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="readonly-field">
+                            <div><label>Severity</label></div>
+                            <ng-container *ngIf="issueDetail.severity === 'Low'">
+                                <div class="badge badge-low">{{issueDetail.severity}}</div>
+                            </ng-container>
+                            <ng-container *ngIf="issueDetail.severity === 'Medium'">
+                                <div class="badge badge-medium">{{issueDetail.severity}}</div>
+                            </ng-container>
+                            <ng-container *ngIf="issueDetail.severity === 'High'">
+                                <div class="badge badge-high">{{issueDetail.severity}}</div>
+                            </ng-container>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="readonly-field">
+                            <label>Category</label>
+                            <div class="readonly-field-value">{{issueDetail.category}}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="readonly-field">
+                            <label>Assigned Team</label>
+                            <div class="readonly-field-value">{{issueDetail.assignee}}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="readonly-field">
+                            <label>Alert Policy</label>
+                            <div class="readonly-field-value">{{issueDetail.alert}}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="readonly-field">
+                            <label>Automation Policy</label>
+                            <div class="readonly-field-value">{{issueDetail.automation}}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="readonly-field">
+                            <label>Issue Description</label>
+                            <div class="readonly-field-value">{{issueDetail.description}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8 h-100">
+                <mat-tab-group class="h-100">
+                    <mat-tab label="Links" class="h-100">
+                        <mat-list>
+                            <mat-list-item class="link-list">
+                              <img src="assets/svg/link.svg" alt="Link">
+                              <a>www.alertsystemloremipsum.com</a>
+                            </mat-list-item>
+                            <mat-list-item class="link-list">
+                              <img src="assets/svg/link.svg" alt="Link">
+                              <a>www.alertsystemloremipsum.com</a>
+                            </mat-list-item>
+                            <mat-list-item class="link-list">
+                              <img src="assets/svg/link.svg" alt="Link">
+                              <a>www.alertsystemloremipsum.com</a>
+                            </mat-list-item>
+                            <mat-list-item class="link-list">
+                              <img src="assets/svg/link.svg" alt="Link">
+                              <a>www.alertsystemloremipsum.com</a>
+                            </mat-list-item>
+                          </mat-list>
+                    </mat-tab>
+                    <mat-tab label="History" class="h-100">
+
+                    </mat-tab>
+                    <mat-tab label="Comment" class="h-100">
+
+                    </mat-tab>
+                </mat-tab-group>
+            </div>
+        </div>
+    </div>
+</div>

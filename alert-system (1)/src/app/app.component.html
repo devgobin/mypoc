@@ -1,0 +1,58 @@
+<div class="h-100">
+  <mat-drawer-container class="h-100">
+    <mat-drawer mode="side" opened class="drawer" [ngClass]="{'wid250': isOpened}">
+      <div class="h-100 sidebar-content"  [ngClass]="{'align-items-center': !isOpened}">
+        <div class="h-100 flex-1">
+          <div class="pt-2 pb-3 mb-3 p-content" [ngClass]="{'pl10': isOpened}">
+            <div class="p-logo">AS</div>
+            <div *ngIf="isOpened" class="ps-3 p-text">
+              <div>Alert System</div>
+              <small>To Manage Issues</small>
+            </div>
+          </div>
+          <ul class="nav-items" [ngClass]="{'icon-nav-items': !isOpened}">
+            <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+              <a routerLink="/home/dashboard">
+                <img class="nav-icon" src="assets\svg\chart.svg" alt="Dashboard">
+                <span class="nav-text" *ngIf="isOpened">Dashboard</span>
+              </a>
+            </li>
+            <li class="nav-item" routerLinkActive="active">
+              <a routerLink="/home/issue-list">
+                <img class="nav-icon" src="assets\svg\dashboard.svg" alt="Dashboard">
+                <span class="nav-text" *ngIf="isOpened">Issues Board</span>
+              </a>
+            </li>
+            <li class="nav-item" routerLinkActive="active">
+              <a>
+                <img class="nav-icon" src="assets\svg\document.svg" alt="Dashboard">
+                <span class="nav-text" *ngIf="isOpened">Reports</span>
+              </a>
+            </li>
+            <li class="nav-item" routerLinkActive="active">
+              <a>
+                <img class="nav-icon" src="assets\svg\alert-hexagon.svg" alt="Dashboard">
+                <span class="nav-text" *ngIf="isOpened">Alert Policy</span>
+              </a>
+            </li>
+            <li class="nav-item" routerLinkActive="active">
+              <a>
+                <img class="nav-icon" src="assets\svg\setting.svg" alt="Dashboard">
+                <span class="nav-text" *ngIf="isOpened">Automation Policy</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div [ngClass]="{'pe-3': isOpened}">
+          <button class="mat-icon-button icon-btn-toggle" [ngClass]="{'ms-auto': isOpened}" matRipple (click)="isOpened = !isOpened">
+            <img src="assets\svg\double-arrow-left.svg" alt="close" *ngIf="isOpened">
+            <img src="assets\svg\double-arrow-right.svg" alt="open" *ngIf="!isOpened">
+          </button>
+        </div> 
+      </div>
+    </mat-drawer>
+    <mat-drawer-content [ngClass]="{'ml250': isOpened}">
+      <router-outlet></router-outlet>
+    </mat-drawer-content>
+  </mat-drawer-container>
+</div>
