@@ -1,3 +1,23 @@
+Colors: ['#5A9BD5', '#ED7D31', '#A5A5A5', '#FFC000', '#4472C4']
+	•	Why: Balanced and clean colors suitable for corporate dashboards.
+
+2. Contrast & High Visibility
+	•	Domain Colors: ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF6361']
+	•	Why: Strong contrast makes data visually distinct.
+
+3. Cool Tones
+	•	Domain Colors: ['#2196F3', '#00BCD4', '#4CAF50', '#FF9800', '#F44336']
+	•	Why: Calm colors that provide a modern, minimalistic design.
+
+4. Monochromatic Blues
+	•	Domain Colors: ['#1565C0', '#1E88E5', '#42A5F5', '#90CAF9', '#BBDEFB']
+	•	Why: Elegant with consistent shades for a sleek look.
+
+
+
+
+
+
 *** Settings ***
 Library           Process
 Library           keyboard_control.py
