@@ -1,3 +1,27 @@
+Here are 5 color schemes designed for ngx-charts with a minimum of 5 colors, focusing on clean and visually pleasing palettes for data visualization:
+
+1. Vibrant Scheme (Inspired by the First Image)
+
+['#3D8BFD', '#28C76F', '#FFC107', '#FFA726', '#FF5252']
+
+2. Soft Pastels
+
+['#A0D7E7', '#A8E6CF', '#FFD66B', '#FFABAB', '#D5AAFF']
+
+3. Modern Contrast
+
+['#0057FF', '#00E676', '#FFC400', '#FF7043', '#D32F2F']
+
+4. Dark Mode-Friendly Palette
+
+['#00B8D9', '#36CFC9', '#FFC53D', '#FF8A80', '#FF5252']
+
+5. Monochromatic Blues
+
+['#003F5C', '#2F4B7C', '#665191', '#A05195', '#D45087']
+
+These schemes are suitable for ngx-charts and can be applied to visualizations like bar charts, pie charts, or line graphs. If you’d like, I can help you integrate these schemes into your Angular project.
+
 If you prefer softer monochromatic color schemes that avoid harsh contrasts, here are gentler color palettes that gradually transition through subtle shades:
 
 1. Soft Blue Palette (Calming & Minimal)
