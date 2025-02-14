@@ -1,0 +1,48 @@
+<div class="h-100 d-flex flex-direction-column">
+    <mat-table class="flex-1 overflow-auto" #table [dataSource]="dataSource">
+
+        <ng-container matColumnDef="no">
+            <mat-header-cell *matHeaderCellDef class="w150"> Reference No. </mat-header-cell>
+            <mat-cell *matCellDef="let element" class="w150"> 
+                {{element.no}}
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="link">
+            <mat-header-cell *matHeaderCellDef class="w150"> Link </mat-header-cell>
+            <mat-cell *matCellDef="let element" class="w150" (click)="onEdit(element)"> 
+                <div class="row-nav-link">{{element.link}}</div>
+            </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="summary">
+            <mat-header-cell *matHeaderCellDef> Summary </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{element.summary}} </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="assignee">
+            <mat-header-cell *matHeaderCellDef class="w150"> Assignee </mat-header-cell>
+            <mat-cell *matCellDef="let element" class="w150"> {{element.assignee}} </mat-cell>
+        </ng-container>
+        <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef class="w150"> Status </mat-header-cell>
+            <mat-cell *matCellDef="let element" class="w150"> 
+                <ng-container *ngIf="element.status === 'Open'">
+                    <div class="text-success">Open</div>
+                </ng-container>
+                <ng-container *ngIf="element.status === 'Rejected'">
+                    <div class="text-danger">Rejected</div>
+                </ng-container>
+                <ng-container *ngIf="element.status === 'In-Progress'">
+                    <div class="text-primary">In-Progress</div>
+                </ng-container>
+                <ng-container *ngIf="element.status === 'Closed'">
+                    <div class="text-secondary">Closed</div>
+                </ng-container>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+
+    <mat-paginator #paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]" [showFirstLastButtons]="true">
+    </mat-paginator>
+</div>

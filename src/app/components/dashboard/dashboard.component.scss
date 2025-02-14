@@ -1,0 +1,51 @@
+/* Full-page background */
+body {
+    background: linear-gradient(135deg, #2e2f33, #1a1b1e);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Dashboard Container */
+  .dashboard-container {
+    width: 80%;
+    max-width: 1200px;
+  }
+  
+  /* Grid Layout */
+  .grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 20px;
+  }
+  
+  /* Box Styling */
+  .box {
+    background: rgba(255, 255, 255, 0.1); /* Glass effect */
+    border-radius: 16px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+  }
+  
+  /* Box Sizes */
+  .large {
+    grid-column: span 2;
+    height: 220px;
+  }
+  
+  .small {
+    height: 180px;
+  }
+  
+  .medium {
+    height: 180px;
+  }
+  
+  .tall {
+    grid-row: span 2;
+    height: 400px;
+  }
+  

@@ -1,0 +1,37 @@
+.card {
+  border-radius: 12px;
+  max-width: 500px; 
+  width: 100%;
+}
+
+.page-h{
+  height: 90vh !important
+}
+
+.form-control {
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+}
+
+.btn-success {
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.btn-success:hover {
+  background-color: #156d34;
+}
+
+.logo-text {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #198754, #0c4c27);
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  border-radius: 10px;
+  margin: 0 auto 20px auto;
+}
