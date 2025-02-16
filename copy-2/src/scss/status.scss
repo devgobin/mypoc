@@ -1,0 +1,133 @@
+.text-progress {
+  background: #edf3f3 !important;
+  color: #56ccf2 !important;
+  // max-width: 130px;
+}
+
+.warning-hold {
+  background: rgba(255, 240, 213, 1.37)!important;
+  color: #fe7617 !important;
+  // max-width: 120px;
+}
+
+.pendingApproval {
+  color: #fe7617 !important;
+}
+
+.pendingVerification {
+  color: #56ccf2 !important;
+}
+
+.pendingRegistration {
+  color: #2874fc !important;
+}
+
+.create {
+  background: #f9ffd3 !important;
+  color: #b5d300 !important;
+  // max-width: 120px;
+}
+
+.text-denied {
+  background: #fffdfd !important;
+  color: #eb5757 !important;
+}
+
+.pendingVerification-chip {
+  background: #0957dd0a !important;
+  color: #0957dd !important;
+  // max-width: 130px;
+}
+
+.text-reject {
+  background: #f5efef !important;
+  color: #eb5757 !important;
+  // max-width: 120px;
+}
+
+.text-success {
+  background: rgba(226, 255, 239, 11.396078) !important;
+  color: #219653 !important;
+  // max-width: 120px;
+}
+
+.text-fail {
+  color: #fc615d;
+  background: #ffeae9;
+}
+
+.statusText {
+  width: 160.09px;
+  min-height: 23px;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 13px;
+  padding: 5px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.verification {
+  width: 153px;
+  height: 23px;
+  background: #faf4ff;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 13px;
+  text-align: center;
+  color: #bd70fa;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.applicationInProgress {
+  // width: 153px;
+  padding: 0px 10px;
+  height: 23px;
+  background: #f1fcff;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 13px;
+  text-align: center;
+  color: #40d1ff;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pendingVerificationBg {
+  // width: 153px;
+  padding: 0px 10px;
+  height: 23px;
+  background: #F2F7FF;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 13px;
+  text-align: center;
+  color: #2874FC;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.text-pend-verification {
+  background: #F2F7FF !important;
+  color: #2874FC !important;
+}
+.text-application-inProgress {
+  background: #F1FCFF !important;
+  color: #40D1FF !important;
+}
+.text-verification {
+  background: #F2F7FF !important;
+  color: #2874FC !important;
+}

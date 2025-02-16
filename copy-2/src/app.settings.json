@@ -1,0 +1,43 @@
+{
+  "workflowPath": "",
+  "applicationPath": "http://localhost:3661/",
+  "adminPath": "http://192.168.0.5:8014/",
+  "paymentGateWay": "http://192.168.0.5:9422/",
+  "basePath": "",
+  "socketPath": "https://xconcepts.in/zodiac-socket",
+  "serverDateFormat": "dd/MM/yyyy",
+  "serverDateFormatWithTime": "dd/MM/yyyy HH:mm",
+  "dateViewFormat": "dd MMM yyyy",
+  "dateViewFormatWithTime": "dd MMM yyyy HH:mm",
+  "clientCode": "FID",
+  "dbName": "__FID__INTERNAL__WEB__",
+  "pageSizeOptions": [
+    10,
+    20,
+    50
+  ],
+  "passportDateValidateMonth": 6,
+  "currencySymbol": "FJD",
+  "fileAccept": "application/pdf, image/*",
+  "fileSizeErrorMsg": "File size exceeds the limit of {0} and will not be uploaded.",
+  "fileAcceptPDF": "application/pdf",
+  "maxFileSize": 2097152,
+  "fileFormatErrorMsg": "File unsupported. Please upload the supported file format.",
+  "userManualLocation": "assets/userManual/",
+  "resetURL": "http://192.168.0.5/FIDInternalApplicationWeb/verify_otp",
+  "wordLimits": 5000,
+  "httpErrorMsg": {
+    "default": "Unable to reach the server. Please check your internet connection or try after sometime.",
+    "error404": "Unable to reach Server Error code: 404",
+    "error401": "Your session expired. Please login again to continue."
+  },
+  "fillAllMandatory": "Please Fill All Mandatory Field",
+  "showMaintenance": false,
+  "maintenanceText": "<p>We are currently performing scheduled maintenance. We apologize for any inconvenience this might have caused. </p><p><strong>Expected downtime:</strong> Until October 5, 2024 03:00 PM</p><p>Please check back later!</p>",
+  "isUnderScheduleMaintenance": false,
+  "scheduleMaintenanceText": {
+    "title": "<div style='color:#FF4141; font-weight: 500; font-size: 14px; padding-bottom: 6px'>Scheduled Maintenance</div>",
+    "message": "<div style='color:#212121; font-weight: 400; font-size: 12px; line-height: 15px'>Application will be temporarily unavailable</div><div style='font-size: 12px; font-weight: 700; color: #212121'>From <span style='color:#2874FC'> 20/11/2024 11.00 PM </span> - To <span style='color:#2874FC'> 20/11/2024 03.00 AM. </span></div>"
+  },
+  "isAge": 18
+}

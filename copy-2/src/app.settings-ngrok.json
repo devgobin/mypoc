@@ -1,0 +1,24 @@
+{
+  "applicationPath": "https://fast-moray-crack.ngrok-free.app/fid_internal/",
+  "adminPath": "https://fast-moray-crack.ngrok-free.app/fid_admin/",
+  "basePath": "",
+  "socketPath": "https://xconcepts.in/zodiac-socket",
+  "serverDateFormat": "dd-MM-yyyy",
+  "serverDateFormatWithTime": "dd-MM-yyyy HH:mm",
+  "dateViewFormat": "dd MMM yyyy",
+  "dateViewFormatWithTime": "dd MMM yyyy hh:mm a",
+  "clientCode": "FID",
+  "dbName": "__FID__INTERNAL__WEB__",
+  "pageSizeOptions": [
+    10,
+    20,
+    50
+  ],
+  "currencySymbol": "FJD",
+  "fileAccept": "application/pdf, image/*",
+  "fileSizeErrorMsg": "File size exceeds the limit of {0} and will not be uploaded.",
+  "fileAcceptPDF": "application/pdf",
+  "maxFileSize": 2097152,
+  "fileFormatErrorMsg": "For enhanced security, we request that you convert the file into PDF, JPG, PNG format.",
+  "userManualLocation": "assets/userManual/"
+}

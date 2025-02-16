@@ -1,0 +1,165 @@
+.app-accordion {
+    .app-accordion-item {
+        background-color: #F8F9FA;
+        display: block;
+        position: relative;
+        margin-bottom: 10px;
+        padding: 0 16px;
+        border-radius: 10px;
+
+        .app-accordion-header {
+            display: flex;
+            align-items: center;
+            height: 44px;
+            // padding: 0 16px;
+            user-select: none;
+            cursor: pointer;
+            border-bottom: 1px dashed #E0E0E0;
+
+            .accordion-header-content {
+                flex: 1;
+                display: flex;
+
+                .accordion-title {
+                    flex: 1;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-size: 14px;
+                    padding-right: 16px;
+                    color: var(--app-text-danger);
+
+                    .accordian-title-header {
+                        color: #858585 !important;
+                        font-weight: 500;
+                        font-size: 16px;
+                    }
+
+                    .accordion-title-content {
+                        display: flex;
+                        align-items: center;
+                    }
+
+                    .accordian-title-count {
+                        margin-left: 15px;
+                        color: #6C6B6B;
+                        font-size: 15px;
+                        border-radius: 10px;
+                        padding: 1px 5px;
+                        border: 1px solid #DBE0E1;
+                    }
+
+
+                    ion-icon {
+                        font-size: 18px;
+                        // transition: 0.3s;
+                    }
+                }
+            }
+        }
+
+        .app-accordion-body {
+            display: none;
+            padding: 16px 8px !important;
+        }
+
+        .open-visible {
+            display: none !important;
+        }
+
+        .open-hide {
+            display: flex !important;
+            color: #000;
+        }
+
+        &.open {
+            .app-accordion-header {
+                .accordion-header-content {
+                    .accordion-title {
+
+                        // color: var(--app-primary);
+                        .accordian-title-header {
+                            // font-weight: 500;
+
+                            color: #212121;
+                            // letter-spacing: 1px;
+
+                        }
+
+
+                    }
+
+                    .reverse {
+
+                        ion-icon {
+                            transform: rotate(180deg);
+                        }
+                    }
+                }
+
+
+                .btn-accordion {
+
+
+                    ion-icon {
+                        transform: rotate(180deg);
+                        transition: 0.3s;
+                    }
+
+
+                }
+            }
+
+            .open-visible {
+                display: flex !important;
+            }
+
+            .open-hide {
+                display: none !important;
+            }
+
+            .app-accordion-body {
+                display: block;
+            }
+        }
+    }
+}
+
+.accordion_sub-lb{
+    color: #858585 !important;
+    font-weight: 400;
+    font-size: 14px;
+
+    span{
+        color: var(--app-primary) !important;
+        font-weight: 500;
+        font-size: 15px; 
+    }
+}
+
+.accord-body-header{
+    border-bottom: 1px solid #e0e0e0;
+    // padding-bottom: 10px;
+}
+.accord-body-header-text{
+    color: var(--text-light-color2);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 15px 10px 10px;
+    cursor: pointer;
+    // border-right: 1px solid #2e2e2e;
+}
+
+.accord-nx-lb{
+    font-size: 14px;
+    font-weight: 400;
+    span{
+       font-weight: 600;
+       color: var(--app-primary);
+    }
+}
+
+.selected-text-color{
+    color: var(--app-primary)
+}
+
