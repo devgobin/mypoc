@@ -1,0 +1,68 @@
+<!-- <div class="paginator">
+    <div class="paginator-item-select-container">
+        <div class="paginator-item-select-text text-dull">
+            Showing: {{ pages.length > 0 ? (__pageIndex * __pageSize) + 1 : 0 }} - {{ getEndingItemNumber() }} of
+            {{__length}} Entries
+        </div> |
+        <div class="paginator-item-select">
+            <mat-select class="paginator-select-input" [value]="__pageSize" hideSingleSelectionIndicator="true"
+                (selectionChange)="onSelectOption($event)">
+                @for (optionValue of __pageSizeOptions; track $index) {
+                <mat-option [value]="optionValue" class="paginator-select-option">{{optionValue}}</mat-option>
+                }
+            </mat-select>
+        </div> |
+        <div class="flex">
+
+            @if(pages.length > 0){
+            <div class="page-container">
+                <div class="paginator-slider" #paginatorSlider>
+                    @for (page of pages; track $index) {
+                    <div class="paginator-page page-{{page}}"
+                        [ngClass]="{'active': page - 1 === __pageIndex, 'show': (page <= __pageIndex + 2 && page > __pageIndex -1) || page > pages.length - 2 || (page < 3 && __pageIndex > pages.length - 4), 'dots': page === pages.length - 2}"
+                        (click)="setPage(page - 1, page === pages.length - 2)">
+                        {{page}}</div>
+                    }
+                </div>
+            </div>
+            }
+            <div class="paginator-previous" (click)="navigatePage('previous')" (mousedown)="onMouseDown('previous')"
+                (mouseup)="onMouseUp()">
+                Previous
+            </div>
+            <div class="paginator-next" (click)="navigatePage('next')" (mousedown)="onMouseDown('next')"
+                (mouseup)="onMouseUp()">
+                Next
+            </div>
+        </div>
+    </div>
+</div> -->
+
+<div class="paginator">
+    <div class="paginator-item-select-container">
+        <div class="paginator-item-select">
+            Show
+            <mat-select class="paginator-select-input" [value]="__pageSize" hideSingleSelectionIndicator="true"
+                (selectionChange)="onSelectOption($event)">
+                @for (optionValue of __pageSizeOptions; track $index) {
+                <mat-option [value]="optionValue" class="paginator-select-option">{{optionValue}}</mat-option>
+                }
+            </mat-select>
+            Records
+        </div>
+        <div class="paginator-item-select-text text-dull">
+            Showing: {{ pages.length > 0 ? (__pageIndex * __pageSize) + 1 : 0 }} - {{ getEndingItemNumber() }} of
+            {{__length}} Entries
+        </div>
+        <div class="slot-center">
+            <div class="paginator-previous" (click)="navigatePage('previous')" (mousedown)="onMouseDown('previous')"
+                (mouseup)="onMouseUp()">
+                Previous
+            </div>
+            <div class="paginator-next" (click)="navigatePage('next')" (mousedown)="onMouseDown('next')"
+                (mouseup)="onMouseUp()">
+                Next
+            </div>
+        </div>
+    </div>
+</div>

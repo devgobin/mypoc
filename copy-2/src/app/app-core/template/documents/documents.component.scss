@@ -1,0 +1,231 @@
+.doc-container {
+  min-height: 144px;
+  height: 144px;
+  width: 100%;
+  min-width: 390px;
+  background-color: #F4F6F9;
+  border: 1px dashed var(--app-primary);
+  border-radius: 12px;
+  padding: 12px;
+
+
+  .doc-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+
+
+    .main-label-container {
+      display: flex;
+      flex-direction: column;
+
+      ion-icon {
+        font-size: 25px;
+        color: #495057;
+      }
+
+      .label {
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 12px;
+        padding-left: 8px;
+        color: #495057;
+      }
+
+      .sub-label {
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 18px;
+        letter-spacing: 0.02em;
+        color: #212121;
+
+        .bold {
+          font-size: 12px;
+          font-weight: 700;
+          line-height: 18px;
+          letter-spacing: 0.02em;
+
+        }
+
+      }
+    }
+  }
+}
+
+
+.w270 {
+  width: 270px;
+}
+
+.doc-error {
+  border: 1px solid #EB5757 !important;
+  background-color: #FFF6F6 !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  .doc-content {
+    .main-label-container {
+
+      .error1 {
+
+        // height: 80%;
+        ion-icon {
+          font-size: 50px;
+          color: #EB5757;
+          margin-right: 4px;
+        }
+
+        .errorMsg {
+          font-size: 12px;
+          font-weight: 400;
+          line-height: 15px;
+          text-align: center;
+          color: #EB5757;
+        }
+      }
+
+    }
+  }
+}
+
+.file-upload {
+  .hidden {
+    display: none;
+  }
+}
+
+
+
+.download-button {
+  button {
+    width: 120px;
+    font-size: 16px;
+    padding: 0 24px;
+    font-weight: 500;
+    height: 40px;
+    color: #fff;
+    background: var(--app-primary);
+    border: none;
+    border-radius: 12px;
+  }
+}
+
+.close-button {
+  button {
+    width: 120px;
+    min-width: 120px;
+    height: 40px;
+    border-radius: 12px;
+    padding: 0 24px;
+    font-size: 16px;
+    font-weight: 500;
+    border: 1px solid #F2F2F2;
+    color: #2F80ED;
+  }
+}
+
+.wcheck {
+  width: 800px;
+  height: 520px;
+}
+
+.active {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+
+  img {
+    max-width: 800px;
+    min-width: auto;
+    max-height: 450px;
+    min-height: auto;
+  }
+}
+
+.p-fix {
+  position: absolute;
+  right: 2rem;
+  top: 1rem;
+  z-index: 10000;
+}
+
+
+.bgc {
+  // background-color: #00000061;
+}
+
+
+
+.home-doc-container {
+  // min-width: 744px;
+  width: 100%;
+  min-height: 122px;
+  background: #F6F6F6;
+  padding: 8px !important;
+
+
+  .home-upload {
+    background: #EEF1F6;
+    min-height: 93px !important;
+    border-radius: 4px;
+    padding: 12px;
+    gap: 10px;
+
+    .upload-icon {
+      ion-icon {
+        font-size: 20px;
+      }
+    }
+
+    .home-upload-label {
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 20px;
+      text-align: left;
+      color: rgba(33, 33, 33, 1);
+    }
+
+    .home-upload-sub-label {
+      font-size: 10px;
+      font-weight: 400;
+      line-height: 20px;
+      text-align: left;
+      color: rgba(33, 33, 33, 1);
+    }
+  }
+
+  .upload-error {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    text-align: left;
+    color: #212121;      
+  }
+}
+
+.pt5{
+  padding-top: 5px;
+}
+
+.delete-btn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.disable-doc{
+  background-color: #d6dbe4;
+  opacity: 0.5;
+  pointer-events: none;
+  cursor:not-allowed;
+}
+

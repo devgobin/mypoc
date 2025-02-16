@@ -1,0 +1,101 @@
+<div class="table-container {{ __panelClass }}">
+  <div class="flex-1 relative">
+    <scroll>
+      <div class="app-table-spacer">
+        <table class="app-table {{ __tableClass }}" #tableData>
+          <thead class="app-table-header">
+            <tr class="app-table-header-row">
+              @if (!__hideSelectAll) {
+              <th class="app-table-header-cell header-auto-select">
+                <div class="checkbox">
+                  <mat-checkbox [checked]="
+                      __selectedData.length === __dataSource.length &&
+                      __dataSource.length > 0
+                    " (change)="selectedAllClicked($event)" color="primary">
+                  </mat-checkbox>
+                </div>
+              </th>
+              } @for (columnName of __columnsName; track $index) {
+              <th class="app-table-header-cell header-cell-{{
+                  __columns[$index]
+                }}" [ngClass]="{
+                  pointer: __sortColumnsName.includes(__columns[$index])
+                }" (click)="doSort(__columns[$index])">
+                <div class="table-flex {{__tableFlexClass}}">
+                  <div class="flex align-items-center gap3">
+                    @if (!cellHeaderTemplates[__columns[$index]]) {
+                    {{columnName}}
+                    } @else {
+                    <div class="v-flex">
+                      <ng-container
+                        *ngTemplateOutlet="cellHeaderTemplates[__columns[$index]]; context: {$implicit: {}}">
+                      </ng-container>
+                    </div>
+                    }
+                    <div class="align-center">
+                      @if(__sortItem?.columnName === __columns[$index]) {
+
+                      <ion-icon [name]="__sortItem.sortOrder ? 'arrow-up-outline' : 'arrow-down-outline'">
+                      </ion-icon>
+
+                      }
+                    </div>
+                  </div>
+
+                </div>
+              </th>
+              }
+            </tr>
+          </thead>
+          <tbody class="app-table-body">
+            @for (data of __dataSource | pagination:__hasPagination:
+            __pagination.pageNumber: __pagination.pageSize; track $index ) {
+            <!-- @for(color of __isQualifiedOfficer; track $index){ -->
+            <tr class="app-table-row">
+              @if (!__hideSelectAll) {
+              <td class="app-table-cell cell-auto-select {{data.colorCode}}"
+                [ngClass]="{ lineRemove: verticalLineRemove }">
+                <div class="checkbox1">
+                  <mat-checkbox [checked]="hasSelected(data)" (change)="selectedSingleClicked($event, data)"
+                    color="primary">
+                  </mat-checkbox>
+                </div>
+              </td>
+              } @for (column of __columns; track $index) {
+              <!-- {{column}} -->
+              <td class="app-table-cell cell-{{ column }} {{data.colorCode}}" [ngClass]="getDynamicClasses(data, column)">
+                @if (!cellTemplates[column]) {
+                <div class="cell-content ">{{ data[column] ? data[column] : '-' }}</div>
+                } @else {
+                <ng-container *ngTemplateOutlet="
+                        cellTemplates[column];
+                        context: { $implicit: data }
+                      ">
+                </ng-container>
+                }
+              </td>
+              }
+            </tr>
+            }
+            <!-- } -->
+          </tbody>
+        </table>
+        @if(__dataSource.length === 0) {
+        <app-empty-state></app-empty-state>
+        }
+      </div>
+    </scroll>
+  </div>
+  @if(hidePaginator === true) {
+  <div class="table-container-footer">
+    <ng-container *ngTemplateOutlet="slotLeftTemplate; context: { $implicit: {} }">
+    </ng-container>
+    <div class="between gap16 w100">
+      <app-paginator [length]="__pagination.totalCount" [pageSize]="__pagination.pageSize"
+        [pageIndex]="__pagination.pageNumber" (page)="onPageChanged($event)"></app-paginator>
+      <ng-container *ngTemplateOutlet="slotRightTemplate; context: { $implicit: {} }">
+      </ng-container>
+    </div>
+  </div>
+  }
+</div>

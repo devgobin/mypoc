@@ -1,0 +1,191 @@
+@if(type === '') {
+  <div class="doc-container" #dropzone (click)="triggerClick()" [ngClass]="{
+      'doc-error':  sizeErrorFlag === true
+    }">
+    <!-- @if (tempFile.fileName !== '' && sizeErrorFlag === false) {
+    <div class="justify-content-end" (click)="deleteDocument()">
+      <ion-icon src="assets/delete.svg"></ion-icon>
+    </div>
+    } -->
+    <div class="doc-content h100" [ngClass]="{ h80: tempFile.fileName !== '' }">
+      @if(tempFile.fileName === '' && sizeErrorFlag === false) {
+      <div class="slot-center main-label-container">
+        <div class="slot-center">
+          @if (src=== '') {
+          <ion-icon name="cloud-upload-outline"></ion-icon>
+          } @else if (src !== '') {
+          <ion-icon [src]="src"></ion-icon>
+          } @if (label !== '') {
+          <div class="label">{{ label }}</div>
+          }
+        </div>
+        <br />
+        <div class="sub-label text-center">
+          supported file format is <span class="bold">{{ typeLabel }}</span> &
+          <br />
+          Max file size is <span class="bold">{{ sizeLabel }}</span>
+        </div>
+      </div>
+      }
+      @else if(sizeErrorFlag === true) {
+      <div class="slot-center main-label-container">
+        <div class="slot-center w270 error1">
+          <ion-icon name="warning-outline"></ion-icon>
+          <div class="errorMsg">{{ fileSizeError }}</div>
+        </div>
+        <div class="slot-center pt26">
+          @if (src=== '') {
+          <ion-icon [name]="icon"></ion-icon>
+          } @else if (src !== '') {
+          <ion-icon [src]="src"></ion-icon>
+          } @if (label !== '') {
+          <div class="label">{{ label }}</div>
+          }
+        </div>
+        <br />
+        <div class="sub-label">
+          supported file format is <span class="bold">{{ typeLabel }}</span> & Max
+          file size is <span class="bold">{{ sizeLabel }}</span>
+        </div>
+      </div>
+      }
+      <!-- @else {
+      <div class="slot-center v-flex gap8">
+        <div class="upload-label">{{ tempFile.fileName }}</div>
+        <div class="upload-file-size">
+          File Size : <span>{{ tempFile.fileSize | byteToMb }}</span>
+        </div>
+      </div>
+      } -->
+      @if(tempFile.fileName !== '') {
+      <!-- <h1>sudfgu</h1> -->
+      }
+    </div>
+  </div>
+  
+  <label class="file-upload" #nativeFileUpload>
+    <input type="file" #fileInput (change)="loadImageFromDevice($event)" id="file-input" class="hidden"
+      [accept]="accept" [multiple]="__isMultiple" />
+  </label>
+  
+  } @else if (type === 'multiAndSingleUpload') {
+
+    <div class="doc-container" #dropzone (click)="triggerClick()" [ngClass]="{
+      'doc-error':  sizeErrorFlag === true,
+      'disable-doc': disabled === true
+    }">
+    <!-- @if (tempFile.fileName !== '' && sizeErrorFlag === false) {
+    <div class="justify-content-end" (click)="deleteDocument()">
+      <ion-icon src="assets/delete.svg"></ion-icon>
+    </div>
+    } -->
+    <div class="doc-content h100" [ngClass]="{ h80: tempFile.fileName !== '' }">
+      @if(tempFile.fileName === '' && sizeErrorFlag === false) {
+      <div class="slot-center main-label-container">
+        <div class="slot-center">
+          @if (src=== '') {
+          <ion-icon name="cloud-upload-outline"></ion-icon>
+          } @else if (src !== '') {
+          <ion-icon [src]="src"></ion-icon>
+          } @if (label !== '') {
+          <div class="label">{{ label }}</div>
+          }
+        </div>
+        <br />
+        <div class="sub-label text-center">
+          supported file format is <span class="bold">{{ typeLabel }}</span> &
+          <br />
+          Max file size is <span class="bold">{{ sizeLabel }}</span>
+        </div>
+      </div>
+      }
+      @else if(sizeErrorFlag === true) {
+      <div class="slot-center main-label-container">
+        <div class="slot-center w270 error1">
+          <ion-icon name="warning-outline"></ion-icon>
+          <div class="errorMsg">{{ fileSizeError }}</div>
+        </div>
+        <div class="slot-center pt26">
+          @if (src=== '') {
+          <ion-icon [name]="icon"></ion-icon>
+          } @else if (src !== '') {
+          <ion-icon [src]="src"></ion-icon>
+          } @if (label !== '') {
+          <div class="label">{{ label }}</div>
+          }
+        </div>
+        <br />
+        <div class="sub-label">
+          supported file format is <span class="bold">{{ typeLabel }}</span> & Max
+          file size is <span class="bold">{{ sizeLabel }}</span>
+        </div>
+      </div>
+      }
+      <!-- @else {
+      <div class="slot-center v-flex gap8">
+        <div class="upload-label">{{ tempFile.fileName }}</div>
+        <div class="upload-file-size">
+          File Size : <span>{{ tempFile.fileSize | byteToMb }}</span>
+        </div>
+      </div>
+      } -->
+      @if(tempFile.fileName !== '') {
+      <!-- <h1>sudfgu</h1> -->
+      }
+    </div>
+  </div>
+  
+  <label class="file-upload" #nativeFileUpload>
+    <input type="file" #fileInput (change)="loadImageFromDeviceMulti($event)" id="file-input" class="hidden"
+      [accept]="accept" [multiple]="__isMultiple" />
+  </label>
+
+  } @else if (type === 'SingleUpload') {
+    <div class="home-doc-container">
+      <div class="home-upload" #dropzone (click)="triggerClick()">
+        <div class="v-flex align-items-center">
+          <div class="upload-icon">
+            <ion-icon src="assets/svg/cloud-upload.svg"></ion-icon>
+          </div>
+          <div class="home-upload-label">Browse Files</div>
+          <div class="home-upload-sub-label">Drag and Drop files here</div>
+    
+        </div>
+      </div>
+      <div class="upload-error pt5">
+        Upload all required documents for your application. Max {{fileSizeLimit}} MB Upload per Document. <span>ONLY PDF
+          FILES ALLOWED</span>
+      </div>
+    </div>
+    
+    <label class="file-upload" #nativeFileUpload>
+      <input type="file" #fileInput (change)="loadImageFromDevice($event)" id="file-input" class="hidden"
+        [accept]="accept" [multiple]="__isMultiple" />
+    </label>
+    }
+  
+  <ng-template #Template>
+    <div class="ab bgc">
+      <div class="rel">
+        <div class="p-fix end gap-10 pt8 pr8">
+          <div class="download-button">
+            <button color="primary" (click)="download()">Download</button>
+          </div>
+          <div class="close-button">
+            <button color="danger" (click)="close()">Close</button>
+          </div>
+        </div>
+        <div class="v-flex h100">
+          <div class="flex-1 relative">
+            <div class="ab">
+              <div class="rel">
+                <div class="dis-none wcheck active">
+                  <img [src]="filePath" alt="PreviewImages" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
