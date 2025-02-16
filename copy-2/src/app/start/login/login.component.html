@@ -1,0 +1,44 @@
+<div class="body-pattern h100">
+    <div class="py-2 slot-center h100">
+        <div class="welcome-cover">
+            <div class="welcome-side-left">
+            </div>
+            <div class="welcome-side-right">
+                <div class="div-center h100 px-2">
+                    <div class="d-flex content-center pb26">
+                        <img src="assets/svg/Immi-LoginLogo.svg">
+                    </div>
+                    @if(appSetting.environment.isUnderScheduleMaintenance){
+                        <div class="downTime-box">
+                            <ion-icon src="assets/svg/downtime-icon.svg"></ion-icon>
+                            <div >
+                            <div [innerHTML]="appSetting.environment.scheduleMaintenanceText.title | appSafe: 'html'">
+                            </div>
+                            <div [innerHTML]="appSetting.environment.scheduleMaintenanceText.message | appSafe: 'html'"></div>
+                            </div>
+                        </div>
+                    }
+                    <form #l="ngForm" (ngSubmit)="onSubmit(l)">
+                        <div class="pt16">
+                            <app-input-control type="text" label="User Name" [errorTrue]="errorTrue" [required]="true"
+                                [(ngModel)]="login.userLoginId" name="userLoginId">
+                            </app-input-control>
+                        </div>
+                        <div class="">
+                            <app-input-control type="password" label="Password"
+                                helpText="Password must contain at least 1 uppercase letter, 1 lower case letter, 1 number and min 8 characters"
+                                [errorTrue]="errorTrue" [required]="passwordRequired" [(ngModel)]="login.password" name="password">
+                            </app-input-control>
+                        </div>
+                        <div class="forgot-link pt0">
+                            <a class="link" (click)="forgotPassword(l)"> Reset Password ? </a>
+                        </div>
+                        <div class="justify-content-end pt16">
+                            <button class="btn-primary login-btn" appButton="Login" type="submit"></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,37 @@
+<div class="body-pattern h100">
+    <div class="py-2 slot-center h100">
+        <div class="welcome-cover">
+            <div class="welcome-side-left">
+            </div>
+            <div class="welcome-side-right">
+                <div class="div-center h100">
+                    <div class="d-flex content-center">
+                        <img src="assets/svg/Immi-LoginLogo.svg">
+                    </div>
+                    <div class="pb26"></div>
+                    <form #l="ngForm" class="prime-form-box" (ngSubmit)="onSubmit(l)">
+                        <div class="prime-form-header">
+                            <h3 class="Welcome">
+                                Enter Verification Code
+                            </h3>
+                            <p class="sub-content-text">
+                                The code has been sent to your registered email <br>
+                                {{loginData.emailId | emailMask}}
+                            </p>
+                        </div>
+                        <div class="pb26"></div>
+                        <div>
+                            <app-pin-control [isEyeIcon]="true" boxes="4" id="otp" [(ngModel)]="login.mPin" name="mPin" [required]="true" [errorTrue]="errorTrue"
+                                (onChange)="getOtp($event)" [hideStar]="true"></app-pin-control>
+                        </div>
+                        <div class="pb26"></div>
+                        <div class="justify-content-end p-2">
+                            <button class="btn-primary login-btn" appButton="Verify" type="submit">
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
