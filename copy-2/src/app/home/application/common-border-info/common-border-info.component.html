@@ -1,0 +1,197 @@
+<div class="vertical-tabs v-flex h100">
+    <app-tab-group-vertical class="tab-groups" (tabChange)="borderTabChange($event)">
+        <app-tab-vertical tabTitle="Controversial">
+            <div class="vertical-bg h100">
+                <div class="flex-1 relative h100">
+                    <scroll>
+                        <table class="application-table">
+                            <thead class="app-table-header">
+                                <tr class="app-table-header-row">
+                                    <th class="app-table-header-cell">
+                                        First Name
+                                        <div class="header-cell-subtitle pt8">
+                                            Last Name
+                                        </div>
+                                    </th>
+                                    <th class="app-table-header-cell">Date of Birth</th>
+                                    <th class="app-table-header-cell">Passport No</th>
+                                    <th class="app-table-header-cell">Reason</th>
+                                    <th class="app-table-header-cell">
+                                        From Date
+                                        <div class="header-cell-subtitle pt8">To Date</div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="app-table-body">
+                                @for(item of __controversialList.cllist;
+                                track $index){
+                                <tr class="app-table-row">
+                                    <td class="cell-content">
+                                        {{ item.firstName }}
+                                        <div class="table-cell-subtitle pt8">
+                                            {{ item.lastName }}
+                                        </div>
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.dateOfBirth | appDate }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.passportNo }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.reason }}
+                                    </td>
+
+                                    <td class="cell-content">
+                                        {{ item.fromDate | appDate }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.toDate | appDate }}
+                                    </td>
+                                    <td class="cell-content">
+                                        <!-- {{ item.tatInHours }} -->
+                                    </td>
+                                    <td class="cell-content">
+                                        <!-- {{ item.documentStatusDescription }} -->
+                                        <div class="table-cell-subtitle pt8">
+                                            <!-- {{ item. }} -->
+                                        </div>
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </scroll>
+                </div>
+            </div>
+        </app-tab-vertical>
+        <app-tab-vertical tabTitle="Travel History">
+            <div class="vertical-bg h100">
+                <div class="flex-1 relative h100">
+                    <scroll>
+                        <table class="application-table">
+                            <thead class="app-table-header">
+                                <tr class="app-table-header-row">
+                                    <th class="app-table-header-cell">Passport No</th>
+                                    <th class="app-table-header-cell">Nationality</th>
+                                    <th class="app-table-header-cell">Entry Date</th>
+                                    <th class="app-table-header-cell">Exit Date</th>
+                                </tr>
+                            </thead>
+                            <tbody class="app-table-body">
+                                @for(item of
+                                __travelHistory.travelHistory;
+                                track $index){
+                                <tr class="app-table-row">
+                                    <td class="cell-content">
+                                        {{ item.passportNo }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.nationality }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.entryDate | appDate }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.exitDate | appDate }}
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </scroll>
+                </div>
+            </div>
+        </app-tab-vertical>
+
+        <app-tab-vertical tabTitle="Permit Details">
+            <div class="vertical-bg h100">
+                <div class="flex-1 relative h100">
+                    <scroll>
+                        <table class="application-table">
+                            <thead class="app-table-header">
+                                <tr class="app-table-header-row">
+                                    <th class="app-table-header-cell">Permit No</th>
+                                    <th class="app-table-header-cell">Permit Type</th>
+                                    <th class="app-table-header-cell">Start Date</th>
+                                    <th class="app-table-header-cell">End Date</th>
+                                    <th class="app-table-header-cell">Passport Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="app-table-body">
+                                @for(item of permitLst; track $index){
+                                <tr class="app-table-row">
+                                    <td class="cell-content">
+                                        {{ item.permitno }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.permittype }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.startdate | appDate }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.enddate | appDate }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.permitstatus }}
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </scroll>
+                </div>
+            </div>
+        </app-tab-vertical>
+
+        <app-tab-vertical tabTitle="Passport List">
+            <div class="vertical-bg h100">
+                <div class="flex-1 relative h100">
+                    <scroll>
+                        <table class="application-table">
+                            <thead class="app-table-header">
+                                <tr class="app-table-header-row">
+                                    <th class="app-table-header-cell">Passport No</th>
+                                    <th class="app-table-header-cell">Date of Issue</th>
+                                    <th class="app-table-header-cell">Place of Issue</th>
+                                    <th class="app-table-header-cell">Nationality</th>
+                                    <th class="app-table-header-cell">
+                                        Valid From
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                        Valid To
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="app-table-body">
+                                @for(item of passPortLst; track $index){
+                                <tr class="app-table-row">
+                                    <td class="cell-content">
+                                        {{ item.passportNo }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.dateofIssue }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.placeofIssue }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.nationality }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.validFrom | appDate }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.validTo | appDate }}
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </scroll>
+                </div>
+            </div>
+        </app-tab-vertical>
+    </app-tab-group-vertical>
+</div>
