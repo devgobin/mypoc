@@ -1,0 +1,24 @@
+.danger {
+    color: rgba(254, 45, 45, 1);
+}
+
+.warning {
+    color: rgba(254, 118, 23, 1);
+}
+
+.success {
+    color: rgba(0, 172, 24, 1);
+}
+
+.status-progress {
+    width: 160px;
+    height: 23px;
+    background-color: rgba(246, 252, 254, 1);
+    color: rgba(86, 204, 242, 1);
+    font-size: 13px;
+    font-weight: 400;
+}
+
+.isQualified{
+  color: #285413;
+}

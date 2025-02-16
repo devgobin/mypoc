@@ -1,0 +1,278 @@
+<div class="vertical-tabs v-flex h100">
+    <app-tab-group-vertical class="tab-groups">
+        <app-tab-vertical tabTitle="Assigned Officer History">
+            @if(isLoading) {
+            <div class="v-flex vertical-bg h100">
+                <div class="between pb16">
+                    <div class="col-md-3">
+                        <div class="labelHead pb8">Assigned Officer History</div>
+                        <div class="text-gray-border-bottom-1"></div>
+                    </div>
+
+                    <div class="slot-center gap16">
+                        @if(__assignedOfficerHistory.isHigherOfficer === 'Y'){
+                        <button class="home-btn-primary" appButton="Assign To" (click)="OpenAssignTo()"></button>
+                        }
+                        @if(__permitParams.blnShowSelfAssignBtn === 'Y' && __permitParams.statusValue !== 'APINP'){
+                        <button class="home-btn-primary" appButton="Self Assign" (click)="selfAssign()"></button>
+                        }
+                    </div>
+                </div>
+                <!-- <div class="p8"></div> -->
+                <div class="flex-1 relative h100">
+                    <scroll>
+                        <table class="application-table">
+                            <thead class="app-table-header">
+                                <tr class="app-table-header-row">
+                                    <th class="app-table-header-cell">Assigned To</th>
+                                    <th class="app-table-header-cell">Assigned By</th>
+                                    <th class="app-table-header-cell">
+                                        Assigned Date / Time
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                        <div class="text-center">Status</div>
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                        Completed Turn Around Time
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="app-table-body">
+                                @for(item of
+                                __permitParams.plstentPermitApplicationAssignedOfficerHistory;
+                                track $index){
+                                <tr class="app-table-row">
+                                    <td class="cell-content">
+                                        {{
+                                        item.assignedToFullName
+                                        ? item.assignedToFullName
+                                        : "-"
+                                        }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{
+                                        item.assignedByFullName
+                                        ? item.assignedByFullName
+                                        : "-"
+                                        }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.assignedDate | appDate : "datetime" }}
+                                    </td>
+                                    <td class="cell-content">
+                                        <div class="text-center">
+                                            {{ item.statusDescription }}
+                                        </div>
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.workedTatInDays | tat:'day' }}
+                                        {{item.workedTatInHours |
+                                        tat : 'hr' }}
+                                        {{item.workedTatInMinutes | tat : "min"}}
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </scroll>
+                </div>
+            </div>
+            }
+        </app-tab-vertical>
+        <app-tab-vertical tabTitle="Status History">
+            <div class="vertical-bg v-flex h100">
+                <div class="pb16">
+                    <div class="col-md-2">
+                        <div class="labelHead pb8">Status History</div>
+                        <div class="text-gray-border-bottom-1"></div>
+                    </div>
+                </div>
+                <div class="flex-1 relative h100">
+                    <scroll>
+                        <table class="application-table">
+                            <thead class="app-table-header">
+                                <tr class="app-table-header-row">
+                                    <th class="app-table-header-cell">Status</th>
+                                    <th class="app-table-header-cell">Changed By</th>
+                                    <th class="app-table-header-cell">
+                                        Changed Date / Time
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                        Total Turn Around Time
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="app-table-body">
+                                @for(item of
+                                __permitParams.plstentPermitApplicationStatusHistory;
+                                track $index){
+                                <tr class="app-table-row">
+                                    <td class="cell-content">
+                                        {{ item.statusDescription }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.changedByFullName ? item.changedByFullName : '-' }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.changedDate | appDate : "datetime" }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.workedTatInDays | tat:'day' }}
+                                        {{item.workedTatInHours |
+                                        tat : 'hr' }}
+                                        {{item.workedTatInMinutes | tat : "min"}}
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </scroll>
+                </div>
+            </div>
+        </app-tab-vertical>
+
+        <app-tab-vertical tabTitle="Communication History">
+            <div class="vertical-bg v-flex h100">
+                <div class="pb16">
+                    <div class="col-md-2">
+                        <div class="labelHead pb8">Email History</div>
+                        <div class="text-gray-border-bottom-1"></div>
+                    </div>
+                </div>
+                <div class="flex-1 relative h100">
+                    <scroll>
+                        <table class="application-table">
+                            <thead class="app-table-header">
+                                <tr class="app-table-header-row">
+                                    <th class="app-table-header-cell">From Email ID</th>
+                                    <th class="app-table-header-cell">To Email ID</th>
+                                    <th class="app-table-header-cell">Date Sent/Time</th>
+                                    <th class="app-table-header-cell">Email Status</th>
+                                    <th class="app-table-header-cell">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="app-table-body">
+                                @for(item of
+                                __permitParams.plstentPermitApplicationEmailHistory; track
+                                $index){
+                                <tr class="app-table-row">
+                                    <td class="cell-content">
+                                        {{ item.pentCommunicationTracking.fromEmailId }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{ item.pentCommunicationTracking.toEmailId }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{
+                                        item.pentCommunicationTracking.sentDate
+                                        | appDate : "datetime"
+                                        }}
+                                    </td>
+                                    <td class="cell-content">
+                                        {{
+                                        item.pentCommunicationTracking
+                                        .sentStatusDescription
+                                        }}
+                                    </td>
+                                    <td class="cell-content">
+                                        <div class="eye-icon">
+                                            <ion-icon name="eye" (click)="openEmailHistory(item)">
+                                            </ion-icon>
+                                        </div>
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </scroll>
+                </div>
+            </div>
+        </app-tab-vertical>
+    </app-tab-group-vertical>
+</div>
+
+
+<ng-template #emailHistory>
+    <div class="v-flex h100 slide-template">
+        <div class="slide-header header-padding between border-bottom-line m7px">
+            <div class="slide-label">Email History</div>
+            <div (click)="dialogService.closeAll()" class="cursor-pointer">
+                <ion-icon name="close-circle"></ion-icon>
+            </div>
+        </div>
+        <div class="email-content pb0">
+            <div class="d-flex p-1 between">
+                <div class="url-link-noline">
+                    To:{{ __permitEmailHistory.pentCommunicationTracking.toEmailId }}
+                </div>
+                <div class="text-gray">
+                    {{
+                    __permitEmailHistory.pentCommunicationTracking.sentDate
+                    | appDate : "datetime"
+                    }}
+                </div>
+            </div>
+            <div class="d-flex p-1 between">
+                <div class="text-gray">
+                    From: {{ __permitEmailHistory.pentCommunicationTracking.fromEmailId }}
+                </div>
+                @if(__permitEmailHistory.pentCommunicationTracking.sentStatusDescription
+                !== ''){
+                <div class="mailstatusbox">
+                    {{
+                    __permitEmailHistory.pentCommunicationTracking.sentStatusDescription
+                    }}
+                </div>
+                }
+            </div>
+            <div class="m7px border-bottom-line px-2"></div>
+        </div>
+        <div class="header-padding">
+            <div class="text-gray mail-msg p-1">
+                {{ __permitEmailHistory.pentCommunicationTracking.mailContent }}
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #assignedToTemplate>
+    <div class="v-flex relative h100 slide-template">
+        <div class="slide-header header-padding between border-bottom-line m7px">
+            <div class="slide-label">
+                Application Assigned Officer
+            </div>
+            <div (click)="dialog.closeDialog()" class="cursor-pointer">
+                <ion-icon name="close-circle"></ion-icon>
+            </div>
+        </div>
+        <div class="v-flex p16 h100">
+            <app-input-control label="Re Assign" [(ngModel)]="reAssignSearch" name="reAssignSearch"></app-input-control>
+            <row>
+                <div class="col-md-3">
+                    <div class="lg-label-header light-lb pb8">
+                        Users
+                    </div>
+                    <div class="text-gray-border-bottom-1"></div>
+                </div>
+            </row>
+            <div class="flex-1 relative h100">
+                <scroll>
+                    @for(user of __assignedOfficerHistory.plstuserlist.ilstUser | filterAndSort : reAssignSearch :
+                    'fullname' :
+                    false ;
+                    track $index){
+                    <div class="header-content mb8 pr8">
+                        <div class="ass-fnt">
+                            {{user.fullname}}
+                        </div>
+                        <div class="slot-center gap16">
+                            <button class="home-btn-primary" appButton="Assign"
+                                (click)="getAssigedOfficer(user)"></button>
+                        </div>
+                    </div>
+                    }
+                </scroll>
+            </div>
+        </div>
+    </div>
+</ng-template>

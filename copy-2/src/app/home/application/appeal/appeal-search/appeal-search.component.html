@@ -1,0 +1,180 @@
+<div class="body-pattern h100">
+  <div class="v-flex card h100 home-margin">
+    <div class="header-label">
+      Appeal Applications
+    </div>
+    <div class="d-flex  align-items-center gap16">
+
+      @if(activeList.length > 0) {
+      <!-- <button class="btn-grey" appButton="Open" (click)="openEmployerDetail()"></button> -->
+      }
+      <div>
+        <app-input-control className="home-input" type="date" label="Applied Date From" [(ngModel)]="searchParams"
+          name=""></app-input-control>
+      </div>
+      <div>
+        <app-input-control className="home-input" type="date" label="Applied Date To"></app-input-control>
+      </div>
+      <button class="home-btn-primary" appButton="Filters" (click)="openSearchTemplates()"></button>
+    </div>
+  </div>
+  <div class="flex-1 relative">
+    <scroll>
+      <app-table [pagination]="pagination" [columns]="appealColumn" [columnsName]="appealColumnName"
+        (pageChanged)="pageChanged($event)" (onSelect)="onSelected($event)" columnID="agentRegistrationId"
+        [hidePaginator]="true" [hideSelectAll]="true" [verticalLineRemove]="true"
+        [dataSource]="appealSearchResult.plstentPermitApplicationSearchResultset">
+
+        <!-- Table Header -->
+
+        <ng-template cellHeaderDef="permitTypeDescription">
+          <div>
+            Permit Type
+          </div>
+          <div class="table-sub-heading pt8">
+            Application Type
+          </div>
+        </ng-template>
+        <ng-template cellHeaderDef="paymentDate">
+          <div>
+            Payment Date
+          </div>
+          <div class="table-sub-heading pt8">
+            Receipt No
+          </div>
+        </ng-template>
+        <ng-template cellHeaderDef="paymentAmount">
+          <div class="left-align">
+            Payment Amount ({{appSetting.environment.currencySymbol}})
+          </div>
+          <div class="table-sub-heading pt8 left-align">
+            Payment Status
+          </div>
+        </ng-template>
+        <ng-template cellHeaderDef="statusDescription">
+          <div class="slot-center">
+            Status
+          </div>
+          <div class="table-sub-heading pt8 slot-center">
+            TAT
+          </div>
+        </ng-template>
+
+        <!-- Table cell -->
+
+        <ng-template cellDef="applicationNo" let-element>
+          <div class="table-link">
+            {{element.permitApplicationNo}}
+          </div>
+        </ng-template>
+        <ng-template cellDef="applicantName" let-element>
+          <div class="table-link">
+            {{element.applicantName}}
+          </div>
+        </ng-template>
+        <ng-template cellDef="permitTypeDescription" let-element>
+          <div class="table-cell-greysNeutral">
+            {{element.permitTypeDescription}}
+          </div>
+          <div class="table-cell-greysNeutral1 pt8">
+            {{element.applicationTypeDescription}}
+          </div>
+        </ng-template>
+        <ng-template cellDef="paymentDate" let-element>
+          <div class="table-cell-greysNeutral">
+            {{element.paymentDate}}
+          </div>
+          <div class="table-cell-greysNeutral1 pt8">
+            {{element.paymentReceiptNo}}
+          </div>
+        </ng-template>
+        <ng-template cellDef="paymentAmount" let-element>
+          <div class="left-align table-cell-greysNeutral">
+            {{element.paymentAmount}}
+          </div>
+          <div class="table-cell-greysNeutral1 pt8 left-align">
+            {{element.paymentStatusDescription}}
+          </div>
+        </ng-template>
+        <ng-template cellDef="statusDescription" let-element>
+          <div class="slot-center">
+            <app-status-text [statusValue]="element.statusDescription"></app-status-text>
+          </div>
+          <div class="table-sub-cell table-cell-greysNeutral1 pt8 slot-center">
+            {{element.tat}}
+          </div>
+        </ng-template>
+        <ng-template cellDef="action" let-element>
+          <div>
+            <div class="action-icon">
+              <ion-icon src="assets/svg/open-icon.svg"
+                (click)="openAppealDetail(element.permitApplicationId, element.applicationType)"></ion-icon>
+              <ion-icon name="eye-outline"></ion-icon>
+            </div>
+          </div>
+        </ng-template>
+      </app-table>
+    </scroll>
+  </div>
+</div>
+
+<ng-template #appealSearch>
+  <div class="v-flex h100 search-template">
+    <div class="search-header between">
+      <div class="search-label">
+        Advanced <span>Search</span>
+      </div>
+      <div (click)="dialog.closeDialog()" class="cursor-pointer">
+        <ion-icon name="close-circle"></ion-icon>
+      </div>
+    </div>
+    <div class="search-container">
+      <form #l="ngForm" autocomplete="off" class="h100">
+        <row>
+          <div class="col-md-4 ">
+            <app-input-control type="text" label="Permit Number" className="white-input" [(ngModel)]="searchParams"
+              name=""></app-input-control>
+          </div>
+          <div class="col-md-4">
+            <app-input-control type="text" className="white-input" label="Application No"
+              [(ngModel)]="searchParams.permitApplicationNo" name="organizationName"></app-input-control>
+          </div>
+          <div class="col-md-4">
+            <app-input-control type="text" className="white-input" label="Applicant Name"
+              [(ngModel)]="searchParams.applicantName" name="applicantName" key="constant"
+              keyName="description"></app-input-control>
+          </div>
+          <div class="col-md-4">
+            <app-input-control type="text" className="white-input" label="Passport No" [(ngModel)]="searchParams"
+              name=""></app-input-control>
+          </div>
+          <div class="col-md-4">
+            <app-input-control type="select" className="white-input" label="Permit Type"
+              [(ngModel)]="searchParams.permitTypeValue" name="permitTypeValue"></app-input-control>
+          </div>
+          <div class="col-md-4">
+            <app-input-control type="select" className="white-input" label="Application Type"
+              [(ngModel)]="searchParams.applicationTypeValue" name="applicationTypeValue"
+              name="contactNumber"></app-input-control>
+          </div>
+          <div class="col-md-4">
+            <app-input-control type="date" className="white-input" label="Payment Date"
+              [(ngModel)]="searchParams.paymentDateFrom" name="paymentDateFrom"></app-input-control>
+          </div>
+          <div class="col-md-4">
+            <app-input-control type="date" className="white-input" label="Start Date" [(ngModel)]="searchParams"
+              name="contactNumber"></app-input-control>
+          </div>
+          <div class="col-md-4">
+            <app-input-control type="date" className="white-input" label="End Date" [(ngModel)]="searchParams"
+              name="contactNumber"></app-input-control>
+          </div>
+        </row>
+      </form>
+    </div>
+    <div class="search-footer end">
+      <button class="btn-grey" appButton="Clear" (click)="clearAllSearch()"></button>
+      <button class="btn-secondary" appButton="Search" (click)="implementSearch()"></button>
+    </div>
+  </div>
+</ng-template>

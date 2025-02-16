@@ -1,0 +1,1250 @@
+            <app-tab-vertical tabTitle="Primary Applicant">
+              <div class="v-flex h100">
+                <div class="flex-1 relative">
+                  <scroll>
+                    <div class="vertical-bg">
+                      <form #l="ngForm" (ngSubmit)="saveInvestorPermitPrimaryApplicantDetail(l)">
+                        @if(investorParams.statusValue === 'APINP') {
+                        <row>
+                          <div class="col-md-12 pb16 end">
+                            <button class="home-btn-primary" appButton="Save"></button>
+                          </div>
+                          <div class="col-md-2">
+                            <div class="lg-label-header dark-lb pb8">
+                              Personal Details
+                            </div>
+                            <div class="text-gray-border-bottom-1"></div>
+                          </div>
+                        </row>
+                        <row className="pt26">
+                          @if(investorParams.applicationTypeValue === 'EXTEN') {
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="text" label="Existing Permit Number"
+                              [(ngModel)]="investorParams.exisitingPermitNumber"
+                              [required]="true" [errorTrue]="errorTrue" name="existingPermitNumber"></app-input-control>
+                          </div>
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="select" label="Preferred Title"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.preferredTitleValue"
+                              [items]="initialData.DDLValues.DDLPreferredTitle" key="constant" keyName="description"
+                              [required]="true" [errorTrue]="errorTrue" name="preferredTitleValue"></app-input-control>
+                          </div>
+                          @if(investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.
+                          preferredTitleValue === 'OTHER') {
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="text" label="Other Title" [required]="true"
+                              [errorTrue]="errorTrue"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.otherTitle"
+                              name="otherTitle"></app-input-control>
+                          </div>
+                          } @else {
+                          <div class="col-md-4"></div>
+                          }
+                          } @else {
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="select" label="Preferred Title"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.preferredTitleValue"
+                              [items]="initialData.DDLValues.DDLPreferredTitle" key="constant" keyName="description"
+                              [required]="true" [errorTrue]="errorTrue" name="preferredTitleValue"></app-input-control>
+                          </div>
+                          @if(investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.
+                          preferredTitleValue === 'OTHER') {
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="text" label="Other Title" [required]="true"
+                              [errorTrue]="errorTrue"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.otherTitle"
+                              name="otherTitle"></app-input-control>
+                          </div>
+                          } @else {
+                          <div class="col-md-4"></div>
+                          }
+                          <div class="col-md-4"></div>
+                          }
+
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="text" label="Given Name" [required]="true"
+                              [errorTrue]="errorTrue"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.givenNames"
+                              name="givenNames"></app-input-control>
+                          </div>
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="text" label="Surname" [required]="true"
+                              [errorTrue]="errorTrue"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.surname"
+                              name="surname"></app-input-control>
+                          </div>
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="email" label="Email Id" [required]="true"
+                              [errorTrue]="errorTrue"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.emailId"
+                              name="emailId"></app-input-control>
+                          </div>
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="number" [maxLength]="20" label="Contact No"
+                              [required]="true" [errorTrue]="errorTrue"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.mobileNo"
+                              name="mobileNo"></app-input-control>
+                          </div>
+
+
+                          <div class="col-md-4">
+                            <app-check-box label="Any other name Applicant known by"
+                              [objArray]="[{label: 'Yes', trueValue: 'Y', falseValue: ''}, {label: 'No', trueValue: 'N', falseValue: ''}]"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.isAnyOtherName"
+                              name="isAnyOtherName12" [required]="true" [errorTrue]="errorTrue"></app-check-box>
+                          </div>
+                          @if(investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.
+                          isAnyOtherName === 'Y') {
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="text" label="Other Given Names"
+                              [required]="true" [errorTrue]="errorTrue" [(ngModel)]="
+                                investorParams.pentInvestorPermitApplication
+                                  .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                  .otherGivenNames
+                              " name="otherGivenNames"></app-input-control>
+                          </div>
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="text" label="Other Surname"
+                              [required]="true" [errorTrue]="errorTrue" [(ngModel)]="
+                                investorParams.pentInvestorPermitApplication
+                                  .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                  .otherSurname
+                              " name="otherSurname"></app-input-control>
+                          </div>
+                          }
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="select" label="Gender" [required]="true"
+                              [errorTrue]="errorTrue" [items]="initialData.DDLValues.DDLGender" key="constant"
+                              keyName="description"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.genderValue"
+                              name="genderValue"></app-input-control>
+                          </div>
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="date" label="Date of Birth"
+                              [required]="true" [errorTrue]="errorTrue" [isAdult]="true"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.dateOfBirth"
+                              name="dateOfBirth232"></app-input-control>
+                          </div>
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="select" label="Nationality"
+                              [required]="true" [errorTrue]="errorTrue" [items]="initialData.DDLValues.DDLNationality"
+                              key="constant" keyName="description"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.nationalityValue"
+                              name="nationalityValue"></app-input-control>
+                          </div>
+                          @if(investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.nationalityValue
+                          === 'OTHER') {
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="text" label="Other Nationality"
+                              [required]="true" [errorTrue]="errorTrue"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.otherNationality"
+                              name="otherNationality"></app-input-control>
+                          </div>
+                          }
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="select" label="Martial Status"
+                              [required]="true" [errorTrue]="errorTrue" [items]="initialData.DDLValues.DDLMartialStatus"
+                              key="constant" keyName="description"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.maritalStatusValue"
+                              name="maritalStatusValue"></app-input-control>
+                          </div>
+
+                          <div class="col-md-4">
+                            <app-check-box label="Are you currently outside Fiji?"
+                              [objArray]="[{label: 'Yes', trueValue: 'Y', falseValue: ''}, {label: 'No', trueValue: 'N', falseValue: ''}]"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.currentlyOutsideOfFiji"
+                              name="currentlyOutsideOfFiji4634" [required]="true"
+                              [errorTrue]="errorTrue"></app-check-box>
+                          </div>
+
+                          @if(investorParams.pentInvestorPermitApplication.currentlyOutsideOfFiji ===
+                          'Y'){
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" label="Intended Date of Arrival" type="date"
+                              [required]="true" [errorTrue]="errorTrue"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.indentedArraivalDate"
+                              name="indentedArraivalDate" [minDate]="appService.getCurrentDate()"></app-input-control>
+                          </div>
+                          }
+
+                          <div class="check-lb col-md-12">
+                            Are you already in the Fiji Islands, please provide the following information:
+                          </div>
+                          <div class="col-md-12">
+                            <div class="step-lg-title">Current Permit Details</div>
+                          </div>
+
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="text" label="Permit No"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.existingPermitNumber"
+                              name="existingPermitNumber1"></app-input-control>
+                          </div>
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="date" label="Date of Entry"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.existingDateOfEntry"
+                              [maxDate]="appService.getCurrentDate()" name="existingDateOfEntry"></app-input-control>
+                          </div>
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="text" label="Port of Entry"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.existingPortOfEntry"
+                              name="existingPortOfEntry"></app-input-control>
+                          </div>
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="select" label="Type of Permit"
+                              [items]="initialData.DDLValues.DDLPermitCat" key="constant" keyName="description"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.typeOfExistingPermitValue"
+                              name="typeOfExistingPermitValue"></app-input-control>
+                          </div>
+
+                        </row>
+
+                        <!-- PASSPORT DETAIL -->
+                        <row className="pt16">
+                          <div class="col-md-2">
+                            <div class="lg-label-header dark-lb pb8">
+                              Passport Details
+                            </div>
+                            <div class="text-gray-border-bottom-1"></div>
+                          </div>
+                        </row>
+                        <row className="pt26">
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="text" label="Passport Number"
+                              [required]="true" [errorTrue]="errorTrue"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.passportNumber"
+                              name="passportNumber"></app-input-control>
+                          </div>
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="select" label="Country Of Passport"
+                              [required]="true" [errorTrue]="errorTrue" [items]="initialData.DDLValues.DDLNationality"
+                              key="constant" keyName="description"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.countryOfPassportValue"
+                              name="countryOfPassportValue1"></app-input-control>
+                          </div>
+
+                          @if(investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.countryOfPassportValue
+                          === 'OTHER') {
+                          <app-input-control className="white-input" type="text" label="Other Country Of Passport"
+                            [required]="true" [errorTrue]="errorTrue"
+                            [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.otherCountry"
+                            name="otherCountry1"></app-input-control>
+                          }
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="text" label="Place of Issue"
+                              [required]="true" [errorTrue]="errorTrue"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.placeOfIssue"
+                              name="placeOfIssue"></app-input-control>
+                          </div>
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="date" label="Date of Issue"
+                              [required]="true" [errorTrue]="errorTrue"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.dateOfIssue"
+                              [maxDate]="appService.getCurrentDate()" name="dateOfIssue"></app-input-control>
+                          </div>
+                          <div class="col-md-4">
+                            <app-input-control className="white-input" type="date" label="Date of Expiry"
+                              [required]="true" [errorTrue]="errorTrue"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.dateOfExpiry"
+                              [minDate]="appService.getCurrentDate()"
+                              [addMaxMonth]="appSetting.environment.passportDateValidateMonth" [isFuture]="true"
+                              name="dateOfExpiry"></app-input-control>
+                          </div>
+
+
+                        </row>
+
+                        <div class="dashed-border"></div>
+                        <row>
+                          <div class="col-md-12 pt16 pb8">
+                            <app-check-box type="horDisabledValueLeft" label="Other Current Passport Details (If Yes)"
+                              [objArray]="[{ label: 'Yes', trueValue: 'Y', falseValue: '' },{ label: 'No', trueValue: 'N', falseValue: '' }]"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.isAnyOtherPassport"
+                              name="isAnyOtherPassport" [btnClicked]="true"></app-check-box>
+                          </div>
+                          @if(investorParams.pentInvestorPermitApplication
+                          .pentInvestorPermitApplicationPrimaryApplicantDetail
+                          .isAnyOtherPassport === 'Y'){
+                          <div class="col-md-12">
+                            <row>
+                              <div class="col-md-9">
+                                <table class="specific_table">
+                                  <thead class="app-table-header">
+                                    <tr class="app-table-header-row">
+                                      <th rowspan="2" class="app-table-header-cell">
+                                        <div class="table-flex pb8">
+                                          <span>Passport No</span>
+                                        </div>
+                                        <div class="">Country Of Passport</div>
+                                      </th>
+                                      <th class="app-table-header-cell">
+                                        <div class="table-flex">
+                                          <span>Place of Issue</span>
+                                        </div>
+                                      </th>
+                                      <th class="app-table-header-cell">
+                                        <div class="table-flex">
+                                          <span>Date of Issue</span>
+                                        </div>
+                                      </th>
+                                      <th class="app-table-header-cell">
+                                        <div class="table-flex">
+                                          <span>Date of Expiry</span>
+                                        </div>
+                                      </th>
+                                    </tr>
+                                  </thead>
+                                  <tbody class="app-table-body">
+
+                                    <tr class="app-table-row">
+                                      <td rowspan="2" class="cell-content">
+                                        <div>
+                                          {{
+                                          investorParams.pentInvestorPermitApplication
+                                          .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                          .pentInvestorPermitApplicationPrimaryApplicantOtherPassports
+                                          .passportNumber
+                                          }}
+                                        </div>
+                                        <div class="pt16">
+                                          {{
+                                          investorParams.pentInvestorPermitApplication
+                                          .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                          .pentInvestorPermitApplicationPrimaryApplicantOtherPassports
+                                          .countryOfPassportDescription
+                                          }}
+                                        </div>
+                                      </td>
+                                      <td class="cell-content">
+                                        {{
+                                        investorParams.pentInvestorPermitApplication
+                                        .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                        .pentInvestorPermitApplicationPrimaryApplicantOtherPassports
+                                        .placeOfIssue
+                                        }}
+                                      </td>
+                                      <td class="cell-content">
+                                        {{
+                                        investorParams.pentInvestorPermitApplication
+                                        .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                        .pentInvestorPermitApplicationPrimaryApplicantOtherPassports
+                                        .dateOfIssue | appDate
+                                        }}
+                                      </td>
+                                      <td class="cell-content">
+                                        {{
+                                        investorParams.pentInvestorPermitApplication
+                                        .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                        .pentInvestorPermitApplicationPrimaryApplicantOtherPassports
+                                        .dateOfExpiry | appDate
+                                        }}
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </div>
+                            </row>
+                          </div>
+                          }
+                        </row>
+
+                        <div class="dashed-border mb26"></div>
+
+                        <row>
+                          <div class="col-md-12 p-0">
+                            <app-check-box label="Did you held any previous passport(s) ?" type="horDisabledValueLeft"
+                              [objArray]="objArray"
+                              [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.isAnyPreviousPassports"
+                              name="isAnyPreviousPassports"></app-check-box>
+                          </div>
+                        </row>
+
+                        @if(investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.isAnyPreviousPassports
+                        === 'Y') {
+                        <row>
+                          <!-- <div class="col-md-4">
+                            <app-label type="verticalText" header="Country Of Passport" value="{{
+                                                            investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.
+                                                            pentInvestorPermitApplicationPrimaryApplicantPreviousPassports.countryOfPassportDescription
+                                                          }}"></app-label>
+                          </div> -->
+                          @if(investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.pentInvestorPermitApplicationPrimaryApplicantPreviousPassports.countryOfPassportValue
+                          === 'OTHER') {
+                          <div class="col-md-4">
+                            <app-label type="verticalText" header="Other Country Of Passport" value="{{
+                                                            investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.
+                                                            pentInvestorPermitApplicationPrimaryApplicantPreviousPassports.otherCountry
+                                                          }}"></app-label>
+                          </div>
+                          }
+                        </row>
+                        <row>
+                          <div class="col-md-12">
+                            <!-- <row>
+                                  <div class="col-md-9"> -->
+                            <table class="specific_table">
+                              <thead class="app-table-header">
+                                <tr class="app-table-header-row">
+                                  <th rowspan="2" class="app-table-header-cell">
+                                    <div class="table-flex pb8">
+                                      <span>Passport No</span>
+                                    </div>
+                                    <div>Country Of Passport</div>
+                    
+                                  </th>
+                                  <th class="app-table-header-cell">
+                                    <div class="table-flex">
+                                      <span>Place of Issue</span>
+                                    </div>
+                                  </th>
+                                  <th class="app-table-header-cell">
+                                    <div class="table-flex">
+                                      <span>Date of Issue</span>
+                                    </div>
+                                  </th>
+                                  <th class="app-table-header-cell">
+                                    <div class="table-flex">
+                                      <span>Date of Expiry</span>
+                                    </div>
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody class="app-table-body">
+                                <!-- @if(investorParams.recommendationValue ===
+                                          'vvvvv' || investorParams.recommendationValue
+                                          === 'MMMM'){ } @else{ -->
+                                <tr class="app-table-row">
+                                  <td rowspan="2" class="cell-content">
+                                    <div>
+                                      {{
+                                      investorParams.
+                                      pentInvestorPermitApplication.
+                                      pentInvestorPermitApplicationPrimaryApplicantDetail.
+                                      pentInvestorPermitApplicationPrimaryApplicantPreviousPassports.passportNumber
+                                      }}
+                                    </div>
+                                    <div class="pt16"> {{
+                                      investorParams.
+                                      pentInvestorPermitApplication.
+                                      pentInvestorPermitApplicationPrimaryApplicantDetail.
+                                      pentInvestorPermitApplicationPrimaryApplicantPreviousPassports.countryOfPassportDescription
+                                      }}</div>
+
+                                  </td>
+                                  <td class="cell-content">
+                                    {{
+                                    investorParams.
+                                    pentInvestorPermitApplication.
+                                    pentInvestorPermitApplicationPrimaryApplicantDetail.
+                                    pentInvestorPermitApplicationPrimaryApplicantPreviousPassports.placeOfIssue
+                                    }}
+                                  </td>
+                                  <td class="cell-content">
+                                    {{
+                                    investorParams.
+                                    pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.
+                                    pentInvestorPermitApplicationPrimaryApplicantPreviousPassports.dateOfIssue | appDate
+                                    }}
+                                  </td>
+                                  <td class="cell-content">
+                                    {{
+                                    investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.
+                                    pentInvestorPermitApplicationPrimaryApplicantPreviousPassports.dateOfExpiry |
+                                    appDate
+                                    }}
+                                  </td>
+                                </tr>
+                                <!-- } -->
+                              </tbody>
+                            </table>
+                            <!-- </div>
+                                </row> -->
+                          </div>
+                        </row>
+                        }
+
+                        }
+
+                      </form>
+                      @if(investorParams.statusValue !== 'APINP') {
+                      <row>
+                        <div class="col-md-2">
+                          <div class="lg-label-header dark-lb pb8">
+                            Personal Details
+                          </div>
+                          <div class="text-gray-border-bottom-1"></div>
+                        </div>
+                      </row>
+                      <row>
+                        @if(investorParams.applicationTypeValue === 'EXTEN') {
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Existing Permit Number" value="{{
+                              investorParams.exisitingPermitNumber
+                            }}"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Preferred Title" value="{{
+                                                  investorParams.pentInvestorPermitApplication
+                                                    .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                                    .preferredTitleValue
+                                                }}"></app-label>
+                        </div>
+                        @if(investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.
+                        preferredTitleValue === 'OTHER') {
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Other Title" value="{{
+                                                  investorParams.pentInvestorPermitApplication
+                                                    .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                                    .otherTitle
+                                                }}"></app-label>
+                        </div>
+                        } @else {
+                        <div class="col-md-4"></div>
+                        }
+                        } @else {
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Preferred Title" value="{{
+                                                    investorParams.pentInvestorPermitApplication
+                                                      .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                                      .preferredTitleValue
+                                                  }}"></app-label>
+                        </div>
+                        @if(investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.
+                        preferredTitleValue === 'OTHER') {
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Other Title" value="{{
+                                                    investorParams.pentInvestorPermitApplication
+                                                      .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                                      .otherTitle
+                                                  }}"></app-label>
+                        </div>
+                        } @else {
+                        <div class="col-md-4"></div>
+                        }
+                        <div class="col-md-4"></div>
+                        }
+
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Given Name" value="{{
+                                                    investorParams.pentInvestorPermitApplication
+                                                      .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                                      .givenNames
+                                                  }}"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Surname" value="{{
+                                                    investorParams.pentInvestorPermitApplication
+                                                      .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                                      .surname
+                                                  }}"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Gender" value="{{
+                                                  investorParams.pentInvestorPermitApplication
+                                                    .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                                    .genderDescription
+                                                }}"></app-label>
+                        </div>
+                      </row>
+
+                      <row>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Contact No" value="{{
+                                                investorParams.pentInvestorPermitApplication
+                                                  .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                                  .mobileNo
+                                              }}"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Email Id" value="{{
+                                                investorParams.pentInvestorPermitApplication
+                                                  .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                                  .emailId
+                                              }}"></app-label>
+                        </div>
+                      </row>
+                      <row>
+                        <div class="col-md-12 pt8">
+                          <app-check-box type="horDisabledValueLeft" label="Any other name Applicant known by"
+                            [objArray]="[{label: 'Yes', trueValue: 'Y', falseValue: ''}, {label: 'No', trueValue: 'N', falseValue: ''}]"
+                            [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.isAnyOtherName"
+                            name="isAnyOtherName"></app-check-box>
+                        </div>
+                      </row>
+                      <row>
+                        @if(investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.isAnyOtherName
+                        === 'Y') {
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Other Given Name" value="{{
+                                                investorParams.pentInvestorPermitApplication.
+                                                pentInvestorPermitApplicationPrimaryApplicantDetail.otherGivenNames
+                                              }}"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Other Surname" value="{{
+                                                investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.
+                                                otherSurname
+                                              }}"></app-label>
+                        </div>
+                        }
+                      </row>
+                      <row>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Date of Birth" value="{{
+                                                  investorParams.pentInvestorPermitApplication
+                                                    .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                                    .dateOfBirth | appDate
+                                                }}"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Nationality" value="{{
+                                                  investorParams.pentInvestorPermitApplication
+                                                    .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                                    .nationalityDescription
+                                                }}"></app-label>
+                        </div>
+                        @if(investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.nationalityValue
+                        === 'OTHER') {
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Other Nationality" value="{{
+                                                  investorParams.pentInvestorPermitApplication
+                                                    .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                                    .otherNationality
+                                                }}"></app-label>
+                        </div>
+                        }
+                      </row>
+                      <row>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Martial Status" value="{{
+                                                  investorParams.pentInvestorPermitApplication
+                                                    .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                                    .maritalStatusDescription
+                                                }}"></app-label>
+                        </div>
+                        @if(investorParams.pentInvestorPermitApplication.currentlyOutsideOfFiji
+                        === "N"){
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Intended Arrival Date" value="{{investorParams.pentInvestorPermitApplication
+                                      .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                      .dateOfBirth | appDate}}">
+                          </app-label>
+                        </div>
+                        }
+                      </row>
+
+                      <!-- <row> -->
+                      <div class="check-lb px-1 pt8">
+                        Are you already in the Fiji Islands, please prove the following information:
+                      </div>
+                      <row>
+                        <div class="col-md-12">
+                          <div class="step-lg-title">Current Permit Details</div>
+                        </div>
+                      </row>
+
+                      <row>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Permit No" value="{{investorParams.pentInvestorPermitApplication.
+                              pentInvestorPermitApplicationPrimaryApplicantDetail.existingPermitNumber
+                                }}">
+                          </app-label>
+                        </div>
+                      </row>
+                      <row>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Date of Entry" value="{{investorParams.pentInvestorPermitApplication.
+                              pentInvestorPermitApplicationPrimaryApplicantDetail.existingDateOfEntry | appDate : 'datetime'
+                                }}">
+                          </app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Port of Entry" value="{{investorParams.pentInvestorPermitApplication.
+                              pentInvestorPermitApplicationPrimaryApplicantDetail.existingPortOfEntry
+                                }}">
+                          </app-label>
+                        </div>
+                      </row>
+                      <row>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Type of Permit" value="{{investorParams.pentInvestorPermitApplication.
+                              pentInvestorPermitApplicationPrimaryApplicantDetail.typeOfExistingPermitDescription
+                                }}">
+                          </app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Permit Expiry Date" value="{{investorParams.pentInvestorPermitApplication.
+                              pentInvestorPermitApplicationPrimaryApplicantDetail.existingPermitExpiryDate | appDate : 'datetime'
+                                }}">
+                          </app-label>
+                        </div>
+                      </row>
+                      <!-- </row> -->
+                      <!-- / -->
+
+                      <!-- PASSPORT DETAIL -->
+                      <row className="pt26">
+                        <div class="col-md-2">
+                          <div class="lg-label-header dark-lb pb8">
+                            Passport Details
+                          </div>
+                          <div class="text-gray-border-bottom-1"></div>
+                        </div>
+                      </row>
+                      <row>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Country of Passport " value="{{
+                                                  investorParams.pentInvestorPermitApplication
+                                                    .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                                    .countryOfPassportDescription
+                                                }}"></app-label>
+                        </div>
+                        @if(investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.countryOfPassportValue
+                        === 'OTHER') {
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Other Country Of Passport"
+                            value="{{investorParams.pentInvestorPermitApplication.
+                                                        pentInvestorPermitApplicationPrimaryApplicantDetail.otherCountry}}">
+                          </app-label>
+                        </div>
+                        }
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Passport Number" value="{{
+                                                  investorParams.pentInvestorPermitApplication
+                                                    .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                                    .passportNumber
+                                                }}"></app-label>
+                        </div>
+                      </row>
+                      <row>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Date of Issue" value="{{
+                                                  investorParams.pentInvestorPermitApplication
+                                                    .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                                    .dateOfIssue | appDate : 'datetime'
+                                                }}"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Date of Expiry" value="{{
+                                                  investorParams.pentInvestorPermitApplication
+                                                    .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                                    .dateOfExpiry | appDate : 'datetime'
+                                                }}"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Place of Issue" value="{{
+                                                  investorParams.pentInvestorPermitApplication
+                                                    .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                                    .placeOfIssue
+                                                }}"></app-label>
+                        </div>
+                      </row>
+
+                      <div class="dashed-border mb8"></div>
+                      <!-- Paste here -->
+                      <!-- @if(investorParams.permitTypeValue !== 'OVEE1') { -->
+                      <!-- <row>
+                          <div class="col-md-12 pt2"> -->
+                      <app-check-box type="horDisabledValueLeft" label="Other Current Passport Details (If Yes)"
+                        [objArray]="[
+                                                                          { label: 'Yes', trueValue: 'Y', falseValue: '' },
+                                                                          { label: 'No', trueValue: 'N', falseValue: '' }
+                                                                        ]" [(ngModel)]="
+                                                                          investorParams.pentInvestorPermitApplication
+                                                                            .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                                                            .isAnyOtherPassport
+                                                                        " [btnClicked]="true"></app-check-box>
+                      <!-- </div>
+                        </row> -->
+
+                      @if(investorParams.pentInvestorPermitApplication
+                      .pentInvestorPermitApplicationPrimaryApplicantDetail
+                      .isAnyOtherPassport === 'Y'){
+                      <!-- <div class="col-md-4">
+                        <app-label type="verticalText" header="Country Of Passport" value="{{
+                                                                          investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.
+                                                                          pentInvestorPermitApplicationPrimaryApplicantOtherPassports.countryOfPassportDescription
+                                                                        }}"></app-label>
+                      </div> -->
+                      @if(investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.pentInvestorPermitApplicationPrimaryApplicantOtherPassports.countryOfPassportValue
+                      === 'OTHER') {
+                      <div class="col-md-4">
+                        <app-label type="verticalText" header="Other Country Of Passport" value="{{
+                              investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.
+                              pentInvestorPermitApplicationPrimaryApplicantOtherPassports.otherCountry
+                            }}"></app-label>
+                      </div>
+                      }
+                      <div class="col-md-12">
+                        <row>
+                          <div class="col-md-9">
+                            <table class="specific_table">
+                              <thead class="app-table-header">
+                                <tr class="app-table-header-row">
+                                  <th rowspan="2" class="app-table-header-cell">
+                                    <div class="table-flex pb8">
+                                      <span>Passport No</span>
+                                    </div>
+                                    <div>Country of Passport</div>
+                                  </th>
+                                  <th class="app-table-header-cell">
+                                    <div class="table-flex">
+                                      <span>Place of Issue</span>
+                                    </div>
+                                  </th>
+                                  <th class="app-table-header-cell">
+                                    <div class="table-flex">
+                                      <span>Date of Issue</span>
+                                    </div>
+                                  </th>
+                                  <th class="app-table-header-cell">
+                                    <div class="table-flex">
+                                      <span>Date of Expiry</span>
+                                    </div>
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody class="app-table-body">
+                                <!-- @if(investorParams.recommendationValue ===
+                                      'vvvvv' || investorParams.recommendationValue
+                                      === 'MMMM'){ } @else{ -->
+                                <tr class="app-table-row">
+                                  <td rowspan="2" class="cell-content">
+                                    <div>
+                                      {{
+                                      investorParams.pentInvestorPermitApplication
+                                      .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                      .pentInvestorPermitApplicationPrimaryApplicantOtherPassports
+                                      .passportNumber
+                                      }}
+                                    </div>
+                                    <div class="pt16">
+                                      {{
+                                      investorParams.pentInvestorPermitApplication
+                                      .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                      .pentInvestorPermitApplicationPrimaryApplicantOtherPassports
+                                      .countryOfPassportDescription
+                                      }}
+                                    </div>
+                                  </td>
+                                  <td class="cell-content">
+                                    {{
+                                    investorParams.pentInvestorPermitApplication
+                                    .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                    .pentInvestorPermitApplicationPrimaryApplicantOtherPassports
+                                    .placeOfIssue
+                                    }}
+                                  </td>
+                                  <td class="cell-content">
+                                    {{
+                                    investorParams.pentInvestorPermitApplication
+                                    .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                    .pentInvestorPermitApplicationPrimaryApplicantOtherPassports
+                                    .dateOfIssue | appDate
+                                    }}
+                                  </td>
+                                  <td class="cell-content">
+                                    {{
+                                    investorParams.pentInvestorPermitApplication
+                                    .pentInvestorPermitApplicationPrimaryApplicantDetail
+                                    .pentInvestorPermitApplicationPrimaryApplicantOtherPassports
+                                    .dateOfExpiry | appDate
+                                    }}
+                                  </td>
+                                </tr>
+                                <!-- } -->
+                              </tbody>
+                            </table>
+                          </div>
+                        </row>
+                      </div>
+                      }
+                      <div class="dashed-border mb8"></div>
+                      <row>
+                        <div class="col-md-12 p-0">
+                          <app-check-box label="Did you held any previous passport(s) ?" type="horDisabledValueLeft"
+                            [objArray]="objArray"
+                            [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.isAnyPreviousPassports"
+                            name="isAnyPreviousPassports"></app-check-box>
+                        </div>
+                      </row>
+
+                      @if(investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.isAnyPreviousPassports
+                      === 'Y') {
+                      <row>
+                        <!-- <div class="col-md-4">
+                          <app-label type="verticalText" header="Country Of Passport" value="{{
+                                                          investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.
+                                                          pentInvestorPermitApplicationPrimaryApplicantPreviousPassports.countryOfPassportDescription
+                                                        }}"></app-label>
+                        </div> -->
+                        @if(investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.pentInvestorPermitApplicationPrimaryApplicantPreviousPassports.countryOfPassportValue
+                        === 'OTHER') {
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Other Country Of Passport" value="{{
+                                                          investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.
+                                                          pentInvestorPermitApplicationPrimaryApplicantPreviousPassports.otherCountry
+                                                        }}"></app-label>
+                        </div>
+                        }
+                      </row>
+                      <row>
+                        <div class="col-md-12">
+                          <!-- <row>
+                                <div class="col-md-9"> -->
+                          <table class="specific_table">
+                            <thead class="app-table-header">
+                              <tr class="app-table-header-row">
+                                <th rowspan="2" class="app-table-header-cell">
+                                  <div class="table-flex pb8">
+                                    <span>Passport No</span>
+                                    <div class="pt16">Country Of Passport</div>
+                                  </div>
+                                </th>
+                                <th class="app-table-header-cell">
+                                  <div class="table-flex">
+                                    <span>Place of Issue</span>
+                                  </div>
+                                </th>
+                                <th class="app-table-header-cell">
+                                  <div class="table-flex">
+                                    <span>Date of Issue</span>
+                                  </div>
+                                </th>
+                                <th class="app-table-header-cell">
+                                  <div class="table-flex">
+                                    <span>Date of Expiry</span>
+                                  </div>
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody class="app-table-body">
+                              <!-- @if(investorParams.recommendationValue ===
+                                        'vvvvv' || investorParams.recommendationValue
+                                        === 'MMMM'){ } @else{ -->
+                              <tr class="app-table-row">
+                                <td rowspan="2" class="cell-content">
+                                  <div>
+                                    {{
+                                    investorParams.
+                                    pentInvestorPermitApplication.
+                                    pentInvestorPermitApplicationPrimaryApplicantDetail.
+                                    pentInvestorPermitApplicationPrimaryApplicantPreviousPassports.passportNumber
+                                    }}
+                                  </div>
+                                  <div class="pt16">
+                                    {{
+                                    investorParams.
+                                    pentInvestorPermitApplication.
+                                    pentInvestorPermitApplicationPrimaryApplicantDetail.
+                                    pentInvestorPermitApplicationPrimaryApplicantPreviousPassports.countryOfPassportDescription
+                                    }}
+                                  </div>
+                                </td>
+                                <td class="cell-content">
+                                  {{
+                                  investorParams.
+                                  pentInvestorPermitApplication.
+                                  pentInvestorPermitApplicationPrimaryApplicantDetail.
+                                  pentInvestorPermitApplicationPrimaryApplicantPreviousPassports.placeOfIssue
+                                  }}
+                                </td>
+                                <td class="cell-content">
+                                  {{
+                                  investorParams.
+                                  pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.
+                                  pentInvestorPermitApplicationPrimaryApplicantPreviousPassports.dateOfIssue | appDate
+                                  }}
+                                </td>
+                                <td class="cell-content">
+                                  {{
+                                  investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.
+                                  pentInvestorPermitApplicationPrimaryApplicantPreviousPassports.dateOfExpiry | appDate
+                                  }}
+                                </td>
+                              </tr>
+                              <!-- } -->
+                            </tbody>
+                          </table>
+                          <!-- </div>
+                              </row> -->
+                        </div>
+                      </row>
+                      }
+
+                      <div class="dashed-border"></div>
+                      <!-- <div class="dashed-border mt26 mb26"></div> -->
+                      <!-- } -->
+
+                      <!-- @if(investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.length
+                            > 0) { -->
+
+                      }
+
+                      <row>
+                        <div class="col-md-2 pt8">
+                          <div class="lg-label-header dark-lb pb8">
+                            Address Details
+                          </div>
+                          <div class="text-gray-border-bottom-1"></div>
+                        </div>
+                      </row>
+                      <row>
+                        <div class="col-md-4">
+                          <div class="home-address-container">
+                            <div class="home-address-header">
+                              Residential Address
+                            </div>
+                            <div class="home-address-content">
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentResidentialAddress.line1
+                              }},
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentResidentialAddress.line2
+                              }},
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentResidentialAddress.line3
+                              }}
+                              <br />
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentResidentialAddress.cityTown
+                              }}
+                              <br />
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentResidentialAddress.provinceState
+                              }},
+                              <br />
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentResidentialAddress.countryDescription
+                              ? investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentResidentialAddress.countryDescription
+                              : "-"
+                              }}
+                              <br />
+                              @if(investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.pentResidentialAddress.countryValue
+                              === 'OTHER') {
+                              {{
+                              investorParams.pentInvestorPermitApplication.
+                              pentInvestorPermitApplicationPrimaryApplicantDetail.
+                              pentResidentialAddress.country
+                              ? investorParams.pentInvestorPermitApplication.
+                              pentInvestorPermitApplicationPrimaryApplicantDetail.
+                              pentResidentialAddress.country
+                              : "-"
+                              }}
+                              }
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="home-address-container">
+                            <div class="home-address-header">
+                              Postal Address
+                            </div>
+                            <div class="home-address-content">
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentPostalAddress.line1
+                              }},
+                              <br />
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentPostalAddress.line2
+                              }},
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentPostalAddress.line3
+                              }}
+                              <br />
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentPostalAddress.cityTown
+                              }}
+                              <br />
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentPostalAddress.provinceState
+                              }},
+                              <br />
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentPostalAddress.countryDescription
+                              ? investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentPostalAddress.countryDescription
+                              : "-"
+                              }}
+                              <br />
+                              @if(investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.pentResidentialAddress.countryValue
+                              === 'OTHER') {
+                              {{
+                              investorParams.pentInvestorPermitApplication.
+                              pentInvestorPermitApplicationPrimaryApplicantDetail.
+                              pentResidentialAddress.country
+                              ? investorParams.pentInvestorPermitApplication.
+                              pentInvestorPermitApplicationPrimaryApplicantDetail.
+                              pentResidentialAddress.country
+                              : "-"
+                              }}
+                              }
+                            </div>
+                          </div>
+                        </div>
+                      </row>
+                      <row className="mt16">
+                        <div class="col-md-4">
+                          <div class="home-address-container">
+                            <div class="home-address-header">
+                              Intended Residential Address in Fiji
+                            </div>
+                            <div class="home-address-content">
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedResidentialAddress.line1
+                              }},
+                              <br />
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedResidentialAddress
+                              .postBoxNoLocation
+                              }},
+                              <br />
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedResidentialAddress
+                              .provinceDescription
+                              }},
+                              <br />
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedResidentialAddress
+                              .islandDescription
+                              }},
+                              <br />
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedResidentialAddress
+                              .tikinaDescription
+                              }}
+                              <br />
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedResidentialAddress
+                              .cityTown
+                              }}
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="home-address-container">
+                            <div class="home-address-header">
+                              Intended Postal Address in Fiji
+                            </div>
+                            <div class="home-address-content">
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedPostalAddress.line1
+                              }},
+                              <br />
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedPostalAddress.postBoxNoLocation
+                              }},
+                              <br />
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedPostalAddress
+                              .provinceDescription
+                              }},
+                              <br />
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedPostalAddress
+                              .islandDescription
+                              }},
+                              <br />
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedPostalAddress
+                              .tikinaDescription
+                              }}
+                              <br />
+                              {{
+                              investorParams.pentInvestorPermitApplication
+                              .pentInvestorPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedPostalAddress
+                              .cityTown
+                              }}
+                            </div>
+                          </div>
+                        </div>
+                      </row>
+
+                      <div _ngcontent-ng-c1456055678="" class="dashed-border mt26"></div>
+                      <row>
+                        <div class="col-md-2 pt8">
+                          <div class="lg-label-header dark-lb pb8">
+                            Conviction Offenses
+                          </div>
+                          <div class="text-gray-border-bottom-1"></div>
+                        </div>
+                      </row>
+                      <div class="v-flex h100">
+                        <div class="checkbox-success-container pt8">
+                          <ul>
+                            @for (item of investorParams .pentInvestorPermitApplication
+                            .pentInvestorPermitApplicationPrimaryApplicantDetail.plstentInvestorPermitApplicationCharacterDeclaration;
+                            track $index) {
+                            <li>
+                              <div class="checkbox-success">
+                                <app-check-box type="horCheckWithoutError" [label]="item.declaration"
+                                  [objArray]="[{label: 'Yes', trueValue: 'Y', falseValue: ''}, {label: 'No', trueValue: 'N', falseValue: ''}]"
+                                  [(ngModel)]="item.isChecked" [btnClicked]="true"
+                                  name="isCheckedD{{$index}}"></app-check-box>
+                              </div>
+                            </li>
+                            }
+                          </ul>
+                        </div>
+                        <div class="pt8 pb8">
+                          <app-input-control label="Comments" designType="textarea" [maxCharacterLength]="true"
+                            [maxLength]="appSetting.environment.wordLimits"
+                            [(ngModel)]="investorParams.pentInvestorPermitApplication.pentInvestorPermitApplicationPrimaryApplicantDetail.ientInvestorPermitApplicationDeclarationComment.comments"
+                            name="comments" [btnClicked]="true" [noEmoji]="true"
+                            className="textarea"></app-input-control>
+                        </div>
+                      </div>
+                    </div>
+                  </scroll>
+                </div>
+              </div>
+            </app-tab-vertical>

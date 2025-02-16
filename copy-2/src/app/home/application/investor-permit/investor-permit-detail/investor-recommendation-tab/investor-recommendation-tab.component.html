@@ -1,0 +1,56 @@
+<div class="v-flex h100">
+	<div class="flex-1 relative">
+		<scroll>
+			@for(item of investorParams.plstentPermitApplicationRecommendation; track item; let x = $index){
+			<accordion>
+				<accordion-item [isOpen]="true">
+					<accordion-header>
+						<div class="accordion-header-content">
+							<div class="accordion-title dis-flex w100">
+								<div class="accordian-title-header col-md-6">
+									{{item.stageDescription}}
+								</div>
+								<div class="d-flex g36 col-md-6">
+									<div class="d-flex gap-5 slot-right-content accordion_sub-lb pr24">
+										Current Action: <span class="pl8">{{item.currentActionDescription}}</span>
+									</div>
+									<div class="d-flex gap-15 slot-right-content accordion_sub-lb">
+										Current Officer: <span class="pl8">{{item.currentOfficerFullName}}</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</accordion-header>
+					<accordion-body>
+						<div>
+							<div class="d-flex accord-body-header ">
+								@for(accLst of accordionTabList; track accLst; let j = $index){
+								<div (click)="doSwap(x,j,item)" class="pointer tab-header accord-body-header-text"
+									[ngClass]="{ 'selected-text-color':  item.tabIndex === j  }">
+									{{accLst.tabTitle}}
+								</div>
+								@if (accordionTabList.length-1 !== j) {
+								<div class="text-gray-border-right"></div>
+								}
+								}
+								<div class="align-items-center checked px-2">
+									Checked
+									<span>({{item.checkedCount ? item.checkedCount : 0 }})</span>
+								</div>
+								<div class="align-items-center un-checked">
+									Unchecked
+									<span>({{item.uncheckedCount ? item.uncheckedCount : 0}})</span>
+								</div>
+							</div>
+							<app-investor-recommendation-content [index]="item.tabIndex" [item]="item" [parentObj]="investorParams"
+								(parentData)="getPermitData($event)" (checkLstCount)="getCheckLstCount($event, item)" (getRecommend)="savePermitRecommendation($event)">
+							</app-investor-recommendation-content>
+						</div>
+					</accordion-body>
+				</accordion-item>
+			</accordion>
+			}
+		</scroll>
+	</div>
+
+</div>

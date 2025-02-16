@@ -1,0 +1,1607 @@
+<div class="body-pattern h100">
+  <div class="v-flex detail-card">
+    <div class="header-panel between">
+      <div class="header-label">
+        Appeal Detail
+      </div>
+    </div>
+    <div class="home-card-panel">
+      <row>
+        <div class="col-md-10">
+          <row>
+            <div class="col-md-3 p0">
+              <div class="pb16">
+                <row>
+                  <div class="col-md-6 p0 ">
+                    <div class="app-label-header">Application No: </div>
+                  </div>
+                  <div class="col-md-6 p0">
+                    <div class="app-label-value">{{appeal.permitApplicationNo}}</div>
+                  </div>
+                </row>
+              </div>
+              <div class="pb16">
+                <row>
+                  <div class="col-md-6 p0 ">
+                    <div class="app-label-header">Applicant Name: </div>
+                  </div>
+                  <div class="col-md-6 p0">
+                    <div class="app-label-value">
+                      {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.surname}}  {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.givenNames}}
+                    </div>
+                  </div>
+                </row>
+              </div>
+              <div class="pb16">
+                <row>
+                  <div class="col-md-6 p0 ">
+                    <div class="app-label-header">Passport No :</div>
+                  </div>
+                  <div class="col-md-6 p0">
+                    <div class="app-label-value">
+                      {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.passportNumber}}
+                    </div>
+                  </div>
+                </row>
+              </div>
+            </div>
+            <div class="col-md-3 p0">
+              <div class="pb16">
+                <row>
+                  <div class="col-md-6 p0 ">
+                    <div class="app-label-header ">Assigned By :</div>
+                  </div>
+                  <div class="col-md-6 p0">
+                    <div class="app-label-value">
+                      <!-- {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.}} -->
+                    </div>
+                  </div>
+                </row>
+              </div>
+              <div class="pb16">
+                <row>
+                  <div class="col-md-6 p0 ">
+                    <div class="app-label-header">Assigned Date :</div>
+                  </div>
+                  <div class="col-md-6 p0">
+                    <div class="app-label-value"></div>
+                  </div>
+                </row>
+              </div>
+              <div class="pb16">
+                <row>
+                  <div class="col-md-6 p0">
+                    <div class="app-label-header">Permit No :</div>
+                  </div>
+                  <div class="col-md-6 p0">
+                    <div class="app-label-value"></div>
+                  </div>
+                </row>
+              </div>
+            </div>
+            <div class="col-md-4 p0">
+              <div class="pb16">
+                <app-label type="labelAndStatus" header="Stage" [value]="appeal.stageValue"></app-label>
+              </div>
+              <div class="pb16">
+                <app-label type="labelAndStatus" header="Status" [value]="appeal.statusValue"></app-label>
+              </div>
+              <div class="">
+                <app-label type="labelAndStatus" header="Current Action"
+                  [value]="appeal.currentActionValue"></app-label>
+              </div>
+
+            </div>
+            <div class="col-md-2  gradient-border-right-2">
+              <div class="status-percentage">Success Percentage</div>
+              <div class="w100 slot-center">
+                <app-circle-progress></app-circle-progress>
+              </div>
+            </div>
+          </row>
+        </div>
+
+        <div class="col-md-2 align-items-center ">
+          <row>
+            <div class="col-md-12">
+              <div class="pb8 color-1">
+                Controversial (2)
+              </div>
+              <div class="pb8 color-2">
+                Travel History (6)
+              </div>
+              <div class="pb8 color-3">
+                Uplift Of PI Status (4)
+              </div>
+              <div class="pb8 color-4">
+                DPO (2)
+              </div>
+            </div>
+          </row>
+        </div>
+
+      </row>
+    </div>
+    <div class="v-flex h100 horizontal-tab pt16">
+      <app-tab-group [isHorizontal]="false" class="tabs-groups" (tabChange)="onTabChange($event)">
+
+        <app-tab tabTitle="Required Info">
+          <div class="content-1 grey-card h100">
+            <div class="vertical-label py-1 ">
+              <label class="py-1"> Comments </label>
+              <div class="comment-text py-1">{{appeal.pentAppealApplicationRequiredInformation.comments}}
+              </div>
+            </div>
+            <div class="pt8"></div>
+            <div class="v-flex h100">
+              <div class="flex-1 relative">
+                <scroll>
+                  <app-table [columns]="documentColumn" [columnsName]="documentColumnName"
+                    (onSelect)="onSelected($event)" [hidePaginator]="false" [hideSelectAll]="true"
+                    [verticalLineRemove]="true" [dataSource]="recommendationData">
+
+                    <ng-template cellDef="documentType" let-element>
+
+                      {{element.documentTypeValue}}
+
+                    </ng-template>
+                    <ng-template cellDef="dependentName" let-element>
+
+                      <!-- {{element.expiryDate}} -->
+
+                    </ng-template>
+                    <ng-template cellDef="uploadFileName" let-element>
+
+                      {{element.pentDocumentFile.documentFileName}}
+
+                    </ng-template>
+                    <ng-template cellDef="documentNo" let-element>
+
+                      {{element.documentRefNo}}
+
+                    </ng-template>
+                    <ng-template cellDef="expiryDate" let-element>
+
+                      {{element.expiryDate}}
+
+                    </ng-template>
+
+                  </app-table>
+                </scroll>
+              </div>
+            </div>
+          </div>
+        </app-tab>
+        <app-tab tabTitle="Application">
+          <div class="vertical-tabs v-flex h100">
+            <app-tab-group-vertical class="tab-groups" (tabChange)="onTabChange($event)">
+              <app-tab-vertical tabTitle="Primary Applicant">
+                <div class="v-flex h100">
+                  <div class="flex-1 relative">
+                    <div class="ab">
+                      <div class="rel">
+                        <div class="vertical-bg">
+                          <row>
+                            <div class="col-md-2">
+                              <div class="labelHead pb8 p-1">
+                                Personal Details
+                              </div>
+                              <div class="text-gray-border-bottom-1"></div>
+                            </div>
+                          </row>
+                          <row>
+                            <div class="col-md-4">
+                              <app-label type="verticalText" header="Preferred Title"
+                                [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.preferredTitleValue"></app-label>
+                            </div>
+                            <div class="col-md-4">
+                              <app-label type="verticalText" header="Other Title"
+                                [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.otherTitle"></app-label>
+                            </div>
+                            <div class="col-md-4">
+                              <app-label type="verticalText" header="Surname"
+                                [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.surname"></app-label>
+                            </div>
+                          </row>
+                          <row>
+                            <div class="col-md-4">
+                              <app-label type="verticalText" header="Given Names"
+                                [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.givenNames"></app-label>
+
+                            </div>
+                            <div class="col-md-4">
+                              <app-label type="verticalText" header="Any other names Applicant known by"
+                                [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.isAnyOtherName"></app-label>
+                            </div>
+                            <div class="col-md-4">
+                              <app-check-box type="horcheckDisable" label="Gender"
+                              [objArray]="[{label: 'Yes', trueValue: 'Y', falseValue: ''},{label: 'No', trueValue: 'N', falseValue: ''}]"
+                              [(ngModel)]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.isAnyOtherPassport"
+                              name="isAnyOtherPassport"></app-check-box>
+                            </div>
+                          </row>
+                          <row>
+                            <div class="col-md-4">
+                              <app-label type="verticalText" header="Date of Birth"
+                                [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.dateOfBirth"></app-label>
+                            </div>
+                            <div class="col-md-4">
+                              <app-label type="verticalText" header="Nationality"
+                                [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.nationalityDescription"></app-label>
+                            </div>
+                            <div class="col-md-4">
+                              <app-label type="verticalText" header="Other Nationality"
+                                [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.otherNationality"></app-label>
+                            </div>
+                          </row>
+                          <row>
+
+                          </row>
+                          <row>
+                            <div class="col-md-4">
+                              <app-label type="verticalText" header="Martial Status"
+                                [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.maritalStatusDescription"></app-label>
+                            </div>
+
+                            <div class="col-md-4">
+                              <div class="cusmat-checkbox label-head">
+                                <app-check-box type="horcheckDisable" label="Is Currently Resident in Fiji"
+                                  [objArray]="[{label: '', trueValue: 'Y', falseValue: 'N'}]"
+                                  [(ngModel)]="appeal.pentWorkPermitApplicationInformation.currentlyOutsideOfFiji"
+                                  name="currentlyOutsideOfFiji"></app-check-box>
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <app-label type="verticalText" header="Date of Entry"
+                                [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.existingDateOfEntry"></app-label>
+                            </div>
+
+                          </row>
+                          <row>
+                            <div class="col-md-4">
+                              <app-label type="verticalText" header="Port of Entry"
+                                [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.existingPortOfEntry"></app-label>
+                            </div>
+                            <div class="col-md-4">
+                              <app-label type="verticalText" header="Type of Permit"
+                                [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.typeOfExistingPermitDescription"></app-label>
+                            </div>
+                            <div class="col-md-4">
+                              <app-label type="verticalText" header="Permit Expiry Date"
+                                [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.existingPermitExpiryDate"></app-label>
+                            </div>
+
+                          </row>
+
+                          <row className="pt26">
+                            <div class="col-md-2">
+                              <div class="labelHead pb8">
+                                Personal Details
+                              </div>
+                              <div class="text-gray-border-bottom-1"></div>
+                            </div>
+                          </row>
+                          <row>
+                            <div class="col-md-4">
+                              <app-label type="verticalText" header="Passport Number"
+                                [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.passportNumber"></app-label>
+                            </div>
+                            <div class="col-md-4">
+                              <app-label type="verticalText" header="Country of Passport "
+                                [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.countryOfPassportDescription"></app-label>
+                            </div>
+                            <div class="col-md-4">
+                              <app-label type="verticalText" header="Other Country"
+                                [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.otherCountry"></app-label>
+                            </div>
+                          </row>
+                          <row>
+                            <div class="col-md-4">
+                              <app-label type="verticalText" header="Date of Issue"
+                                [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.dateOfIssue"></app-label>
+                            </div>
+                            <div class="col-md-4">
+                              <app-label type="verticalText" header="Date of Expiry"
+                                [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.dateOfExpiry"></app-label>
+                            </div>
+                            <div class="col-md-4">
+                              <app-label type="verticalText" header="Place of Issue"
+                                [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.placeOfIssue"></app-label>
+                            </div>
+                          </row>
+                          <div class="dashed-border my-1"></div>
+                          <row>
+                            <div class="col-md-1"></div>
+
+
+                            <div clas="col-md-4 ">
+                              <div class="d-flex align-items-center pb8">
+                                <app-check-box type="horcheckDisable" label="Other Current Passport Details (If Yes)"
+                                  [objArray]="[{label: 'Yes', trueValue: 'Y', falseValue: ''},{label: 'No', trueValue: 'N', falseValue: ''}]"
+                                  [(ngModel)]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.isAnyOtherPassport"
+                                  name="isAnyOtherPassport"></app-check-box>
+                              </div>
+                            </div>
+                          </row>
+                          <row>
+                            <div class="col-md-9">
+                              <table class="specific_table">
+                                <thead class="app-table-header">
+                                  <tr class="app-table-header-row">
+                                    <th rowspan="2" class="app-table-header-cell">
+                                      <div class="table-flex pt8 size"><span>Passport No</span></div>
+                                      <div class="size ptb8">Country Of Passport</div>
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                      <div class="table-flex size"><span>Place of Issue</span></div>
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                      <div class="table-flex size"><span>Date of Issue</span></div>
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                      <div class="table-flex size"><span>Date of Expiry</span></div>
+                                    </th>
+
+                                  </tr>
+                                </thead>
+                                <tbody class="app-table-body ">
+
+                                  <tr class="app-table-row ">
+                                    <td rowspan="2" class="cell-content ">
+                                      <div class="size">
+                                        {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantOtherPassports.passportNumber}}
+                                      </div>
+                                      <div class="pt16 size">
+                                        {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantOtherPassports.countryOfPassportDescription}}
+                                      </div>
+
+                                    </td>
+                                    <td class="cell-content">
+                                      <div class="size">
+                                        {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantOtherPassports.placeOfIssue}}
+                                      </div>
+                                    </td>
+
+                                    <td class="cell-content">
+                                      <div class="size">
+                                        {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantOtherPassports.dateOfIssue}}
+                                      </div>
+                                    </td>
+                                    <td class="cell-content">
+                                      <div class="size">
+                                        {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantOtherPassports.dateOfExpiry}}
+                                      </div>
+                                    </td>
+
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </row>
+                          <div class="dashed-border my-1"></div>
+                          <row>
+
+                            <div class="col-md-1"></div>
+                            <div clas="col-md-4">
+                              <div class="d-flex align-items-center pb8">
+                                <app-check-box type="horcheckDisable" label="Is There Any Previous Visit To Fiji ?"
+                                  [objArray]="[{label: 'Yes', trueValue: 'Y', falseValue: ''},{label: 'No', trueValue: 'N', falseValue: ''}]"
+                                  [(ngModel)]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.isPreviousVisitToFiji"
+                                  name="isPreviousVisitToFijihds"></app-check-box>
+                              </div>
+                            </div>
+
+                            <div class="col-md-9">
+                              <table class="specific_table">
+                                <thead class="app-table-header">
+                                  <tr class="app-table-header-row">
+                                    <th rowspan="2" class="app-table-header-cell">
+                                      <div class="table-flex pb8 size"><span>#</span></div>
+
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                      <div class="table-flex size"><span>From Date</span></div>
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                      <div class="table-flex size"><span>To Date</span></div>
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                      <div class="table-flex size"><span>Type of Permit</span></div>
+                                    </th>
+
+                                  </tr>
+                                </thead>
+                                <tbody class="app-table-body ">
+                                  @for (previousVisitDetail of
+                                  appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantPreviousVisitDetail;
+                                  track $index) {
+                                  <tr class="app-table-row ">
+
+                                    <td class="cell-content">
+                                      <div class="pb20 size"> #{{$index + 1}} </div>
+                                    </td>
+                                    <td class="cell-content ">
+                                      <div class="pb24 size">{{previousVisitDetail.fromDate}} </div>
+                                    </td>
+
+                                    <td class="cell-content">
+                                      <div class="pb20 size">{{previousVisitDetail.toDate}} </div>
+                                    </td>
+
+                                    <td class="cell-content">
+                                      <div class="pb20 size">{{previousVisitDetail.typeOfPermitDescription}}</div>
+                                    </td>
+                                  </tr>
+                                  }
+                                </tbody>
+                              </table>
+                            </div>
+                          </row>
+                          <div class="dashed-border my-1"></div>
+                          <row>
+
+                            <div class="col-md-1"></div>
+                            <div clas="col-md-4">
+                              <div class="d-flex align-items-center pb8">
+                                <app-check-box type="horcheckDisable" label="Have You Ever Been Convicted Of
+                                  A Criminal Offence"
+                                  [objArray]="[{label: 'Yes', trueValue: 'Y', falseValue: ''},{label: 'No', trueValue: 'N', falseValue: ''}]"
+                                  [(ngModel)]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.isAnyCriminalOffence"
+                                  name="isAnyCriminalOffence1"></app-check-box>
+                              </div>
+                            </div>
+
+                            <div class="col-md-9">
+                              <table class="specific_table">
+                                <thead class="app-table-header">
+
+                                  <tr class="app-table-header-row">
+                                    <th rowspan="2" class="app-table-header-cell">
+                                      <div class="table-flex pb8 size"><span>#</span></div>
+
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                      <div class="table-flex size"><span>Date of Criminal Offence </span></div>
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                      <div class="table-flex size"><span>Offence</span></div>
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                      <div class="table-flex size"><span>Sentence</span></div>
+                                    </th>
+
+                                  </tr>
+
+                                </thead>
+                                <tbody class="app-table-body ">
+                                  @for (criminalOffenceDetail of
+                                  appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantCriminalOffenceDetail;
+                                  track $index) {
+                                  <tr class="app-table-row ">
+                                    <td rowspan="2" class="cell-content ">
+                                      <div class="size">
+                                        #{{ $index+1 }}
+                                      </div>
+
+
+                                    </td>
+                                    <td class="cell-content">
+                                      <div class="size">
+                                        {{criminalOffenceDetail.dateOfCriminalOffence}}
+                                      </div>
+
+                                    </td>
+                                    <td class="cell-content">
+                                      <div class="size">
+                                        {{criminalOffenceDetail.offence}}
+                                      </div>
+
+                                    </td>
+                                    <td class="cell-content">
+                                      <div class="size">
+                                        {{criminalOffenceDetail.sentence}}
+                                      </div>
+                                    </td>
+
+                                  </tr>
+                                  }
+                                </tbody>
+                              </table>
+                            </div>
+                          </row>
+                          <div class="dashed-border my-1"></div>
+                          <row>
+                            <div class="col-md-2">
+                              <div class="labelHead pt16 pb8">
+                                Address Details
+                              </div>
+                              <div class="text-gray-border-bottom-1"></div>
+                            </div>
+
+                          </row>
+                          <row className="pt24">
+                            <div class="col-md-4 labelHead1 pb8">
+                              Residential Address
+                            </div>
+                            <div class="col-md-4 labelHead1 pb8">
+                              Postal Address
+                            </div>
+                          </row>
+                          <row className="pt16">
+                            <div class="col-md-4 line-height">
+                              <div>
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentResidentialAddress.line2
+                                !=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentResidentialAddress.line2}},
+                                }
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentResidentialAddress.line2
+                                !=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentResidentialAddress.line2}},
+                                }
+                                <br>
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentResidentialAddress.islandValue
+                                !=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentResidentialAddress.islandValue}},
+                                }
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentResidentialAddress.provinceValue
+                                !=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentResidentialAddress.provinceValue}},
+                                }
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentResidentialAddress.tikinaValue
+                                !=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentResidentialAddress.tikinaValue}},
+                                }
+                                <br>
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentResidentialAddress.cityVillageValue
+                                != ''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentResidentialAddress.cityVillageValue}},
+                                }
+
+                              </div>
+                            </div>
+                            <div class="col-md-4 line-height">
+                              <div>
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentPostalAddress.line2
+                                !=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentPostalAddress.line2}},
+                                }
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentPostalAddress.line2
+                                !=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentPostalAddress.line2}},
+                                }
+                                <br>
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentPostalAddress.islandValue
+                                !=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentPostalAddress.islandValue}},
+                                }
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentPostalAddress.provinceValue
+                                !=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentPostalAddress.provinceValue}},
+                                }
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentPostalAddress.tikinaValue
+                                !=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentPostalAddress.tikinaValue}},
+                                }
+                                <br>
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentPostalAddress.cityVillageValue){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentPostalAddress.cityVillageValue}},
+                                }
+
+                              </div>
+                            </div>
+
+                          </row>
+                          <row className="pt26">
+                            <div class="col-md-4 labelHead1 pb8">
+                              <div>
+                                Intended Residential Address in Fiji
+                              </div>
+                            </div>
+                            <div class="col-md-4 labelHead1 pb8">
+                              Intended Postal Address in Fiji
+                            </div>
+
+                          </row>
+                          <row className="pt16">
+                            <div class="col-md-4 line-height">
+                              <div>
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedResidentialAddress.line2
+                                !=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedResidentialAddress.line2}},
+                                }
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedResidentialAddress.line2
+                                !=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedResidentialAddress.line2}},
+                                }
+                                <br>
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedResidentialAddress.islandValue
+                                !=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedResidentialAddress.islandValue}},
+                                }
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedResidentialAddress.provinceValue
+                                !=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedResidentialAddress.provinceValue}},
+                                }
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedResidentialAddress.tikinaValue
+                                !=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedResidentialAddress.tikinaValue}},
+                                }
+                                <br>
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedResidentialAddress.cityVillageValue
+                                !=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedResidentialAddress.cityVillageValue}},
+                                }
+
+                              </div>
+                            </div>
+                            <div class="col-md-4 line-height">
+                              @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedPostalAddress.line2
+                              !=''){
+                              {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedPostalAddress.line2}},
+                              }
+                              @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedPostalAddress.line2
+                              !=''){
+                              {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedPostalAddress.line2}},
+                              }
+                              <br>
+                              @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedPostalAddress.islandValue
+                              !=''){
+                              {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedPostalAddress.islandValue}},
+                              }
+                              @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedPostalAddress.provinceValue
+                              !=''){
+                              {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedPostalAddress.provinceValue}},
+                              }
+                              @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedPostalAddress.tikinaValue
+                              !=''){
+                              {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedPostalAddress.tikinaValue}},
+                              }
+                              <br>
+                              @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedPostalAddress.cityVillageValue
+                              !=''){
+                              {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentIntendedPostalAddress.cityVillageValue}},
+                              }
+                            </div>
+
+                          </row>
+                          <row className="pt26">
+                            <div class="col-md-12 res-address ">
+                              Residential Address Of The Applicant And Spouse Where They Lived For 12 Months Or More In
+                              The Last 10 Years:
+                            </div>
+                          </row>
+                          <row className="pt26">
+                            <div class="col-md-2">
+                              <div class="labelHead pb8">
+                                Address 1
+                              </div>
+                            </div>
+
+                          </row>
+                          <row className="pt26">
+                            <div class="col-md-4 address">
+                              Applicant
+                            </div>
+                            <div class="col-md-4 address">
+                              Spouse
+                            </div>
+                          </row>
+                          <row className="pt26 ">
+                            <div class="col-md-4 gap-5">
+                              <div class="d-flex gap-5">
+                                <div class="labelHead pb8 ">
+                                  Date
+                                </div>
+                                <div>
+                                  {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.primaryApplicantFromDate}}
+
+                                  @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.primaryApplicantToDate !==
+                                  ''){
+                                  to
+                                  }
+                                  {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.primaryApplicantToDate}}
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-4 gap-5">
+                              <div class="d-flex gap-5">
+                                <div class="labelHead pb8">
+                                  Date
+                                </div>
+                                <div>
+                                  {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.spouseFromDate}}
+                                  @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.spouseToDate!==
+                                  '') {
+                                  to
+                                  }
+                                  {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.spouseToDate}}
+                                </div>
+                              </div>
+                            </div>
+                          </row>
+                          <row className="pt26">
+                            <!-- <div class="col-md-4 line-height">
+                              <div>
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentPrimaryApplicantAddress.line2!=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentPrimaryApplicantAddress.line2}},
+                                }
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentPrimaryApplicantAddress.line2!=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentPrimaryApplicantAddress.line2}},
+                                }
+                                <br>
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentPrimaryApplicantAddress.islandValue!=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentPrimaryApplicantAddress.islandValue}},
+                                }
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentPrimaryApplicantAddress.provinceValue
+                                !=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentPrimaryApplicantAddress.provinceValue}},
+                                }
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentPrimaryApplicantAddress.tikinaValue
+                                !=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentPrimaryApplicantAddress.tikinaValue}},
+                                }
+                                <br>
+                                @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentPrimaryApplicantAddress.cityVillageValue
+                                !=''){
+                                {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentPrimaryApplicantAddress.cityVillageValue}},
+                                }
+
+                              </div>
+                            </div> -->
+                            <!-- <div class="col-md-4 line-height">
+                              @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentSpouseAddress.line2
+                              !=''){
+                              {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentSpouseAddress.line2}},
+                              }
+                              @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentSpouseAddress.line2
+                              !=''){
+                              {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentSpouseAddress.line2}},
+                              }
+                              <br>
+                              @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentSpouseAddress.islandValue
+                              !=''){
+                              {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentSpouseAddress.islandValue}},
+                              }
+                              @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentSpouseAddress.provinceValue
+                              !=''){
+                              {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentSpouseAddress.provinceValue}},
+                              }
+                              @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentSpouseAddress.tikinaValue
+                              !=''){
+                              {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentSpouseAddress.tikinaValue}},
+                              }
+                              @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentSpouseAddress.cityVillageValue
+                              !=''){
+                              <br>
+                              @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentSpouseAddress.cityVillageValue
+                              !=''){
+                              {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail.pentSpouseAddress.cityVillageValue}},
+                              }
+                              }
+                            </div> -->
+                          </row>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </app-tab-vertical>
+              <app-tab-vertical tabTitle="Applicant Document">
+                <div class="vertical-bg h100">
+                  <app-table [columns]="applicantDocumentColumns" [columnsName]="applicantDocumentColumnsName"
+                    [hidePaginator]="false" [hideSelectAll]="true" [verticalLineRemove]="true"
+                    [dataSource]="applicantTable">
+
+                    <ng-template cellDef="documentType" let-element>
+                      <div class="p-1">
+                        {{element.documentTypeDescription}}
+                      </div>
+                    </ng-template>
+                    <ng-template cellDef="documentNo" let-element>
+                      <div class="p-1">
+                        {{element.documentRefNo}}
+                      </div>
+                    </ng-template>
+                    <ng-template cellDef="fileName" let-element>
+                      <div class="p-1">
+                        {{element.documentFileName}}
+                      </div>
+                    </ng-template>
+                    <ng-template cellDef="uploadedDateTime" let-element>
+                      <div class="p-1">
+                        {{element.expiryDate}}
+                      </div>
+                    </ng-template>
+                    <ng-template cellDef="status" let-element>
+                      <div class="d-flex gap-5 slot-center">
+                        <div class=" table-cell-link line ">
+                          {{element.status}}
+                        </div>
+                        <div class=" table-cell-link line">
+                          {{element.notes}}
+                        </div>
+
+                      </div>
+                    </ng-template>
+
+
+                  </app-table>
+                </div>
+              </app-tab-vertical>
+              <app-tab-vertical tabTitle="Dependent">
+                <div class="vertical-bg h100">
+                  <app-table [columns]="dependentColumns" [columnsName]="dependentColumnsName" [hidePaginator]="false"
+                    [hideSelectAll]="true" [verticalLineRemove]="true" [dataSource]="dependentTable">
+
+                    <!-- <ng-template cellDef="name" let-element>
+                      <div class="">
+                        {{element.givenNames}}
+                      </div>
+                    </ng-template> -->
+                    <ng-template cellDef="fullName" let-element>
+                      <div class=" table-cell-link">
+                        {{element.givenNames}}
+                      </div>
+                    </ng-template>
+                    <ng-template cellDef="Gender" let-element>
+                      <div class="">
+                        {{element.genderDescription}}
+                      </div>
+                    </ng-template>
+                    <ng-template cellDef="dob" let-element>
+                      <div class="">
+                        {{element.dateOfBirth}}
+                      </div>
+                    </ng-template>
+                    <ng-template cellDef="passportNumber" let-element>
+                      <div class="">
+                        {{element.passportNumber}}
+                      </div>
+                    </ng-template>
+                    <ng-template cellDef="relationship" let-element>
+                      <div class="">
+                        {{element.relationshipDescription}}
+                      </div>
+                    </ng-template>
+                  </app-table>
+                </div>
+              </app-tab-vertical>
+              <app-tab-vertical tabTitle="Dependent Document">
+                <div class="vertical-bg h100">
+                  <app-table [columns]="dependentDocumentColumns" [columnsName]="dependentDocumentColumnsName"
+                    [hidePaginator]="false" [hideSelectAll]="true" [verticalLineRemove]="true"
+                    [dataSource]="dependentDocumentTable">
+                    <ng-template cellDef="documentType" let-element>
+                      <div class="p-1">
+                        {{element.documentTypeDescription}}
+                      </div>
+                    </ng-template>
+                    <ng-template cellDef="dependent" let-element>
+                      <div class="p-1">
+                        {{element.documentType}}
+                      </div>
+                    </ng-template>
+                    <ng-template cellDef="documentNo" let-element>
+                      <div class="p-1">
+                        {{element.documentRefNo}}
+                      </div>
+                    </ng-template>
+                    <ng-template cellDef="fileName" let-element>
+                      <div class="p-1">
+                        {{element.documentFileName}}
+                      </div>
+                    </ng-template>
+                    <ng-template cellDef="status" let-element>
+                      <div class="p-1">
+                        {{element.expiryDate}}
+                      </div>
+                    </ng-template>
+                    <ng-template cellDef="status" let-element>
+                      <div class="d-flex gap-5 slot-center">
+                        <div class=" table-cell-link line ">
+                          {{element.status}}
+                        </div>
+                        <div class=" table-cell-link line">
+                          {{element.notes}}
+                        </div>
+
+                      </div>
+                    </ng-template>
+
+
+                  </app-table>
+                </div>
+              </app-tab-vertical>
+              <app-tab-vertical tabTitle="Employer">
+                <div class="vertical-bg  v-flex h100">
+                  <div class="flex-1 relative">
+                    <scroll>
+                      <row>
+                        <div class="col-md-3">
+                          <div class="labelHead pb8 p-1">
+                            Employment Details
+                          </div>
+                          <div class="text-gray-border-bottom-1"></div>
+                        </div>
+                      </row>
+                      <row>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Position of Employee"
+                            [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.positionOfEmployee"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Duties of the Position"
+                            [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.dutiesOfEmployee "></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header=" Is this a new position"
+                            [value]=" appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.isPositionNew"></app-label>
+                        </div>
+                      </row>
+                      <row>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Experience required for the position"
+                            [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.experienceNeededForPosition"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Qualification  required for the position"
+                            [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.qualificatonNeededForPosition "></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header=" What qualifications does the applicant have?"
+                            [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.primaryApplicantQualification "></app-label>
+                        </div>
+                      </row>
+                      <row>
+
+                        <div class="col-md-7">
+                          <app-label type="verticalText"
+                            header=" Give reasons why this position cannot be filled by a citizen of the Fiji Islands:"
+                            [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.reasonWhyPositionCannotFilledByLocal"></app-label>
+                        </div>
+
+                      </row>
+                      <div class="dashed-border my-1"></div>
+                      <row>
+                        <div class="col-md-9">
+                        <div class="res-address ptb8">
+                          This Position Needs To Be Advertised, Therefore Please Attach Copies Of All Advertisements In The Fiji Islands For The Vacancy:
+                        </div>
+                        </div>
+
+                        <div class="col-md-9">
+                          <table class="specific_table ">
+                            <thead class="app-table-header">
+                              <tr class="app-table-header-row">
+                                <th rowspan="2" class="app-table-header-cell">
+                                  <div class="table-flex pb8 size"><span>Newspaper</span></div>
+
+                                </th>
+                                <th class="app-table-header-cell">
+                                  <div class="table-flex size slot-center"><span>Issue Date</span></div>
+                                </th>
+                                <th class="app-table-header-cell">
+                                  <div class="table-flex size"><span>No of Applicants</span></div>
+                                </th>
+                                <th class="app-table-header-cell">
+                                  <div class="table-flex size"><span>Result</span></div>
+                                </th>
+
+                              </tr>
+                            </thead>
+                            <tbody class="app-table-body ">
+                              @for (item of
+                              appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.plstentWorkPermitApplicationPositionAdvertisementDetail;
+                              track $index) {
+                              <tr class="app-table-row ">
+                                <td rowspan="2" class="cell-content ">
+                                  <div class="size"><app-input-control type="text" [btnClicked]="true"
+                                      [(ngModel)]="item.newspaperName"
+                                      name="newspaperName{{$index}}"></app-input-control></div>
+                                </td>
+                                <td class="cell-content">
+                                  <app-input-control type="date" [btnClicked]="true" [(ngModel)]="item.issueDate"
+                                    name="issueDate{{$index}}"></app-input-control>
+                                </td>
+                                <td class="cell-content">
+                                  <div class="size"> <app-input-control type="text" [btnClicked]="true"
+                                      [(ngModel)]="item.numberOfApplicants"
+                                      name="numberOfApplicants{{$index}}"></app-input-control></div>
+                                </td>
+                                <td class="cell-content">
+                                  <div class="size"> <app-input-control type="text" [btnClicked]="true"
+                                      [(ngModel)]="item.result" name="result{{$index}}"></app-input-control></div>
+                                </td>
+
+                              </tr>
+                              }
+                            </tbody>
+                          </table>
+                        </div>
+                      </row>
+                      <div class="dashed-border my-1"></div>
+                      <row>
+                        <div class="col-md-9 mb24">
+                          <app-label type="verticalText"
+                            header=" Give Reasons Why The Local Applicants Were Not Suitable:"
+                            [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.reasonWhyPositionCannotFilledByLocal"></app-label>
+                          <app-label type="verticalText"
+                            header=" What Type Of Training Does The Organisation Intend To Do To Fill This Position By A Local Person? "
+                            [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.reasonWhyLocalApplicantsNotSuitable "></app-label>
+
+                        </div>
+                        <div class="col-md-9">
+                          <table class="specific_table ">
+                            <thead class="app-table-header">
+                              <tr class="app-table-header-row">
+                                <th rowspan="2" class="app-table-header-cell">
+                                  <div class="table-flex pb8 size"><span>Names</span></div>
+
+                                </th>
+                                <th class="app-table-header-cell">
+                                  <div class="table-flex size"><span>Positions</span></div>
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody class="app-table-body ">
+                              @for (localPersonAndPosition of
+                              appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.plstentWorkPermitApplicationLocalPersonAndPositionDetail;
+                              track $index) {
+                              <tr class="app-table-row ">
+                                <td rowspan="2" class="cell-content ">
+                                  <div class="size"> {{localPersonAndPosition.name}}</div>
+
+                                </td>
+                                <td class="cell-content">
+                                  <div class="size">
+                                    {{localPersonAndPosition.position}}
+                                  </div>
+                                </td>
+                              </tr>
+                              }
+                            </tbody>
+                          </table>
+                        </div>
+
+                      </row>
+                      <row>
+                        <div class="col-md-2"></div>
+                        <div class="col-md-7 right ptb8">
+                          <app-check-box type="horcheckDisable" label=" If Applicant Is An Investor" [objArray]="[{label: '', trueValue: 'Y', falseValue: ''}]"
+                            [(ngModel)]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.isInvestor"></app-check-box>
+                        </div>
+
+                      </row>
+                      <row>
+                        <div class="col-md-5 end">
+                          Name Of Business
+                        </div>
+                        <div class="col-md-7 start">
+                          <div class="max-width">
+                            <app-input-control type="text"
+                              [(ngModel)]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantShareHoldingDetail.nameOfBusiness"></app-input-control>
+                          </div>
+                        </div>
+                      </row>
+                      <row>
+                        <div class="col-md-12 start pb24 text1">
+                          ShareHolder
+                        </div>
+                      </row>
+                      <row>
+                        <div class="col-md-5 end">
+                          Shareholder Name
+                        </div>
+                        <div class="col-md-7 start  ">
+                          <div class="max-width">
+                            <app-input-control type="text"
+                              [(ngModel)]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantShareHoldingDetail"></app-input-control>
+                          </div>
+                        </div>
+
+                      </row>
+                      <row>
+                        <div class="col-md-5 end  ">
+                          Shareholding(%)
+                        </div>
+                        <div class="col-md-7 start ">
+                          <div class="max-width">
+                            <app-input-control type="text"
+                              [(ngModel)]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantShareHoldingDetail.shareHoldingPercentage"></app-input-control>
+                          </div>
+                        </div>
+
+                      </row>
+                      <row>
+                        <div class="col-md-5 end  ">
+                          Monetary Value($)
+                        </div>
+                        <div class="col-md-7 start ">
+                          <div class="max-width">
+                            <app-input-control type="text"
+                              [(ngModel)]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantShareHoldingDetail.monetaryValue"></app-input-control>
+                          </div>
+                        </div>
+
+                      </row>
+                      <row>
+                        <div class="col-md-5 end ">
+                          Date Of Commencement Of Business
+                        </div>
+                        <div class="col-md-7 start ">
+                          <div class="max-width">
+                            <app-input-control type="date"
+                              [(ngModel)]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantShareHoldingDetail.dateOfCommensementOfBusiness"></app-input-control>
+                          </div>
+                        </div>
+
+                      </row>
+                      <row>
+                        <div class="col-md-12 pt16">
+                          <div class="labelHead pb8">
+                            Employer Details
+                          </div>
+                          <div class="col-md-2">
+                            <div class="text-gray-border-bottom-1"></div>
+                          </div>
+
+                        </div>
+                      </row>
+
+                      <row>
+                        <div class="col-md-4">
+                            <app-label type="verticalText" header="Name of Employer" [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationEmployerDetail.organizationName"></app-label>
+                        </div>
+                        <div class="col-md-4 ">
+                            <app-label type="verticalText" header="Address" label=""></app-label>
+                          <div class="val ptb8 line-height">
+                              @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationEmployerDetail.pentAddress.address
+                              !=''){
+                              {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationEmployerDetail.pentAddress.address}},
+                              }
+                              @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationEmployerDetail.pentAddress.postBoxNoLocation
+                              !=''){
+                              {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationEmployerDetail.pentAddress.postBoxNoLocation}},
+                              }
+                             
+                              @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationEmployerDetail.pentAddress.islandDescription
+                              !=''){
+                              {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationEmployerDetail.pentAddress.islandDescription}},
+                              }
+                              @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationEmployerDetail.pentAddress.tikinaDescription
+                              !=''){
+                              {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationEmployerDetail.pentAddress.tikinaDescription}},
+                              }
+                              @if(appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationEmployerDetail.pentAddress.cityVillageDescription
+                              !=''){
+                              {{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationEmployerDetail.pentAddress.cityVillageDescription}},
+                              }         
+                            </div>
+                          </div>
+                      </row>
+                      <row>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header=" Nature Of Business" value="Nature"></app-label>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="v-flex p-1 vertical-label">
+                              <label class="ptb8">
+                                  Details about number of Employees
+                              </label>
+                              <div class="label2">
+                                  <label class="ptb8">Local</label>
+                                  <div class="sub-labels p-1">{{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.numberOfLocalEmployees}}</div>
+                              </div>
+                              <div class="label2">
+                                  <label class="ptb8">Expatriate</label>
+                                  <div class="sub-labels p-1">{{appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.numberOfLocalEmployees}}</div>
+                              </div>
+                          </div>
+                      </div>
+                      </row>
+                      <!-- <div class="dashed-border mt26 mb26"></div> -->
+                    </scroll>
+                  </div>
+
+
+                </div>
+
+              </app-tab-vertical>
+              <app-tab-vertical tabTitle="Employer Document">
+                <div class="vertical-bg h100">
+                  <app-table [columns]="employerDocumentColumns" [columnsName]="employerDocumentColumnsName"
+                    [hidePaginator]="false" [hideSelectAll]="true" [verticalLineRemove]="true"
+                    [dataSource]="employerDocumentTable">
+                    <ng-template cellDef="documentType" let-element>
+                      <div class="p-1">
+                        {{element.documentTypeDescription}}
+                      </div>
+                    </ng-template>
+                    <ng-template cellDef="fileName" let-element>
+                      <div class="p-1">
+                        {{element.documentTypeDescription}}
+                      </div>
+                    </ng-template>
+                    <ng-template cellDef="documentNo" let-element>
+                      <div class="p-1">
+                        {{element.documentRefNo}}
+                      </div>
+                    </ng-template>
+                    <ng-template cellDef="uploadedDateTime" let-element>
+                      <div class="p-1">
+                        {{element.expiryDate}}
+                      </div>
+                    </ng-template>
+                    <ng-template cellDef="status" let-element>
+                      <div class="d-flex">
+                        <div class="p-1 table-cell-link">
+                          {{element.status}}
+                        </div>
+                        <div class="p-1 table-cell-link">
+                          {{element.notes}}
+                        </div>
+
+                      </div>
+                    </ng-template>
+
+
+                  </app-table>
+                </div>
+              </app-tab-vertical>
+              <app-tab-vertical tabTitle="Employer Declaration">
+                <div class="vertical-bg">
+                  <row>
+                    <div class="col-md-4">
+                      <app-label type="verticalText" header="Name of Person doing the Declaration"
+                        [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationEmployerDetail.pentWorkPermitApplicationEmployerDeclarationSummary.nameOfPerson"></app-label>
+                    </div>
+                    <div class="col-md-4">
+                      <app-label type="verticalText" header="Position in Organization"  [value]="appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationEmployerDetail.pentWorkPermitApplicationEmployerDeclarationSummary.positionInOrganization"></app-label>
+                    </div>
+                  </row>
+
+                  <div class="checkbox-success-container">
+                    <ul>
+                      @for (item of
+                      appeal.pentWorkPermitApplicationInformation.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationEmployeeDeclarationSummary.plstentWorkPermitApplicationEmployeeDeclaration;
+                      track $index) {
+                      <li>
+                        <div class="checkbox-success">
+                          <mat-checkbox class="mat-checks checkbox-1  ">{{item}}</mat-checkbox>
+                          <!-- <span">{{item}}</span> -->
+                        </div>
+                      </li>
+                      }
+                    </ul>
+                  </div>
+                </div>
+              </app-tab-vertical>
+            </app-tab-group-vertical>
+          </div>
+        </app-tab>
+        <app-tab tabTitle="Recommendation">
+          <accordion>
+            <accordion-item [isOpen]="true">
+              <accordion-header>
+                <div class="accordion-header-content">
+                  <div class="accordion-title dis-flex w100">
+                    <div class="accordian-title-header col-md-6">
+                      Director Review
+                    </div>
+                    <div class="d-flex space-between col-md-6">
+                      <div class="d-flex gap-5 slot-right-content">
+                        Current Action: <span
+                          class="pl8">{{appeal.plstentPermitApplicationRecommendation.currentActionValue}}</span>
+                      </div>
+                      <div class="d-flex gap-15 slot-right-content">
+                        Current Officer: <span
+                          class="pl8">{{appeal.plstentPermitApplicationRecommendation.currentOfficer}}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </accordion-header>
+              <accordion-body>
+                <div>
+                  <!-- <div class="d-flex gap16 ">
+                                        <div (click)="doSwap('cmnt') " class="pointer tab-header"
+                                            [ngClass]="{'text-color' : swap===true}">
+                                            Comments
+                                        </div>
+                                        <div (click)="doSwap('other')" class="pointer tab-header"
+                                            [ngClass]="{'text-color' : swap===false}">
+                                            Checklist
+                                        </div>
+                                    </div> -->
+                  <div class="d-flex p8 notes-border-bottom">
+                    <div class="heading-1 gradient-border-right-1 p8" [ngClass]="{'tabActive-text': swap===true}"
+                      (click)="doSwap('cmnt') ">Comments</div>
+
+                    <div class="heading-1 p8" [ngClass]="{'tabActive-text' : swap===false}" (click)="doSwap('other')">
+                      Checklist</div>
+                  </div>
+                  @if (swap) {
+                  <row className="pt16">
+                    <div class="col-md-6 px-2">
+                      <app-input-control type="textarea" label="Comments" className="textarea" [required]="true"
+                        [(ngModel)]="appeal.plstentPermitApplicationRecommendation.comments"></app-input-control>
+                    </div>
+                    <div class="col-md-3 px-2 slot-center ">
+                      <div class="upload-height"></div>
+                      <app-documents></app-documents>
+                    </div>
+                    <div class="col-md-3 p8 pb16">
+                      <div class="v-flex h100 space-between">
+                        <app-input-control type="select" className="white-input" label="Recommendation"
+                          [(ngModel)]="appeal.plstentPermitApplicationRecommendation.recommendationValue"></app-input-control>
+                        <div class="label">Next Action:<span
+                            class="">{{appeal.plstentPermitApplicationRecommendation.nextActionValue}}</span> </div>
+                      </div>
+                    </div>
+                  </row>
+                  <div class="end">
+                    <button class="btn-secondary" appButton="Complete"></button>
+                  </div>
+                  } @else {
+                  <row className="pt26">
+                    @for (item of appeal.plstentPermitApplicationChecklist; track $index) {
+                    <div class="col-md-6">
+                      <div class="d-flex align-items-center">
+                        <div class="col-md-8">
+                          {{item.checklistTypeDescription}}
+                        </div>
+                        <div clas="col-md-4">
+                          <div class="d-flex align-items-center">
+                            <app-check-box label=""
+                              [objArray]="[{label: 'Yes', trueValue: 'Y', falseValue: ''}, {label: 'No', trueValue: 'N', falseValue: ''}]"
+                              [(ngModel)]="item.checklistForDescription" name="checklistForDescription"></app-check-box>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    }
+                  </row>
+
+
+
+                  }
+                </div>
+              </accordion-body>
+            </accordion-item>
+          </accordion>
+        </app-tab>
+        <app-tab tabTitle="Border
+        Information" (tabChange)="onTabChange($event)">
+          <div class="vertical-tabs v-flex h100">
+            <app-tab-group-vertical class="tab-groups">
+              <app-tab-vertical tabTitle="Controversial">
+                <div class="vertical-bg h100">
+                  <app-table [columns]="controversialColunm" [columnsName]="controversialColunmName"
+                    [hidePaginator]="false" [hideSelectAll]="true" [verticalLineRemove]="true" [dataSource]="">
+
+                  </app-table>
+                </div>
+              </app-tab-vertical>
+              <app-tab-vertical tabTitle="Travel History">
+                <div class="vertical-bg h100">
+                  <app-table [columns]="travelHistoryColunm" [columnsName]="travelColunmName" [hidePaginator]="false"
+                    [hideSelectAll]="true" [verticalLineRemove]="true" [dataSource]=""></app-table>
+                </div>
+              </app-tab-vertical>
+
+
+              <app-tab-vertical tabTitle="Uplift of PI Status">
+                <div class="vertical-bg h100">
+                  <app-table [columns]="statusColumn" [columnsName]="statusColumnName" [hidePaginator]="false"
+                    [hideSelectAll]="true" [verticalLineRemove]="true" [dataSource]="">
+                  </app-table>
+                </div>
+              </app-tab-vertical>
+
+
+              <app-tab-vertical tabTitle="DPO">
+                <div class="vertical-bg h100">
+                  <app-table [columns]="dpoColunm" [columnsName]="dpoColunmName" [hidePaginator]="false"
+                    [hideSelectAll]="true" [verticalLineRemove]="true" [dataSource]="">
+
+                  </app-table>
+                </div>
+              </app-tab-vertical>
+
+
+            </app-tab-group-vertical>
+          </div>
+        </app-tab>
+        <app-tab tabTitle="History" (tabChange)="onTabChange($event)">
+          <div class="vertical-tabs v-flex h100">
+            <app-tab-group-vertical class="tab-groups">
+              <app-tab-vertical tabTitle="Assigned Officer History">
+                <div class="vertical-bg h100">
+                  <div class="between">
+                    <div class="col-md-3">
+                      <div class="labelHead pb8">
+                        Assigned Officer History
+                      </div>
+                      <div class="text-gray-border-bottom-1"></div>
+                    </div>
+                    <div class="slot-center gap16">
+                      <!-- @if(agentRegistration.blnShowSelfAssignBtn === 'True') {
+                        <button class="home-btn-primary" appButton="Self Assign"
+                        (click)="saveagentregistrationassignedofficerselfassign()"></button>
+                      } @else if(agentRegistration.blnShowReAssignBtn  === 'True') { -->
+                      <button class="home-btn-primary" appButton="Assign To"></button>
+                      <!-- } -->
+                    </div>
+                  </div>
+                  <div class="p8"></div>
+                  <app-table [columns]="assignedOfficerColunm" [columnsName]="assignedOfficerColunmName"
+                    [hidePaginator]="false" [hideSelectAll]="true" [verticalLineRemove]="true"
+                    [dataSource]="assignedOfficerTabledata">
+
+                    <ng-template cellDef="assignedTo" let-element>
+                      <div>
+                        {{element.assignedTo}}
+                      </div>
+                    </ng-template>
+                    <ng-template cellDef="assignedBy" let-element>
+                      <div>
+                        {{element.assignedBy}}
+                      </div>
+                    </ng-template>
+
+                    <ng-template cellDef="assignedDate" let-element>
+                      <div>
+                        {{element.assignedDate | appDate}}
+                      </div>
+                    </ng-template>
+                    <ng-template cellDef="tatInHours" let-element>
+                      <div>
+                        {{element.tatInHours}}
+                      </div>
+                    </ng-template>
+                    <ng-template cellDef="assignedDate" let-element>
+                      <div>{{element.assignedDate}}</div>
+                    </ng-template>
+                    <ng-template cellDef="statusDescription" let-element>
+                      <app-status-text [statusValue]="element.statusDescription"></app-status-text>
+                    </ng-template>
+
+                  </app-table>
+                </div>
+              </app-tab-vertical>
+              <app-tab-vertical tabTitle="Status History">
+                <div class="vertical-bg h100">
+                  <div class="col-md-2">
+                    <div class="labelHead pb8">
+                      Status History
+                    </div>
+                    <div class="text-gray-border-bottom-1"></div>
+                  </div>
+
+                  <div class="p8"></div>
+                  <app-table [columns]="statusHistoryColunm" [columnsName]="statusHistoryColunmName"
+                    [hidePaginator]="false" [hideSelectAll]="true" [verticalLineRemove]="true"
+                    [dataSource]="statusHistoryTabledata"></app-table>
+
+                  <ng-template cellDef="assignedDateTime" let-element>
+                    <div>{{element.assignedDateTime}}</div>
+                  </ng-template>
+                  <ng-template cellDef="statusDescription" let-element>
+                    <app-status-text [statusValue]="element.statusDescription"></app-status-text>
+                  </ng-template>
+                  <ng-template cellDef="changedBy" let-element>
+                    <div>
+                      {{element.changedBy}}
+                    </div>
+                  </ng-template>
+                  <ng-template cellDef="changedDate" let-element>
+                    <div>
+                      {{element.changedDate}}
+                    </div>
+                  </ng-template>
+                  <ng-template cellDef="tatInHours" let-element>
+                    <div>
+                      {{element.tatInHours}}
+                    </div>
+                  </ng-template>
+
+
+                </div>
+              </app-tab-vertical>
+
+
+              <app-tab-vertical tabTitle="Communication History">
+                <div class="vertical-bg h100">
+                  <div class="col-md-3">
+                    <div class="labelHead pb8">
+                      Communication History
+                    </div>
+                    <div class="text-gray-border-bottom-1"></div>
+                  </div>
+
+                  <div class="p8"></div>
+
+                  <app-table [columns]="communicationColunm" [columnsName]="communicationColunmName"
+                    [hidePaginator]="false" [hideSelectAll]="true" [verticalLineRemove]="true"
+                    [dataSource]="communicationTabledata">
+
+                    <ng-template cellDef="fromEmailId" let-element>
+                      <div>{{element.pentCommunicationTracking.fromEmailId}}</div>
+                    </ng-template>
+                    <ng-template cellDef="toEmailId" let-element>
+                      <div>{{element.pentCommunicationTracking.toEmailId}}</div>
+                    </ng-template>
+                    <ng-template cellDef="sentDate" let-element>
+                      <div>{{element.pentCommunicationTracking.sentDate | appDate}}</div>
+                    </ng-template>
+                    <ng-template cellDef="sentStatusDescription" let-element>
+                      <app-status-text [statusValue]="element.pentCommunicationTracking.sentStatusDescription"></app-status-text>
+                    </ng-template>
+                    <ng-template cellDef="action" let-element>
+                      <ion-icon name="eye-outline"></ion-icon>
+                    </ng-template>
+
+                  </app-table>
+                </div>
+              </app-tab-vertical>
+            </app-tab-group-vertical>
+          </div>
+        </app-tab>
+        <app-tab tabTitle="Permit" (tabChange)="onTabChange($event)">
+          <div class="vertical-tabs v-flex h100">
+            <div class="flex-1 relative">
+              <div class="ab">
+                <div class="rel">
+                  @if(uploadUrl !== '') {
+                  <div class="pdf-viewer">
+                    <div class="ab">
+                      <div class="h100">
+                        @if(!loadingTrue) {
+                        <app-pdf-viewer [url]="uploadUrl"></app-pdf-viewer>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </app-tab>
+      </app-tab-group>
+    </div>
+  </div>
+</div>
+
+
+<ng-template #emailHistory>
+  <div class="v-flex h100 slide-template">
+    <div class="slide-header header-padding between border-bottom-line m7px">
+      <div class="slide-label">
+        Email History
+      </div>
+      <div (click)="dialogService.closeAll()" class="cursor-pointer">
+        <ion-icon name="close-circle"></ion-icon>
+      </div>
+    </div>
+    <div class="email-content pb0">
+      <div class="d-flex p-1 between">
+        <div class="url-link-noline ">To:</div>
+        <div class="text-gray"></div>
+      </div>
+      <div class="d-flex p-1 between">
+        <div class="text-gray">From: </div>
+        <!-- @if(agentEmailHistory.pentCommunicationTracking.sentStatusDescription !== ''){ -->
+        <div class="mailstatusbox"></div>
+        <!-- } -->
+      </div>
+      <div class="m7px border-bottom-line px-2"></div>
+    </div>
+    <div class="header-padding">
+      <div class="text-gray mail-msg p-1">
+        <!-- {{agentEmailHistory.pentCommunicationTracking.mailContent}} -->
+      </div>
+    </div>
+  </div>
+</ng-template>

@@ -1,0 +1,2167 @@
+<div class="body-pattern detail-card">
+  <div class="header-panel between">
+    <div class="lg-header-label">
+      Work Permit Category: {{ screenName }}
+      <!-- - <span>New</span> -->
+    </div>
+  </div>
+  <div class="home-card-panel">
+    <row>
+      <div class="col-md-10">
+        <row>
+          <div class="col-md-3 p0">
+            <div class="pb16">
+              <row>
+                <div class="col-md-6 p0">
+                  <div class="app-label-header">Application No :</div>
+                </div>
+                <div class="col-md-6 p0">
+                  <div class="app-label-value">
+                    {{
+                    permitParams.permitApplicationNo
+                    ? permitParams.permitApplicationNo
+                    : "-"
+                    }}
+                  </div>
+                </div>
+              </row>
+            </div>
+            <div class="pb16">
+              <row>
+                <div class="col-md-6 p0">
+                  <div class="app-label-header">Applicant Name :</div>
+                </div>
+                <div class="col-md-6 p0">
+                  <div class="app-label-value">
+                    {{
+                    permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.givenNames
+                    }} {{
+                    permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.surname
+                    }}
+                  </div>
+                </div>
+              </row>
+            </div>
+            <div class="pb16">
+              <row>
+                <div class="col-md-6 p0">
+                  <div class="app-label-header">Passport No :</div>
+                </div>
+                <div class="col-md-6 p0">
+                  <div class="app-label-value">
+                    {{
+                    permitParams.pentWorkPermitApplication
+                    .pentWorkPermitApplicationPrimaryApplicantDetail
+                    .passportNumber
+                    }}
+                  </div>
+                </div>
+              </row>
+            </div>
+          </div>
+          <div class="col-md-3 p0">
+            <div class="pb16">
+              <row>
+                <div class="col-md-6 p0">
+                  <div class="app-label-header">Assigned By :</div>
+                </div>
+                <div class="col-md-6 p0">
+                  <div class="app-label-value">
+                    {{
+                    permitParams.assignedByFullName ? permitParams.assignedByFullName : '-'
+                    }}
+                  </div>
+                </div>
+              </row>
+            </div>
+            <div class="pb16">
+              <row>
+                <div class="col-md-6 p0">
+                  <div class="app-label-header">Assigned Date :</div>
+                </div>
+                <div class="col-md-6 p0">
+                  <div class="app-label-value">
+                    {{
+                    permitParams.assignedDate ? (permitParams.assignedDate | appDate : 'datetime') : '-'
+                    }}</div>
+                </div>
+              </row>
+            </div>
+            <div class="pb16">
+              <row>
+                <div class="col-md-6 p0">
+                  <div class="app-label-header">Permit No :</div>
+                </div>
+                <div class="col-md-6 p0">
+                  <div class="app-label-value">
+                    {{
+                    permitParams.permitNumber ? permitParams.permitNumber : '-'
+                    }}
+                  </div>
+                </div>
+              </row>
+            </div>
+          </div>
+          <div class="col-md-4 p0 gradient-border-right-2">
+            <div class="pb3">
+              <app-label type="labelAndStatus" header="Stage" [value]="
+                  permitParams.stageDescription
+                    ? permitParams.stageDescription
+                    : '-'
+                "></app-label>
+            </div>
+            <div class="pb3">
+              <app-label type="labelAndStatus" header="Status" [value]="
+                  permitParams.statusDescription
+                    ? permitParams.statusDescription
+                    : '-'
+                "></app-label>
+            </div>
+            <div class="">
+              <app-label type="labelAndStatus" header="Current Action" [value]="
+                  permitParams.currentActionDescription
+                    ? permitParams.currentActionDescription
+                    : '-'
+                "></app-label>
+            </div>
+          </div>
+          <div class="col-md-2 align-items-center gradient-border-right-2">
+            <row>
+              <div class="col-md-12">
+                <div class="pb8 color-1">Controversial
+                  ({{permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.plstentPrimaryApplicantCotraversialList.length}})
+                </div>
+                <div class="pb8 color-2">Travel History
+                  ({{permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.plstentPrimaryApplicantTravelHitory.length}})
+                </div>
+                <div class="pb8 color-3">Uplift Of PI Status
+                  ({{permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.plstentPrimaryApplicantPIStatusList.length}})
+                </div>
+                <div class="pb8 color-4">DPO
+                  ({{permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.plstentPrimaryApplicantDPOList.length}})
+                </div>
+              </div>
+            </row>
+          </div>
+        </row>
+      </div>
+
+      <div class="col-md-2">
+        <div class="status-percentage">Success Percentage</div>
+        <div class="w100 slot-center">
+          <app-circle-progress value='permitParams.successPercentage'></app-circle-progress>
+        </div>
+      </div>
+    </row>
+  </div>
+  <div class="v-flex h100 home-tab-container horizontal-tab pb16">
+    <app-tab-group [isHorizontal]="false" class="tabs-groups" (tabChange)="onTabChange($event)">
+      <app-tab tabTitle="Required Info">
+        <div class="vertical-tabs v-flex h100">
+          <app-label type="verticalText1" header="Comments"
+            value="{{permitParams.pentAppealApplicationRequiredInformation.comments}}"></app-label>
+          <div class="flex-1 relative mt16">
+            <scroll>
+              <table class="application-table">
+                <thead class="app-table-header">
+                  <tr class="app-table-header-row">
+                    <th class="app-table-header-cell">Document Type</th>
+                    <th class="app-table-header-cell">Dependent Name</th>
+                    <th class="app-table-header-cell">Uploaded File Name</th>
+                    <th class="app-table-header-cell">Document Number</th>
+                    <th class="app-table-header-cell">Expiry Date</th>
+                    <th class="app-table-header-cell">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="app-table-body">
+                  @for(item of
+                  permitParams.pentAppealApplicationRequiredInformation.plstentAppealApplicationRequiredDocuments;
+                  track $index){
+                  <tr class="app-table-row">
+                    <td class="cell-content">
+                      {{ item.pentDocumentFile.documentType }}
+                    </td>
+                    <td class="cell-content">
+                      {{ item.documentRefNo }}
+                    </td>
+                    <td class="cell-content">
+                      {{ item.pentDocumentFile.documentFileName }}
+                    </td>
+                    <td class="cell-content">
+                      {{ item.pentDocumentFile.documentFileName }}
+                    </td>
+                    <td class="cell-content">
+                      {{ item.expiryDate }}
+                    </td>
+                    <td class="cell-content">
+                      <div class="vw-action">
+                        <span>View</span>
+                        <span>Notes</span>
+                      </div>
+                    </td>
+                  </tr>
+                  }
+                </tbody>
+              </table>
+            </scroll>
+          </div>
+        </div>
+      </app-tab>
+      <app-tab tabTitle="Application">
+        <div class="vertical-tabs v-flex h100">
+          <app-tab-group-vertical class="tab-groups" (tabChange)="onTabChange($event)">
+            <app-tab-vertical tabTitle="Primary Applicant">
+              <div class="v-flex h100">
+                <div class="flex-1 relative">
+                  <scroll>
+                    <div class="vertical-bg">
+                      <row>
+                        <div class="col-md-2">
+                          <div class="lg-label-header dark-lb pb8">
+                            Personal Details
+                          </div>
+                          <div class="text-gray-border-bottom-1"></div>
+                        </div>
+                      </row>
+                      <row>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Preferred Title" value="{{
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .preferredTitleValue
+                            }}"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Other Title" value="{{
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .otherTitle
+                            }}"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Surname" value="{{
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .surname
+                            }}"></app-label>
+                        </div>
+                      </row>
+                      <row>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Given Names" value="{{
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .givenNames
+                            }}"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Any other names Applicant known by" value="{{
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .otherGivenNames
+                            }}"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Gender" value="{{
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .genderDescription
+                            }}"></app-label>
+                        </div>
+                      </row>
+                      <row>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Date of Birth" value="{{
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .dateOfBirth | appDate
+                            }}"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Nationality" value="{{
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .nationalityDescription
+                            }}"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Other Nationality" value="{{
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .otherNationality
+                            }}"></app-label>
+                        </div>
+                      </row>
+                      <row> </row>
+                      <row>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Martial Status" value="{{
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .maritalStatusDescription
+                            }}"></app-label>
+                        </div>
+
+                        <div class="col-md-4 pt16">
+                          <app-check-box type="horcheckDisable" [objArray]="[
+                              {
+                                label: 'Is currently Resident in Fiji',
+                                trueValue: 'Y',
+                                falseValue: 'N'
+                              }
+                            ]"
+                            [(ngModel)]="permitParams.pentWorkPermitApplication.currentlyOutsideOfFiji"></app-check-box>
+                        </div>
+                        <div class="col-md-3">
+                          <app-label type="verticalText" header="Date of Entry" value="{{
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .existingDateOfEntry | appDate
+                            }}"></app-label>
+                        </div>
+                      </row>
+                      <row>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Port of Entry" value="{{
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .existingPortOfEntry | appDate
+                            }}"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Type of Permit" value="{{
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .typeOfExistingPermitDescription
+                            }}"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Permit Expiry Date" value="{{
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .existingPermitExpiryDate | appDate
+                            }}"></app-label>
+                        </div>
+                      </row>
+                      <row className="pt26">
+                        <div class="col-md-2">
+                          <div class="lg-label-header dark-lb pb8">
+                            Passport Details
+                          </div>
+                          <div class="text-gray-border-bottom-1"></div>
+                        </div>
+                      </row>
+                      <row>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Passport Number" value="{{
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .passportNumber
+                            }}"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Country of Passport " value="{{
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .countryOfPassportDescription
+                            }}"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Other Country" value="{{
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .otherCountry
+                            }}"></app-label>
+                        </div>
+                      </row>
+                      <row>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Date of Issue" value="{{
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .dateOfIssue | appDate
+                            }}"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Date of Expiry" value="{{
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .dateOfExpiry
+                            }}"></app-label>
+                        </div>
+                        <div class="col-md-4">
+                          <app-label type="verticalText" header="Place of Issue" value="{{
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .placeOfIssue
+                            }}"></app-label>
+                        </div>
+                      </row>
+                      <div class="dashed-border"></div>
+                      <row>
+                        <div class="col-md-12 pt16 pb16">
+                          <app-check-box type="horCheck" label="Other Current Passport Details (If Yes)" [objArray]="[
+                              { label: 'Yes', trueValue: 'Y', falseValue: '' },
+                              { label: 'No', trueValue: 'N', falseValue: '' }
+                            ]" [(ngModel)]="
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .isAnyOtherPassport
+                            " [required]="true"></app-check-box>
+                        </div>
+                        <div class="col-md-12">
+                          <row>
+                            <div class="col-md-9">
+                              <table class="specific_table">
+                                <thead class="app-table-header">
+                                  <tr class="app-table-header-row">
+                                    <th rowspan="2" class="app-table-header-cell">
+                                      <div class="table-flex pb8">
+                                        <span>Passport No</span>
+                                      </div>
+                                      <div>Country Of Passport</div>
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                      <div class="table-flex">
+                                        <span>Place of Issue</span>
+                                      </div>
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                      <div class="table-flex">
+                                        <span>Date of Issue</span>
+                                      </div>
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                      <div class="table-flex">
+                                        <span>Date of Expiry</span>
+                                      </div>
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody class="app-table-body">
+                                  <!-- @for(item of ) -->
+                                  <tr class="app-table-row">
+                                    <td rowspan="2" class="cell-content">
+                                      <div>
+                                        {{
+                                        permitParams
+                                        .pentWorkPermitApplication
+                                        .pentWorkPermitApplicationPrimaryApplicantDetail
+                                        .pentWorkPermitApplicationPrimaryApplicantOtherPassports
+                                        .passportNumber
+                                        }}
+                                      </div>
+                                      <div class="pt16">
+                                        {{
+                                        permitParams
+                                        .pentWorkPermitApplication
+                                        .pentWorkPermitApplicationPrimaryApplicantDetail
+                                        .pentWorkPermitApplicationPrimaryApplicantOtherPassports
+                                        .countryOfPassportDescription
+                                        }}
+                                      </div>
+                                    </td>
+                                    <td class="cell-content">
+                                      {{
+                                      permitParams
+                                      .pentWorkPermitApplication
+                                      .pentWorkPermitApplicationPrimaryApplicantDetail
+                                      .pentWorkPermitApplicationPrimaryApplicantOtherPassports
+                                      .placeOfIssue
+                                      }}
+                                    </td>
+                                    <td class="cell-content">
+                                      {{
+                                      permitParams
+                                      .pentWorkPermitApplication
+                                      .pentWorkPermitApplicationPrimaryApplicantDetail
+                                      .pentWorkPermitApplicationPrimaryApplicantOtherPassports
+                                      .dateOfIssue | appDate
+                                      }}
+                                    </td>
+                                    <td class="cell-content">
+                                      {{
+                                      permitParams
+                                      .pentWorkPermitApplication
+                                      .pentWorkPermitApplicationPrimaryApplicantDetail
+                                      .pentWorkPermitApplicationPrimaryApplicantOtherPassports
+                                      .dateOfExpiry | appDate
+                                      }}
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </row>
+                        </div>
+                      </row>
+                      <div class="dashed-border"></div>
+                      <row>
+                        <div class="col-md-12 pt16 pb16">
+                          <app-check-box type="horCheck" label="Is there any previous visit to Fiji?" [objArray]="[
+                              { label: '', trueValue: 'Y', falseValue: 'N' }
+                            ]" [(ngModel)]="
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .isPreviousVisitToFiji
+                            "></app-check-box>
+                        </div>
+                        <div class="col-md-12">
+                          <row>
+                            <div class="col-md-9">
+                              <table class="specific_table">
+                                <thead class="app-table-header">
+                                  <tr class="app-table-header-row">
+                                    <th rowspan="2" class="app-table-header-cell">
+                                      <div class="table-flex pb8">
+                                        <span>#</span>
+                                      </div>
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                      <div class="table-flex">
+                                        <span>From Date</span>
+                                      </div>
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                      <div class="table-flex">
+                                        <span>To Date</span>
+                                      </div>
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                      <div class="table-flex">
+                                        <span>Type of Permit</span>
+                                      </div>
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody class="app-table-body">
+                                  @for(item of
+                                  permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantPreviousVisitDetail;
+                                  track $index){
+                                  <tr class="app-table-row">
+                                    <td rowspan="2" class="cell-content">
+                                      {{ $index + 1 }}
+                                    </td>
+                                    <td class="cell-content">
+                                      {{ item.fromDate | appDate }}
+                                    </td>
+                                    <td class="cell-content">
+                                      {{ item.toDate | appDate }}
+                                    </td>
+                                    <td class="cell-content">
+                                      {{ item.typeOfPermitDescription }}
+                                    </td>
+                                  </tr>
+                                  }
+                                </tbody>
+                              </table>
+                            </div>
+                          </row>
+                        </div>
+                      </row>
+                      <div class="dashed-border"></div>
+                      <row>
+                        <div class="col-md-12 pt16 pb16">
+                          <app-check-box type="horCheck" label="Have you ever been convicted of a criminal offense?"
+                            [objArray]="[
+                              { label: 'Yes', trueValue: 'Y', falseValue: '' },
+                              { label: 'No', trueValue: 'Y', falseValue: '' }
+                            ]" [(ngModel)]="
+                              permitParams.pentWorkPermitApplication
+                                .pentWorkPermitApplicationPrimaryApplicantDetail
+                                .isAnyCriminalOffence
+                            "></app-check-box>
+                        </div>
+                        <div class="col-md-12">
+                          <row>
+                            <div class="col-md-9">
+                              <table class="specific_table">
+                                <thead class="app-table-header">
+                                  <tr class="app-table-header-row">
+                                    <th rowspan="2" class="app-table-header-cell">
+                                      <div class="table-flex pb8">
+                                        <span>#</span>
+                                      </div>
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                      <div class="table-flex">
+                                        <span>Date of Criminal Offense </span>
+                                      </div>
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                      <div class="table-flex">
+                                        <span>Offense</span>
+                                      </div>
+                                    </th>
+                                    <th class="app-table-header-cell">
+                                      <div class="table-flex">
+                                        <span>Sentence</span>
+                                      </div>
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody class="app-table-body">
+                                  @for(item of
+                                  permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantCriminalOffenceDetail;
+                                  track $index){
+                                  <tr class="app-table-row">
+                                    <td rowspan="2" class="cell-content">
+                                      {{ $index + 1 }}
+                                    </td>
+                                    <td class="cell-content">
+                                      {{ item.dateOfCriminalOffence | appDate }}
+                                    </td>
+                                    <td class="cell-content">
+                                      {{ item.offence }}
+                                    </td>
+                                    <td class="cell-content">
+                                      {{ item.sentence }}
+                                    </td>
+                                  </tr>
+                                  }
+                                </tbody>
+                              </table>
+                            </div>
+                          </row>
+                        </div>
+                      </row>
+                      <div class="dashed-border mt26 mb26"></div>
+                      <row>
+                        <div class="col-md-2">
+                          <div class="lg-label-header dark-lb pb8">
+                            Address Details
+                          </div>
+                          <div class="text-gray-border-bottom-1"></div>
+                        </div>
+                      </row>
+                      <row>
+                        <div class="col-md-4">
+                          <div class="home-address-container">
+                            <div class="home-address-header">
+                              Residential Address
+                            </div>
+                            <div class="home-address-content">
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentResidentialAddress.line1
+                              }},
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentResidentialAddress.line2
+                              }},
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentResidentialAddress.line3
+                              }}
+                              <br />
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentResidentialAddress.islandDescription
+                              }},
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentResidentialAddress.provinceDescription
+                              }},
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentResidentialAddress.tikinaDescription
+                              }}
+                              <br />
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentResidentialAddress.cityTown
+                              }}
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="home-address-container">
+                            <div class="home-address-header">
+                              Postal Address
+                            </div>
+                            <div class="home-address-content">
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentPostalAddress.line1
+                              }},
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentPostalAddress.line2
+                              }},
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentPostalAddress.line3
+                              }}
+                              <br />
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentPostalAddress.islandDescription
+                              }},
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentPostalAddress.provinceDescription
+                              }},
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentPostalAddress.tikinaDescription
+                              }}
+                              <br />
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentPostalAddress.cityTown
+                              }}
+                            </div>
+                          </div>
+                        </div>
+                      </row>
+                      <row className="mt16">
+                        <div class="col-md-4">
+                          <div class="home-address-container">
+                            <div class="home-address-header">
+                              Intended Residential Address in Fiji
+                            </div>
+                            <div class="home-address-content">
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedResidentialAddress.line1
+                              }},
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedResidentialAddress.line2
+                              }},
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedResidentialAddress.line3
+                              }}
+                              <br />
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedResidentialAddress
+                              .islandDescription
+                              }},
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedResidentialAddress
+                              .provinceDescription
+                              }},
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedResidentialAddress
+                              .tikinaDescription
+                              }}
+                              <br />
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedResidentialAddress
+                              .cityTown
+                              }}
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="home-address-container">
+                            <div class="home-address-header">
+                              Intended Postal Address in Fiji
+                            </div>
+                            <div class="home-address-content">
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedPostalAddress.line1
+                              }},
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedPostalAddress.line2
+                              }},
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedPostalAddress.line3
+                              }}
+                              <br />
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedResidentialAddress
+                              .islandDescription
+                              }},
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedResidentialAddress
+                              .provinceDescription
+                              }},
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedResidentialAddress
+                              .tikinaDescription
+                              }}
+                              <br />
+                              {{
+                              permitParams
+                              .pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentIntendedResidentialAddress
+                              .cityTown
+                              }}
+                            </div>
+                          </div>
+                        </div>
+                      </row>
+                      <row className="pt26">
+                        <div class="col-md-12">
+                          <div class="home-lg-para dark-lb pb26 pl8">
+                            Residential Addresses Of The Applicant Where They
+                            Lived For 12 Months or More In The Last 10 Years:
+                          </div>
+                        </div>
+                      </row>
+                      <row>
+                        <div class="col-md-12 p-0">
+                          <div class="address-lg-header-text">Address 1</div>
+                        </div>
+                        <div class="address-title">Applicant</div>
+                        @for (item of permitParams
+                        .pentWorkPermitApplication
+                        .pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantSpouseResidentialDetail;
+                        track $index) {
+                        <div class="col-md-4">
+                          <div class="address-box-container">
+                            <div class="address-date">
+                              Date
+                              <span>{{ item.primaryApplicantFromDate | appDate }}
+                                to
+                                {{
+                                item.primaryApplicantToDate | appDate
+                                }}</span>
+                            </div>
+                            <div class="address">
+                              {{ item.pentPrimaryApplicantAddress.line1 }},
+                              {{ item.pentPrimaryApplicantAddress.line2 }},
+                              {{ item.pentPrimaryApplicantAddress.line3 }}
+                              <br />
+                              {{
+                              item.pentPrimaryApplicantAddress
+                              .islandDescription
+                              }}
+                              {{
+                              item.pentPrimaryApplicantAddress
+                              .provinceDescription
+                              }}
+                              {{
+                              item.pentPrimaryApplicantAddress
+                              .tikinaDescription
+                              }}
+                              <br />
+                              {{
+                              item.pentPrimaryApplicantAddress
+                              .cityTown
+                              }}
+                            </div>
+                          </div>
+                        </div>
+                        }
+                        <!-- <div class="col-md-4">
+                          <div class="address-box-container">
+                            <div class="address-title">
+                              {{ item.spouseObj.typeName }}
+                            </div>
+                            <div class="address-date">
+                              Date
+                              <span
+                                >{{ item.spouseObj.formDate }} to
+                                {{ item.spouseObj.toDate }}</span
+                              >
+                            </div>
+                            <div class="address">
+                              {{ item.spouseObj.address }}
+                            </div>
+                          </div>
+                        </div> -->
+                      </row>
+                      <row className="pt16">
+                        <div class="col-md-3">
+                          <div class="lg-label-header dark-lb pb8">
+                            Character Declaration
+                          </div>
+                          <div class="text-gray-border-bottom-1"></div>
+                        </div>
+                      </row>
+                      <!-- <div class="checkbox-success-container pt8">
+                        <div class="conviction-lb">Conviction Offences</div>
+                        <ul>
+                          @for (item of permitParams
+                          .pentWorkPermitApplication
+                          .pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationPrimaryApplicantCriminalOffenceDetail;
+                          track $index) {
+                          <li>
+                            <div class="checkbox-success">
+                              <mat-checkbox class="mat-checks">
+                                {{ item.offence }}</mat-checkbox
+                              >
+                            </div>
+                          </li>
+                          }
+                        </ul>
+                      </div> -->
+                      <div class="checkbox-success-container pt8">
+                        <!-- <div class="conviction-lb">Health</div> -->
+                        <ul>
+                          @for (item of permitParams
+                          .pentWorkPermitApplication
+                          .pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationCharactorDeclaration;
+                          track $index) {
+                          <li>
+                            <div class="checkbox-success">
+                              <mat-checkbox class="mat-checks" [checked]="item.isChecked">
+                                {{ item.declaration }}</mat-checkbox>
+                            </div>
+                          </li>
+                          }
+                        </ul>
+                      </div>
+                      @for (item of permitParams
+                      .pentWorkPermitApplication
+                      .pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationCharactorDeclaration;
+                      track $index) {
+                      @if(item.comments){
+                      <div class="checkbox-success-container pt8">
+                        <app-label type="verticalText1" header="Comments" value="{{item.comments}}"></app-label>
+                      </div>
+                      }
+                      }
+
+                    </div>
+                  </scroll>
+                </div>
+              </div>
+            </app-tab-vertical>
+            <app-tab-vertical tabTitle="Applicant Document">
+              <div class="vertical-bg v-flex h100">
+                <div class="flex-1 relative">
+                  <scroll>
+                    <table class="application-table">
+                      <thead class="app-table-header">
+                        <tr class="app-table-header-row">
+                          <th class="app-table-header-cell">Document Type</th>
+                          <th class="app-table-header-cell">Document No</th>
+                          <th class="app-table-header-cell">
+                            File Name
+                            <div class="header-cell-subtitle pt8">
+                              File Size
+                            </div>
+                          </th>
+                          <th class="app-table-header-cell">
+                            Uploaded Date/Time
+                            <div class="header-cell-subtitle pt8">Days To</div>
+                          </th>
+                          <th class="app-table-header-cell">
+                            Status
+                            <div class="header-cell-subtitle pt8">
+                              Changed By
+                            </div>
+                          </th>
+                          <th class="app-table-header-cell">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody class="app-table-body">
+                        @for(documentsDetail of
+                        permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.plstentWorkPermitApplicationDocuments;
+                        track $index){
+                        @for(item of documentsDetail.plstentWorkPermitApplicationDocumentsDetail; track $index){
+                        <tr class="app-table-row">
+                          <td class="cell-content">
+                            {{ documentsDetail.documentTypeDescription }}
+                          </td>
+                          <td class="cell-content">
+                            {{ item.documentRefNo }}
+                          </td>
+                          <td class="cell-content">
+                            {{ item.pentDocumentFile.documentFileName }}
+                            <div class="table-cell-subtitle pt8">
+                              {{ item.pentDocumentFile.documentSize }}
+                            </div>
+                          </td>
+                          <td class="cell-content">
+                            {{
+                            item.pentDocumentFile.uploadedDate
+                            | appDate : "datetime"
+                            }}
+                            <div class="table-cell-subtitle pt8">
+                              {{ item.daysToExpire }} Days
+                              ({{ item.expiryDate | appDate}})
+                            </div>
+                          </td>
+                          <td class="cell-content">
+                            {{ item.documentStatusDescription }}
+                            <div class="table-cell-subtitle pt8">
+                              {{ item.changedByFullName }}
+                            </div>
+                          </td>
+                        </tr>
+                        }
+
+                        }
+                      </tbody>
+                    </table>
+                  </scroll>
+                </div>
+              </div>
+            </app-tab-vertical>
+            @if(this.type !== 'WPLT1'){
+            <app-tab-vertical tabTitle="Dependent">
+              <div class="vertical-bg v-flex h100">
+                <div class="flex-1 relative">
+                  <scroll>
+                    <app-table [columns]="dependentColumns" [columnsName]="dependentColumnsName" [hidePaginator]="false"
+                      [hideSelectAll]="true" [verticalLineRemove]="true" [dataSource]="dependentTable">
+                      <ng-template cellDef="name" let-element>
+                        <div class="">
+                          {{ element.name }}
+                        </div>
+                      </ng-template>
+                      <ng-template cellDef="fullName" let-element>
+                        <div class="table-cell-link">
+                          {{ element.fullName }}
+                        </div>
+                      </ng-template>
+                      <ng-template cellDef="Gender" let-element>
+                        <div class="">
+                          {{ element.Gender }}
+                        </div>
+                      </ng-template>
+                      <ng-template cellDef="dob" let-element>
+                        <div class="">
+                          {{ element.dob }}
+                        </div>
+                      </ng-template>
+                      <ng-template cellDef="passportNumber" let-element>
+                        <div class="">
+                          {{ element.passportNumber }}
+                        </div>
+                      </ng-template>
+                      <ng-template cellDef="relationship" let-element>
+                        <div class="">
+                          {{ element.relationship }}
+                        </div>
+                      </ng-template>
+                    </app-table>
+                  </scroll>
+                </div>
+              </div>
+            </app-tab-vertical>
+            <app-tab-vertical tabTitle="Dependent Document">
+              <div class="vertical-bg v-flex h100">
+                <div class="flex-1 relative">
+                  <scroll>
+                    <app-table [columns]="dependentDocumentColumns" [columnsName]="dependentDocumentColumnsName"
+                      [hidePaginator]="false" [hideSelectAll]="true" [verticalLineRemove]="true"
+                      [dataSource]="dependentDocumentTable">
+                      <ng-template cellDef="documentType" let-element>
+                        <div class="p-1">
+                          {{ element.documentType }}
+                        </div>
+                      </ng-template>
+                      <ng-template cellDef="status" let-element>
+                        <div class="d-flex">
+                          <div class="p-1 table-cell-link">
+                            {{ element.status }}
+                          </div>
+                          <div class="p-1 table-cell-link">
+                            {{ element.notes }}
+                          </div>
+                        </div>
+                      </ng-template>
+                    </app-table>
+                  </scroll>
+                </div>
+              </div>
+            </app-tab-vertical>
+            }
+            <app-tab-vertical tabTitle="Employment">
+              <div class="vertical-bg v-flex h100">
+                <row className="pt16 ">
+                  <div class="col-md-2 p-0">
+                    <div class="lg-label-header dark-lb pb8">
+                      Employment Detail
+                    </div>
+                    <div class="text-gray-border-bottom-1"></div>
+                  </div>
+                </row>
+                <!-- @for (item of items; track $index) { -->
+                <div class="pt16">
+                  <app-label type="verticalText1" header="Is this a new position"
+                    value="{{permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.isPositionNew}}"></app-label>
+                </div>
+                <div class="pt16">
+                  <app-label type="verticalText1" header="Position Of Employee"
+                    value="{{permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.positionOfEmployee}}">
+                  </app-label>
+                </div>
+                <div class="pt16">
+                  <app-label type="verticalText1" header="Duties of the Position"
+                    value="{{permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.positionOfEmployee}}"></app-label>
+                </div>
+                <div class="pt16">
+                  <app-label type="verticalText1" header="Experience Required for the Position" value="{{permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.experienceNeededForPosition}};
+                  "></app-label>
+                </div>
+                <div class="pt16">
+                  <app-label type="verticalText1" header="Qualification Required for the Position"
+                    value="{{permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.qualificatonNeededForPosition}}"></app-label>
+                </div>
+                <div class="pt16">
+                  <app-label type="verticalText1" header="What Qualification does the Applicant Have?"
+                    value="{{permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.primaryApplicantQualification}}"></app-label>
+                </div>
+                <div class="pt16">
+                  <app-label type="verticalText1"
+                    header="Give Reasons Why this Position Cannot Be Filled By A Citizen Of The Fiji Islands"
+                    value="{{permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.reasonWhyPositionCannotFilledByLocal}}"></app-label>
+                </div>
+                <div class="pt16">
+                  <app-label type="verticalText1" header="Give Reasons Why the Local Applicants Were Not Suitable:"
+                    value="{{permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.reasonWhyLocalApplicantsNotSuitable}}"></app-label>
+                </div>
+                <div class="pt16">
+                  <app-label type="verticalText1"
+                    header="What Type Of Training Does The Organization Intend To Do Fill This Position By A Local Person ?"
+                    value="{{permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.trainingPlanForLocalApplicants}}"></app-label>
+                </div>
+                <!-- } -->
+              </div>
+            </app-tab-vertical>
+            <app-tab-vertical tabTitle="Employer">
+              <div class="vertical-bg v-flex h100">
+                <div class="flex-1 relative">
+                  <scroll>
+                    <row>
+                      <div class="col-md-2">
+                        <div class="labelHead dark-lb pb8">
+                          Employer Details
+                        </div>
+                        <div class="text-gray-border-bottom-1"></div>
+                      </div>
+                    </row>
+                    <row>
+                      <div class="col-md-4">
+                        <app-label type="verticalText" header="Name of Employer" value="{{
+                            permitParams.pentWorkPermitApplication
+                              .pentWorkPermitApplicationPrimaryApplicantDetail
+                              .pentWorkPermitApplicationEmployerDetail
+                              .organizationName
+                          }}"></app-label>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="home-address-container">
+                          <div class="home-address-header">Address</div>
+                          <div class="home-address-content">
+                            {{
+                            permitParams.pentWorkPermitApplication
+                            .pentWorkPermitApplicationPrimaryApplicantDetail
+                            .pentWorkPermitApplicationEmployerDetail
+                            .pentAddress.line1
+                            }},
+                            {{
+                            permitParams.pentWorkPermitApplication
+                            .pentWorkPermitApplicationPrimaryApplicantDetail
+                            .pentWorkPermitApplicationEmployerDetail
+                            .pentAddress.line2
+                            }},
+                            {{
+                            permitParams.pentWorkPermitApplication
+                            .pentWorkPermitApplicationPrimaryApplicantDetail
+                            .pentWorkPermitApplicationEmployerDetail
+                            .pentAddress.line3
+                            }},
+                            <br />
+                            {{
+                            permitParams.pentWorkPermitApplication
+                            .pentWorkPermitApplicationPrimaryApplicantDetail
+                            .pentWorkPermitApplicationEmployerDetail
+                            .pentAddress.islandDescription
+                            }}
+                            {{
+                            permitParams.pentWorkPermitApplication
+                            .pentWorkPermitApplicationPrimaryApplicantDetail
+                            .pentWorkPermitApplicationEmployerDetail
+                            .pentAddress.provinceDescription
+                            }}
+                            {{
+                            permitParams.pentWorkPermitApplication
+                            .pentWorkPermitApplicationPrimaryApplicantDetail
+                            .pentWorkPermitApplicationEmployerDetail
+                            .pentAddress.tikinaDescription
+                            }}
+                            <br />
+                            {{
+                            permitParams.pentWorkPermitApplication
+                            .pentWorkPermitApplicationPrimaryApplicantDetail
+                            .pentWorkPermitApplicationEmployerDetail
+                            .pentAddress.cityTown
+                            }}
+                          </div>
+                        </div>
+                      </div>
+                    </row>
+                    <row>
+                      <div class="col-md-4">
+                        <app-label type="verticalText" header="Nature of Business" value="Nature"></app-label>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="employees">
+                          Details about number of Employees
+                        </div>
+                        <div class="pb8">
+                          <app-label type="text" header="Local"
+                            value="{{permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.numberOfLocalEmployees}}"></app-label>
+                        </div>
+                        <app-label type="text" header="Expatriate"
+                          value="{{permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationPrimaryApplicantPositionDetail.numberOfExpatriateEmployees}}"></app-label>
+                      </div>
+                    </row>
+                  </scroll>
+                </div>
+              </div>
+            </app-tab-vertical>
+            <app-tab-vertical tabTitle="Employer Document">
+              <div class="vertical-bg h100">
+                <div class="flex-1 relative">
+                  <scroll>
+                    <table class="application-table">
+                      <thead class="app-table-header">
+                        <tr class="app-table-header-row">
+                          <th class="app-table-header-cell">Document Type</th>
+                          <th class="app-table-header-cell">Document No</th>
+                          <th class="app-table-header-cell">
+                            File Name
+                            <div class="header-cell-subtitle pt8">
+                              File Size
+                            </div>
+                          </th>
+                          <th class="app-table-header-cell">
+                            Uploaded Date/Time
+                            <div class="header-cell-subtitle pt8">Days To</div>
+                          </th>
+                          <th class="app-table-header-cell">
+                            Status
+                            <div class="header-cell-subtitle pt8">
+                              Changed By
+                            </div>
+                          </th>
+                          <th class="app-table-header-cell">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody class="app-table-body">
+                        @for(documentsDetail of
+                        permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.
+                        pentWorkPermitApplicationEmployerDetail.plstentWorkPermitApplicationDocuments;
+                        track $index){
+                        @for(item of documentsDetail.plstentWorkPermitApplicationDocumentsDetail; track $index){
+                        <tr class="app-table-row">
+                          <td class="cell-content">
+                            {{ documentsDetail.documentTypeDescription }}
+                          </td>
+                          <td class="cell-content">
+                            {{ item.documentRefNo }}
+                          </td>
+                          <td class="cell-content">
+                            {{ item.pentDocumentFile.documentFileName }}
+                            <div class="table-cell-subtitle pt8">
+                              {{ item.pentDocumentFile.documentSize }}
+                            </div>
+                          </td>
+                          <td class="cell-content">
+                            {{
+                            item.pentDocumentFile.uploadedDate
+                            | appDate : "datetime"
+                            }}
+                            <div class="table-cell-subtitle pt8">
+                            </div>
+                          </td>
+                          <td class="cell-content">
+                            {{ item.documentStatusDescription }}
+                            <div class="table-cell-subtitle pt8">
+                            </div>
+                          </td>
+                        </tr>
+                        }
+                        }
+                      </tbody>
+                    </table>
+                  </scroll>
+                </div>
+              </div>
+            </app-tab-vertical>
+            <app-tab-vertical tabTitle="Declaration">
+              <div class="vertical-bg">
+                <row>
+                  <div class="col-md-4">
+                    <app-label type="verticalText" header="Name of Person doing the Declaration"
+                      value="{{permitParams.pentWorkPermitApplication
+                        .pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationEmployerDetail.pentWorkPermitApplicationEmployerDeclarationSummary.nameOfPerson}}"></app-label>
+                  </div>
+                  <div class="col-md-4">
+                    <app-label type="verticalText" header="Position in Organization"
+                      value="{{permitParams.pentWorkPermitApplication
+                        .pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationEmployerDetail.pentWorkPermitApplicationEmployerDeclarationSummary.positionInOrganization}}"></app-label>
+                  </div>
+                </row>
+
+                <div class="checkbox-success-container">
+                  <ul>
+                    @for (item of permitParams.pentWorkPermitApplication
+                    .pentWorkPermitApplicationPrimaryApplicantDetail.pentWorkPermitApplicationEmployerDetail.pentWorkPermitApplicationEmployerDeclarationSummary.plstentWorkPermitApplicationEmployerDeclaration;
+                    track $index) {
+                    <li>
+                      <div class="checkbox-success">
+                        <mat-checkbox class="mat-checks" [checked]="item.isChecked">{{
+                          item.employerDeclarationDescription
+                          }}</mat-checkbox>
+                      </div>
+                    </li>
+                    }
+                  </ul>
+                </div>
+              </div>
+            </app-tab-vertical>
+          </app-tab-group-vertical>
+        </div>
+      </app-tab>
+      <app-tab tabTitle="Recommendation">
+        <accordion>
+          <!-- <accordion-item [isOpen]="true">
+            <accordion-header>
+              <div class="accordion-header-content">
+                <div class="accordion-title dis-flex w100">
+                  <div class="accordian-title-header col-md-6">
+                    Director Review
+                  </div>
+                  <div class="d-flex g36 col-md-6">
+                    <div class="d-flex gap-5 slot-right-content">
+                      Current Action: <span>Pending Manager Review</span>
+                    </div>
+                    <div class="d-flex gap-15 slot-right-content">
+                      Current Action: <span>Pending Manager Review</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </accordion-header>
+            <accordion-body>
+              <div>
+                <div class="d-flex gap16 ">
+                  <div (click)="doSwap('cmnt') " class="pointer tab-header" [ngClass]="{'text-color' : swap===true}">
+                    Comments
+                  </div>
+                  <div (click)="doSwap('other')" class="pointer tab-header" [ngClass]="{'text-color' : swap===false}">
+                    Checklist
+                  </div>
+                </div>
+                @if (swap) {
+                <row className="pt16">
+                  <div class="col-md-7 px-2">
+                    <app-input-control type="textarea" label="Comments" className="textarea"
+                      [required]="true"></app-input-control>
+                  </div>
+                  <div class="col-md-2 upload px-2">
+                  </div>
+                  <div class="col-md-3 px-2">
+                    <div class="v-flex h100 justify-between">
+                      <app-input-control type="select" className="white-input"
+                        label="Recommendation"></app-input-control>
+                      <div class="label">Next Action:<span class="">Next</span> </div>
+                    </div>
+                  </div>
+                </row>
+                <div class="end">
+                  <button class="btn-secondary" appButton="Complete"></button>
+                </div>
+                } @else {
+                <row className="pt26">
+                  <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                      <div class="col-md-8">
+                        Request letter from the employer
+                      </div>
+                      <div clas="col-md-4">
+                        <div class="d-flex align-items-center">
+                          <mat-checkbox></mat-checkbox>Yes
+                          <mat-checkbox></mat-checkbox>No
+                        </div>
+                      </div>
+                      <div class="col-md-8">
+                        Police Report of Principal applicant
+                      </div>
+                      <div clas="col-md-4">
+                        <div class="d-flex align-items-center">
+                          <mat-checkbox></mat-checkbox>Yes
+                          <mat-checkbox></mat-checkbox>No
+                        </div>
+                      </div>
+                      <div class="col-md-8">
+                        Medical Report for the Principal applicant
+                      </div>
+                      <div clas="col-md-4">
+                        <div class="d-flex align-items-center">
+                          <mat-checkbox></mat-checkbox>Yes
+                          <mat-checkbox></mat-checkbox>No
+                        </div>
+                      </div>
+                      <div class="col-md-8">
+                        Certified copy of applicant's passport bio data page
+                      </div>
+                      <div clas="col-md-4">
+                        <div class="d-flex align-items-center">
+                          <mat-checkbox></mat-checkbox>Yes
+                          <mat-checkbox></mat-checkbox>No
+                        </div>
+                      </div>
+                      <div class="col-md-8">
+                        Curriculum Vitae [CV]
+                      </div>
+                      <div clas="col-md-4">
+                        <div class="d-flex align-items-center">
+                          <mat-checkbox></mat-checkbox>Yes
+                          <mat-checkbox></mat-checkbox>No
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                      <div class="col-md-8">
+                        Request letter from the employer
+                      </div>
+                      <div clas="col-md-4">
+                        <div class="d-flex align-items-center">
+                          <mat-checkbox></mat-checkbox>Yes
+                          <mat-checkbox></mat-checkbox>No
+                        </div>
+                      </div>
+                      <div class="col-md-8">
+                        Police Report of Principal applicant
+                      </div>
+                      <div clas="col-md-4">
+                        <div class="d-flex align-items-center">
+                          <mat-checkbox></mat-checkbox>Yes
+                          <mat-checkbox></mat-checkbox>No
+                        </div>
+                      </div>
+                      <div class="col-md-8">
+                        Medical Report for the Principal applicant
+                      </div>
+                      <div clas="col-md-4">
+                        <div class="d-flex align-items-center">
+                          <mat-checkbox></mat-checkbox>Yes
+                          <mat-checkbox></mat-checkbox>No
+                        </div>
+                      </div>
+                      <div class="col-md-8">
+                        Certified copy of applicant's passport bio data page
+                      </div>
+                      <div clas="col-md-4">
+                        <div class="d-flex align-items-center">
+                          <mat-checkbox></mat-checkbox>Yes
+                          <mat-checkbox></mat-checkbox>No
+                        </div>
+                      </div>
+                      <div class="col-md-8">
+                        Curriculum Vitae [CV]
+                      </div>
+                      <div clas="col-md-4">
+                        <div class="d-flex align-items-center">
+                          <mat-checkbox></mat-checkbox>Yes
+                          <mat-checkbox></mat-checkbox>No
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </row>
+
+
+
+                }
+              </div>
+            </accordion-body>
+          </accordion-item>
+          <accordion-item>
+            <accordion-header>
+              <div class="accordion-header-content">
+                <div class="accordion-title dis-flex w100">
+                  <div class="accordian-title-header col-md-6">
+                    Director Review
+                  </div>
+                  <div class="d-flex g36 col-md-6">
+                    <div class="d-flex gap-5 slot-right-content">
+                      Current Action: <span>Pending Manager Review</span>
+                    </div>
+                    <div class="d-flex gap-15 slot-right-content">
+                      Current Action: <span>Pending Manager Review</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </accordion-header>
+            <accordion-body>
+              <div>
+                <div class="d-flex gap16 ">
+                  <div (click)="doSwap('cmnt') " class="pointer tab-header" [ngClass]="{'text-color' : swap===true}">
+                    Comments
+                  </div>
+                  <div (click)="doSwap('other')" class="pointer tab-header" [ngClass]="{'text-color' : swap===false}">
+                    Checklist
+                  </div>
+                </div>
+                @if (swap) {
+                <row className="pt16">
+                  <div class="col-md-7 px-2">
+                    <app-input-control type="textarea" label="Comments" className="textarea"
+                      [required]="true"></app-input-control>
+                  </div>
+                  <div class="col-md-2 upload px-2">
+                  </div>
+                  <div class="col-md-3 px-2">
+                    <div class="v-flex h100 justify-between">
+                      <app-input-control type="select" className="white-input"
+                        label="Recommendation"></app-input-control>
+                      <div class="label">Next Action:<span class="">Next</span> </div>
+                    </div>
+                  </div>
+                </row>
+                <div class="end">
+                  <button class="btn-secondary" appButton="Complete"></button>
+                </div>
+                } @else {
+                <row className="pt26">
+                  <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                      <div class="col-md-8">
+                        Request letter from the employer
+                      </div>
+                      <div clas="col-md-4">
+                        <div class="d-flex align-items-center">
+                          <mat-checkbox></mat-checkbox>Yes
+                          <mat-checkbox></mat-checkbox>No
+                        </div>
+                      </div>
+                      <div class="col-md-8">
+                        Police Report of Principal applicant
+                      </div>
+                      <div clas="col-md-4">
+                        <div class="d-flex align-items-center">
+                          <mat-checkbox></mat-checkbox>Yes
+                          <mat-checkbox></mat-checkbox>No
+                        </div>
+                      </div>
+                      <div class="col-md-8">
+                        Medical Report for the Principal applicant
+                      </div>
+                      <div clas="col-md-4">
+                        <div class="d-flex align-items-center">
+                          <mat-checkbox></mat-checkbox>Yes
+                          <mat-checkbox></mat-checkbox>No
+                        </div>
+                      </div>
+                      <div class="col-md-8">
+                        Certified copy of applicant's passport bio data page
+                      </div>
+                      <div clas="col-md-4">
+                        <div class="d-flex align-items-center">
+                          <mat-checkbox></mat-checkbox>Yes
+                          <mat-checkbox></mat-checkbox>No
+                        </div>
+                      </div>
+                      <div class="col-md-8">
+                        Curriculum Vitae [CV]
+                      </div>
+                      <div clas="col-md-4">
+                        <div class="d-flex align-items-center">
+                          <mat-checkbox></mat-checkbox>Yes
+                          <mat-checkbox></mat-checkbox>No
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                      <div class="col-md-8">
+                        Request letter from the employer
+                      </div>
+                      <div clas="col-md-4">
+                        <div class="d-flex align-items-center">
+                          <mat-checkbox></mat-checkbox>Yes
+                          <mat-checkbox></mat-checkbox>No
+                        </div>
+                      </div>
+                      <div class="col-md-8">
+                        Police Report of Principal applicant
+                      </div>
+                      <div clas="col-md-4">
+                        <div class="d-flex align-items-center">
+                          <mat-checkbox></mat-checkbox>Yes
+                          <mat-checkbox></mat-checkbox>No
+                        </div>
+                      </div>
+                      <div class="col-md-8">
+                        Medical Report for the Principal applicant
+                      </div>
+                      <div clas="col-md-4">
+                        <div class="d-flex align-items-center">
+                          <mat-checkbox></mat-checkbox>Yes
+                          <mat-checkbox></mat-checkbox>No
+                        </div>
+                      </div>
+                      <div class="col-md-8">
+                        Certified copy of applicant's passport bio data page
+                      </div>
+                      <div clas="col-md-4">
+                        <div class="d-flex align-items-center">
+                          <mat-checkbox></mat-checkbox>Yes
+                          <mat-checkbox></mat-checkbox>No
+                        </div>
+                      </div>
+                      <div class="col-md-8">
+                        Curriculum Vitae [CV]
+                      </div>
+                      <div clas="col-md-4">
+                        <div class="d-flex align-items-center">
+                          <mat-checkbox></mat-checkbox>Yes
+                          <mat-checkbox></mat-checkbox>No
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </row>
+
+
+
+                }
+              </div>
+            </accordion-body>
+          </accordion-item> -->
+          @for(item of permitParams.plstentPermitApplicationRecommendation; track $index){
+
+          <accordion-item [isOpen]="true">
+            <accordion-header>
+              <div class="accordion-header-content">
+                <div class="accordion-title dis-flex w100">
+                  <div class="accordian-title-header col-md-6">
+                    Director Review
+                  </div>
+                  <div class="d-flex g36 col-md-6">
+                    <div class="d-flex gap-5 slot-right-content accordion_sub-lb pr24">
+                      Current Action: <span>{{item.currentActionDescription}}</span>
+                    </div>
+                    <div class="d-flex gap-15 slot-right-content accordion_sub-lb">
+                      Current Action: <span>{{item.currentOfficer}}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </accordion-header>
+            <accordion-body>
+              <div>
+                <div class="d-flex gap16">
+                  <div (click)="doSwap('cmnt')" class="pointer tab-header" [ngClass]="{ 'text-color': swap === true }">
+                    Comments
+                  </div>
+                  <div (click)="doSwap('other')" class="pointer tab-header"
+                    [ngClass]="{ 'text-color': swap === false }">
+                    Checklist
+                  </div>
+                </div>
+                @if (swap) {
+                <row className="pt16">
+                  <div class="col-md-6 px-2">
+                    <app-input-control designType="textarea" label="Comments" className="textarea" [required]="true"
+                      [errorTrue]="errorTrue" [(ngModel)]="item.comments" [noEmoji]="true" [maxCharacterLength]="true" [maxLength]="appSetting.environment.wordLimits">
+                    </app-input-control>
+                  </div>
+                  <div class="col-md-3 px-2 slot-center">
+                    <div class="upload-height"></div>
+                    <app-documents></app-documents>
+                  </div>
+                  <div class="col-md-3 px-2">
+                    <div class="v-flex h100 justify-between">
+                      <app-input-control type="select" className="white-input" label="Recommendation"
+                        [(ngModel)]="item.recommendationId" name="recommendationId"></app-input-control>
+                      <div class="label">
+                        Next Action:<span class="">Next</span>
+                      </div>
+                    </div>
+                  </div>
+                </row>
+                <div class="end">
+                  <button class="btn-secondary" appButton="Complete"></button>
+                </div>
+                } @else {
+                <row className="pt26">
+                  @for (item of item.plstRecommendation; track $index) {
+                  <div class="col-md-6">
+                    <app-check-box [label]="item" type="horValue" [objArray]="item"></app-check-box>
+                  </div>
+                  }
+                </row>
+
+                }
+              </div>
+            </accordion-body>
+          </accordion-item>
+          }
+        </accordion>
+      </app-tab>
+      <app-tab tabTitle="Border Information" (tabChange)="onTabChange($event)">
+        <div class="vertical-tabs v-flex h100">
+          <app-tab-group-vertical class="tab-groups">
+            <app-tab-vertical tabTitle="Controversial">
+              <div class="vertical-bg h100">
+                <div class="flex-1 relative h100 ">
+                  <scroll>
+                    <table class="application-table">
+                      <thead class="app-table-header">
+                        <tr class="app-table-header-row">
+                          <th class="app-table-header-cell">
+                            First Name
+                            <div class="header-cell-subtitle pt8">
+                              Last Name
+                            </div>
+                          </th>
+                          <th class="app-table-header-cell">Date of Birth</th>
+                          <th class="app-table-header-cell">
+                            Parent Name
+                          </th>
+                          <th class="app-table-header-cell">Passport No</th>
+                          <th class="app-table-header-cell">Reason</th>
+                          <th class="app-table-header-cell">From Date
+                            <div class="header-cell-subtitle pt8">
+                              To Date
+                            </div>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody class="app-table-body">
+                        @for(item of
+                        permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.plstentPrimaryApplicantCotraversialList;
+                        track $index){
+                        <tr class="app-table-row">
+                          <td class="cell-content">
+                            <!-- {{ item.documentStatusDescription }} -->
+                            <div class="table-cell-subtitle pt8">
+                              <!-- {{ item. }} -->
+                            </div>
+                          </td>
+                          <td class="cell-content">
+                            <!-- {{ item.statusDescription }} -->
+                          </td>
+                          <td class="cell-content">
+                            <!-- {{ item.changedBy }} -->
+                          </td>
+                          <td class="cell-content">
+                            <!-- {{ item.changedDate | appDate: 'datetime' }} -->
+                          </td>
+                          <td class="cell-content">
+                            <!-- {{ item.tatInHours }} -->
+                          </td>
+                          <td class="cell-content">
+                            <!-- {{ item.documentStatusDescription }} -->
+                            <div class="table-cell-subtitle pt8">
+                              <!-- {{ item. }} -->
+                            </div>
+                          </td>
+                        </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </scroll>
+                </div>
+              </div>
+            </app-tab-vertical>
+            <app-tab-vertical tabTitle="Travel History">
+              <div class="vertical-bg h100">
+                <div class="flex-1 relative h100 ">
+                  <scroll>
+                    <table class="application-table">
+                      <thead class="app-table-header">
+                        <tr class="app-table-header-row">
+                          <th class="app-table-header-cell">
+                            Passport No
+                          </th>
+                          <th class="app-table-header-cell">Nationality</th>
+                          <th class="app-table-header-cell">
+                            Entry Date
+                          </th>
+                          <th class="app-table-header-cell">Exit Date</th>
+                        </tr>
+                      </thead>
+                      <tbody class="app-table-body">
+                        @for(item of
+                        permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.plstentPrimaryApplicantTravelHitory;
+                        track $index){
+                        <tr class="app-table-row">
+                          <td class="cell-content">
+                            <!-- {{ item.statusDescription }} -->
+                          </td>
+                          <td class="cell-content">
+                            <!-- {{ item.changedBy }} -->
+                          </td>
+                          <td class="cell-content">
+                            <!-- {{ item.changedDate | appDate: 'datetime' }} -->
+                          </td>
+                          <td class="cell-content">
+                            <!-- {{ item.tatInHours }} -->
+                          </td>
+                        </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </scroll>
+                </div>
+              </div>
+            </app-tab-vertical>
+
+            <app-tab-vertical tabTitle="uplift of PI Status">
+              <div class="vertical-bg h100">
+                <div class="flex-1 relative h100 ">
+                  <scroll>
+                    <table class="application-table">
+                      <thead class="app-table-header">
+                        <tr class="app-table-header-row">
+                          <th class="app-table-header-cell">
+                            First Name
+                            <div class="header-cell-subtitle pt8">
+                              Last Name
+                            </div>
+                          </th>
+                          <th class="app-table-header-cell">Date of Birth</th>
+                          <th class="app-table-header-cell">
+                            Parent Name
+                          </th>
+                          <th class="app-table-header-cell">Passport No</th>
+                          <th class="app-table-header-cell">Reason</th>
+                          <th class="app-table-header-cell">From Date
+                            <div class="header-cell-subtitle pt8">
+                              To Date
+                            </div>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody class="app-table-body">
+                        @for(item of
+                        permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.plstentPrimaryApplicantPIStatusList;
+                        track $index){
+                        <tr class="app-table-row">
+                          <td class="cell-content">
+                            <!-- {{ item.documentStatusDescription }} -->
+                            <div class="table-cell-subtitle pt8">
+                              <!-- {{ item. }} -->
+                            </div>
+                          </td>
+                          <td class="cell-content">
+                            <!-- {{ item.statusDescription }} -->
+                          </td>
+                          <td class="cell-content">
+                            <!-- {{ item.changedBy }} -->
+                          </td>
+                          <td class="cell-content">
+                            <!-- {{ item.changedDate | appDate: 'datetime' }} -->
+                          </td>
+                          <td class="cell-content">
+                            <!-- {{ item.tatInHours }} -->
+                          </td>
+                          <td class="cell-content">
+                            <!-- {{ item.documentStatusDescription }} -->
+                            <div class="table-cell-subtitle pt8">
+                              <!-- {{ item. }} -->
+                            </div>
+                          </td>
+                        </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </scroll>
+                </div>
+              </div>
+            </app-tab-vertical>
+
+            <app-tab-vertical tabTitle="DPO">
+              <div class="vertical-bg h100">
+                <div class="vertical-bg h100">
+                  <div class="flex-1 relative h100 ">
+                    <scroll>
+                      <table class="application-table">
+                        <thead class="app-table-header">
+                          <tr class="app-table-header-row">
+                            <th class="app-table-header-cell">
+                              Passport No
+                            </th>
+                            <th class="app-table-header-cell">Nationality</th>
+                            <th class="app-table-header-cell">
+                              Entry Date
+                            </th>
+                            <th class="app-table-header-cell">Exit Date</th>
+                          </tr>
+                        </thead>
+                        <tbody class="app-table-body">
+                          @for(item of
+                          permitParams.pentWorkPermitApplication.pentWorkPermitApplicationPrimaryApplicantDetail.plstentPrimaryApplicantDPOList;
+                          track $index){
+                          <tr class="app-table-row">
+                            <td class="cell-content">
+                              <!-- {{ item.statusDescription }} -->
+                            </td>
+                            <td class="cell-content">
+                              <!-- {{ item.changedBy }} -->
+                            </td>
+                            <td class="cell-content">
+                              <!-- {{ item.changedDate | appDate: 'datetime' }} -->
+                            </td>
+                            <td class="cell-content">
+                              <!-- {{ item.tatInHours }} -->
+                            </td>
+                          </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </scroll>
+                  </div>
+                </div>
+              </div>
+            </app-tab-vertical>
+          </app-tab-group-vertical>
+        </div>
+      </app-tab>
+      <app-tab tabTitle="History" (tabChange)="onTabChange($event)">
+        <div class="vertical-tabs v-flex h100">
+          <app-tab-group-vertical class="tab-groups">
+            <app-tab-vertical tabTitle="Assigned Officer History">
+              <div class="v-flex vertical-bg h100">
+                <div class="between pb16">
+                  <div class="col-md-3">
+                    <div class="labelHead pb8">Assigned Officer History</div>
+                    <div class="text-gray-border-bottom-1"></div>
+                  </div>
+                  <div class="slot-center gap16">
+                    <button class="home-btn-primary" appButton="Assign To"></button>
+                    <!-- } -->
+                  </div>
+                </div>
+                <!-- <div class="p8"></div> -->
+                <div class="flex-1 relative h100 ">
+                  <scroll>
+                    <table class="application-table">
+                      <thead class="app-table-header">
+                        <tr class="app-table-header-row">
+                          <th class="app-table-header-cell">Assigned To</th>
+                          <th class="app-table-header-cell">Assigned By</th>
+                          <th class="app-table-header-cell">
+                            Assigned Date / Time
+                          </th>
+                          <th class="app-table-header-cell ">
+                            <div class="text-center">
+                              Status
+                            </div>
+                          </th>
+                          <th class="app-table-header-cell">Turn Around Time</th>
+                        </tr>
+                      </thead>
+                      <tbody class="app-table-body">
+                        @for(item of
+                        permitParams.plstentPermitApplicationAssignedOfficerHistory;
+                        track $index){
+                        <tr class="app-table-row">
+                          <td class="cell-content">
+                            {{ item.assignedTo }}
+                          </td>
+                          <td class="cell-content">
+                            {{ item.assignedBy }}
+                          </td>
+                          <td class="cell-content">
+                            {{ item.assignedDate | appDate: 'datetime' }}
+                          </td>
+                          <td class="cell-content">
+                            <div class="text-center">
+                              {{ item.statusDescription }}
+                            </div>
+                          </td>
+                          <td class="cell-content">
+                            {{ item.tatInHours }}
+                          </td>
+                        </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </scroll>
+                </div>
+              </div>
+            </app-tab-vertical>
+            <app-tab-vertical tabTitle="Status History">
+              <div class="vertical-bg v-flex h100">
+                <div class="col-md-2">
+                  <div class="labelHead pb8">Status History</div>
+                  <div class="text-gray-border-bottom-1"></div>
+                </div>
+                <div class="flex-1 relative h100 ">
+                  <scroll>
+                    <table class="application-table">
+                      <thead class="app-table-header">
+                        <tr class="app-table-header-row">
+                          <th class="app-table-header-cell">Status</th>
+                          <th class="app-table-header-cell">Changed By</th>
+                          <th class="app-table-header-cell">
+                            Changed Date / Time
+                          </th>
+                          <th class="app-table-header-cell">Turn Around Time</th>
+                        </tr>
+                      </thead>
+                      <tbody class="app-table-body">
+                        @for(item of permitParams.plstentPermitApplicationStatusHistory;
+                        track $index){
+                        <tr class="app-table-row">
+                          <td class="cell-content">
+                            {{ item.statusDescription }}
+                          </td>
+                          <td class="cell-content">
+                            {{ item.changedBy }}
+                          </td>
+                          <td class="cell-content">
+                            {{ item.changedDate | appDate: 'datetime' }}
+                          </td>
+                          <td class="cell-content">
+                            {{ item.tatInHours }}
+                          </td>
+                        </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </scroll>
+                </div>
+              </div>
+            </app-tab-vertical>
+
+            <app-tab-vertical tabTitle="Communication History">
+              <div class="vertical-bg v-flex h100">
+                <div class="col-md-2">
+                  <div class="labelHead pb8">Email History</div>
+                  <div class="text-gray-border-bottom-1"></div>
+                </div>
+                <div class="flex-1 relative h100 ">
+                  <scroll>
+                    <table class="application-table">
+                      <thead class="app-table-header">
+                        <tr class="app-table-header-row">
+                          <th class="app-table-header-cell">From Email ID</th>
+                          <th class="app-table-header-cell">To Email ID</th>
+                          <th class="app-table-header-cell">
+                            Date Sent/Time
+                          </th>
+                          <th class="app-table-header-cell">Email Status</th>
+                          <th class="app-table-header-cell">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody class="app-table-body">
+                        @for(item of permitParams.plstentPermitApplicationEmailHistory;
+                        track $index){
+                        <tr class="app-table-row">
+                          <td class="cell-content">
+                            {{ item.pentCommunicationTracking.fromEmailId }}
+                          </td>
+                          <td class="cell-content">
+                            {{ item.pentCommunicationTracking.toEmailId }}
+                          </td>
+                          <td class="cell-content">
+                            {{ item.sentDate | appDate: 'datetime' }}
+                          </td>
+                          <td class="cell-content">
+                            {{ item.sentStatusDescription }}
+                          </td>
+                          <td class="cell-content">
+                            <ion-icon src="assets/svg/view-eye.svg" matTooltip="view"></ion-icon>
+                          </td>
+                        </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </scroll>
+                </div>
+              </div>
+            </app-tab-vertical>
+          </app-tab-group-vertical>
+        </div>
+      </app-tab>
+      <!-- <app-tab tabTitle="Permit" (tabChange)="onTabChange($event)">
+        <div class="vertical-tabs v-flex h100">
+          <div class="flex-1 relative">
+            <div class="ab">
+              <div class="rel">
+                @if(uploadUrl !== '') {
+                <div class="pdf-viewer">
+                  <div class="ab">
+                    <div class="h100">
+                      @if(!loadingTrue) {
+                      <app-pdf-viewer [url]="uploadUrl"></app-pdf-viewer>
+                      }
+                    </div>
+                  </div>
+                </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </app-tab> -->
+    </app-tab-group>
+  </div>
+</div>

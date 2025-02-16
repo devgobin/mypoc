@@ -1,0 +1,637 @@
+<form #l="ngForm">
+    @if (index === 0) {
+    <row className="pt16">
+      <div class="col-md-6 px-2">
+        <app-input-control designType="textarea" [maxCharacterLength]="true"
+          [maxLength]="appSetting.environment.wordLimits" label="Comments" className="textarea" [required]="true"
+          [errorTrue]="errorTrue" [(ngModel)]="item.comments" name="comments" [noEmoji]="true"
+          [btnClicked]="item.permitApplicationRecommendationId > 0"></app-input-control>
+      </div>
+      <div class="col md-6">
+        <row>
+          <div class="col-md-12 accord-doc pt20 pb16">
+            @if(item.pentPermitApplicationRecommendationDocument.pentDocumentFile.documentFileName
+            === ''){
+            <app-documents [isMultiple]="false" [typeLabel]='fileType' [fileSizeLimit]="uploadLimit" #dropZoneBrochure
+              sizeLabel="2MB" [fileType]="fileType" [accept]="accept"
+              [disabled]="item.permitApplicationRecommendationId > 0"
+              (onUpload)="uploadRecommendationDocument($event, item)"></app-documents>
+            } @else{
+            <div class="after-upload ">
+              @if(item.permitApplicationRecommendationId === 0){
+              <ion-icon name="trash-outline" (click)="deleteBin(item)" class="ml-auto"></ion-icon>
+              }
+              <div class="doc-name">
+                <ion-icon name="document-outline" class="doc-icon"></ion-icon>
+                {{
+                item.pentPermitApplicationRecommendationDocument.pentDocumentFile
+                .documentFileName
+                }}
+                <div class="view-recomm"
+                  (click)="viewPdf(item.pentPermitApplicationRecommendationDocument.pentDocumentFile)">
+                  View
+                </div>
+                <!-- <ion-icon color="primary"  name="eye-outline" (click)="viewPdf(item.pentPermitApplicationRecommendationDocument.pentDocumentFile)"></ion-icon> -->
+              </div>
+            </div>
+            }
+          </div>
+        </row>
+      </div>
+    </row>
+    <row>
+      <div class="col-md-6">
+        @if (item.recommendationValue !== 'ONHLD' && item.parentRecommendationValue !== item.recommendationValue
+        ) {
+        @if(item.recommendationValue !== 'REFCC' &&
+        item.recommendationValue !== 'REFIN' &&
+        item.recommendationValue !== 'SECAS' ){
+        <div class="pt8">
+          <label class="pr8 fnt-wt500">Recommend For
+            <span class="error-danger pl2 fs16">*</span>
+          </label>
+          <!-- <app-check-box type="radioBtn" [objArray]="recommendForLst" [required]="true" [errorTrue]="errorTrue"
+                    [(ngModel)]="item.recommendedForValue" name="recommendedForValue" [btnClicked]="item.permitApplicationRecommendationId > 0" 
+                    (eventChange)="recommendForEvent($event, item)"></app-check-box> -->
+  
+  
+          <mat-radio-group aria-label="Select an option" (change)="recommendForEvent($event, item)"
+            [disabled]="item.permitApplicationRecommendationId > 0" [required]="true" [errorTrue]="errorTrue">
+            <mat-radio-button value="APPRV" color="primary"
+              [checked]="item.recommendedForValue === 'APPRV'">Approval</mat-radio-button>
+            <mat-radio-button value="REJEC" [checked]="item.recommendedForValue === 'REJEC'">Rejection</mat-radio-button>
+          </mat-radio-group>
+          @if(item.recommendedForValue === '' && errorTrue){
+          <div class="error-text mt-10">
+            <span class="error-text-icon">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+            </span>
+            Mandatory
+          </div>
+          }
+        </div>
+        }
+  
+        }
+      </div>
+      <div class="col-md-6">
+        <row>
+          <div class="col-md-6">
+            @if(item.permitApplicationRecommendationId > 0){
+            <app-label type="verticalText" header="Moved To" value="{{ item.recommendationDescription }}"></app-label>
+            }@else{
+            <app-input-control type="select" className="white-input" label="Move To" [items]="item.plstRecommendation"
+              key="constant" keyName="description" [(ngModel)]="item.recommendationValue" name="recommendationValue"
+              (onChange)="loadNextAction(item)" [required]="true" [errorTrue]="errorTrue">
+            </app-input-control>
+            }
+          </div>
+          <div class="col-md-6 vh-end p-2">
+            <div class="accord-nx-lb">
+              Next Action:<span class="pl8">{{ item.nextActionDescription }}</span>
+            </div>
+          </div>
+        </row>
+      </div>
+    </row>
+    @if(item.recommendedForValue === 'APPRV' && item.recommendationValue !== 'ONHLD' &&
+    item.parentRecommendationValue !== item.recommendationValue){
+    @if((item.recommendationValue !== 'REFCC' &&
+    item.recommendationValue !== 'REFIN' &&
+    item.recommendationValue !== 'SECAS') &&(
+    item.parentRecommendationValue !== 'REFCC' &&
+    item.parentRecommendationValue !== 'REFIN' &&
+    item.parentRecommendationValue !== 'SECAS')){
+    <row>
+      <div class="col-md-12 align-items-center">
+        <label class="pr8 fnt-wt500">Permit Validity Type
+          <span class="error-danger pl2 fs16">*</span>
+        </label>
+        <app-check-box type="radioBtn" [objArray]="rangeLabelLst" [required]="true" [errorTrue]="errorTrue"
+          [(ngModel)]="item.permitValidityTypeValue" name="permitValidityTypeValue"
+          [btnClicked]="item.permitApplicationRecommendationId > 0"
+          (eventChange)="getPermitValidityType($event,item)"></app-check-box>
+      </div>
+      @if(item.permitValidityTypeValue === '' && errorTrue){
+      <div class="error-text mt-10 pl-5">
+        <span class="error-text-icon">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+        </span>
+        Mandatory
+      </div>
+      }
+    </row>
+    }
+    <!-- <div class="justify-between pt8"> -->
+    @if(item.recommendationValue !== 'ONHLD' && item.parentRecommendationValue !== item.recommendationValue &&
+    item.recommendedForValue === 'APPRV'){
+    @if(item.permitValidityTypeValue){
+    @if((item.recommendationValue !== 'REFCC' &&
+    item.recommendationValue !== 'REFIN' &&
+    item.recommendationValue !== 'SECAS') &&(
+    item.parentRecommendationValue !== 'REFCC' &&
+    item.parentRecommendationValue !== 'REFIN' &&
+    item.parentRecommendationValue !== 'SECAS')){
+    <row>
+      <div class="col-md-12">
+        <div class="d-flex w100 pt16">
+          <div class="valid-fnt slot-center">Permit Validity</div>
+          <!-- <label class="pr8"
+                >Permit Validity
+              </label> -->
+          <div class="flex-1 pl16">
+            <!-- [maxDate]="appService.getNextYearDate()" -->
+            <row>
+              @if(item.permitValidityTypeValue === 'UNTDT'){
+                <div class="col-md-3">
+                  <app-input-control label="Till Date" type="date" [(ngModel)]="item.tillDate" name="tillDate"
+                    [required]="true" [errorTrue]="errorTrue"
+                    [btnClicked]="item.permitApplicationRecommendationId > 0"></app-input-control>
+                </div>
+              <!-- @if(parentObj.permitTypeValue === "WPLT1" || parentObj.permitTypeValue === "OVEE1" || parentObj.permitTypeValue === "WP3YA"){
+              <div class="col-md-3">
+                <app-input-control label="Till Date" type="date" [(ngModel)]="item.tillDate" name="tillDate"
+                  [required]="true" [errorTrue]="errorTrue"
+                  [btnClicked]="item.permitApplicationRecommendationId > 0"></app-input-control>
+              </div>
+              }
+              @if(parentObj.permitTypeValue !== "WPLT1" && parentObj.permitTypeValue !== "WP3YA" &&
+              parentObj.permitTypeValue !== "OVEE1"){
+              <div class="col-md-3">
+                <app-input-control label="Till Date" type="date" [(ngModel)]="item.tillDate" name="tillDate"
+                  [required]="true" [errorTrue]="errorTrue"
+                  [btnClicked]="item.permitApplicationRecommendationId > 0"></app-input-control>
+              </div>
+              } -->
+              }
+              @if(item.permitValidityTypeValue === 'FIXPR'){
+              <div class="col-md-3">
+                <app-input-control label="No of Year" type="number" [(ngModel)]="item.numberOfYears" name="numberOfYears"
+                  [required]="item.numberOfMonths === 0 && item.numberOfDays === 0"
+                  [errorTrue]="errorTrue && (item.numberOfMonths === 0 && item.numberOfDays === 0)"
+                  [btnClicked]="item.permitApplicationRecommendationId > 0" (onBlur)="getSetToZero(item, 'numberOfYears')"
+                  (onClear)="getSetToZero(item, 'numberOfYears')"></app-input-control>
+              </div>
+              <div class="col-md-3">
+                <app-input-control label="No of Month" type="number" [(ngModel)]="item.numberOfMonths"
+                  name="numberOfMonths" [max]="12" [required]="item.numberOfYears === 0 && item.numberOfDays === 0"
+                  [errorTrue]="errorTrue && (item.numberOfYears === 0 && item.numberOfDays === 0)"
+                  [btnClicked]="item.permitApplicationRecommendationId > 0"
+                  (onBlur)="getSetToZero(item, 'numberOfMonths')"
+                  (onClear)="getSetToZero(item, 'numberOfMonths')"></app-input-control>
+              </div>
+              <div class="col-md-3">
+                <app-input-control label="No of Days" type="number" [(ngModel)]="item.numberOfDays" name="numberOfDays"
+                  [max]="31" [required]="item.numberOfMonths === 0 && item.numberOfYears === 0"
+                  [errorTrue]="errorTrue && (item.numberOfMonths === 0 && item.numberOfYears === 0)"
+                  [btnClicked]="item.permitApplicationRecommendationId > 0" (onBlur)="getSetToZero(item, 'numberOfDays')"
+                  (onClear)="getSetToZero(item, 'numberOfDays')"></app-input-control>
+              </div>
+              }
+              @if(item.permitValidityTypeValue === 'DATRN'){
+                <div class="col-md-3">
+                  <app-input-control type="date" label="Start Date" type="date" [required]="true" [errorTrue]="errorTrue"
+                    [(ngModel)]="item.startDate" name="startDate" [btnClicked]="item.permitApplicationRecommendationId > 0"
+                    (onChange)="item.endDate = ''" (onClear)="item.endDate = ''">
+                  </app-input-control>
+                </div>
+                <div class="col-md-3">
+                  <app-input-control type="date" label="End Date" type="date" [required]="true" [errorTrue]="errorTrue"
+                    [(ngModel)]="item.endDate" [minDate]="item.startDate" [isFuture]="true" name="endDate"
+                    [btnClicked]="item.startDate === '' || item.permitApplicationRecommendationId > 0 "></app-input-control>
+                </div>
+  
+                
+  
+              <!-- @if(parentObj.permitTypeValue === "WP3YA"){
+              
+              @if(item.startDate === ''){
+              <div class="col-md-3">
+                <app-input-control type="date" label="End Date" type="date" [required]="true" [errorTrue]="errorTrue"
+                  [isFuture]="true" [(ngModel)]="item.endDate" [addMaxYear]="3" name="endDate"
+                  [btnClicked]="item.startDate === ''"></app-input-control>
+              </div>
+              }
+              @else {
+              <div class="col-md-3">
+                <app-input-control type="date" label="End Date" type="date" [required]="true" [errorTrue]="errorTrue"
+                  [(ngModel)]="item.endDate" [minDate]="item.startDate" [addMaxYear]="3" [isFuture]="true" name="endDate"
+                  [btnClicked]="item.permitApplicationRecommendationId > 0 "></app-input-control>
+              </div>
+              }
+              } -->
+              <!-- @if(parentObj.permitTypeValue === "WPLT1" || parentObj.permitTypeValue === "OVEE1"){
+              <div class="col-md-3">
+                <app-input-control type="date" label="Start Date" type="date" [required]="true" [errorTrue]="errorTrue"
+                  [(ngModel)]="item.startDate" name="startDate" [btnClicked]="item.permitApplicationRecommendationId > 0"
+                  (onChange)="item.endDate = ''" (onClear)="item.endDate = ''">
+                </app-input-control>
+              </div>
+              @if(item.startDate === ''){
+              <div class="col-md-3">
+                <app-input-control type="date" label="End Date" type="date" [required]="true" [errorTrue]="errorTrue"
+                  [(ngModel)]="item.endDate" [minDate]="item.startDate" name="endDate" [isFuture]="true" [addMaxYear]="1"
+                  [btnClicked]="item.startDate === ''"></app-input-control>
+              </div>
+              }
+              @else {
+              <div class="col-md-3">
+                <app-input-control type="date" label="End Date" type="date" [required]="true" [errorTrue]="errorTrue"
+                  [(ngModel)]="item.endDate" [minDate]="item.startDate" name="endDate" [isFuture]="true" [addMaxYear]="1"
+                  [btnClicked]="item.permitApplicationRecommendationId > 0">
+                </app-input-control>
+              </div>
+              }
+              }
+              @if(parentObj.permitTypeValue !== "WPLT1" && parentObj.permitTypeValue !== "WP3YA" &&
+              parentObj.permitTypeValue !== "OVEE1"){
+              <div class="col-md-3">
+                <app-input-control type="date" label="Start Date" type="date" [required]="true" [errorTrue]="errorTrue"
+                  [(ngModel)]="item.startDate" name="startDate" (onClear)="item.endDate = ''"
+                  (onChange)="item.endDate = ''"
+                  [btnClicked]="item.permitApplicationRecommendationId > 0"></app-input-control>
+              </div>
+              @if(item.startDate === ''){
+              <div class="col-md-3">
+                <app-input-control type="date" label="End Date" type="date" [required]="true" [errorTrue]="errorTrue"
+                  [(ngModel)]="item.endDate" [minDate]="item.startDate" name="endDate" (onClear)="item.endDate = ''"
+                  (onChange)="item.endDate = ''" [btnClicked]="item.startDate === ''">
+                </app-input-control>
+              </div>
+              }
+              @else {
+              <div class="col-md-3">
+                      <app-input-control type="date" label="End Date" type="date" [required]="true" [errorTrue]="errorTrue"
+                        [(ngModel)]="item.endDate" [minDate]="item.startDate" name="endDate" [btnClicked]="item.permitApplicationRecommendationId > 0"></app-input-control>
+                    </div>
+              @if(parentObj.pentWorkPermitApplication.applyingPeriod === "1YROL") {
+              <div class="col-md-3">
+                <app-input-control type="date" label="End Date" type="date" [required]="true" [errorTrue]="errorTrue"
+                  [(ngModel)]="item.endDate" [minDate]="item.startDate" name="endDate" [isFuture]="true" [addMaxYear]="1"
+                  [btnClicked]="item.permitApplicationRecommendationId > 0">
+                </app-input-control>
+              </div>
+              }
+              @if(parentObj.pentWorkPermitApplication.applyingPeriod === "3YROL") {
+              <div class="col-md-3">
+                <app-input-control type="date" label="End Date" type="date" [required]="true" [errorTrue]="errorTrue"
+                  [(ngModel)]="item.endDate" [minDate]="item.startDate" [addMaxYear]="3" [isFuture]="true" name="endDate"
+                  [btnClicked]="item.permitApplicationRecommendationId > 0 "></app-input-control>
+              </div>
+              }
+              }
+              } -->
+              }
+            </row>
+          </div>
+        </div>
+      </div>
+    </row>
+    }
+    }
+    }
+  
+    }
+  
+    <!-- </div> -->
+    @if (item.recommendationValue === 'ONHLD' && item.permitApplicationRecommendationId === 0 &&
+    parentObj.blnIsAssignedOfficer === 'Y' && !isValidatityAvail) {
+    <!-- on hold -->
+    <div class="end">
+      <button class="btn-grey" appButton="Add On Hold Reason" (click)="createRecommendationOnHold(item)"
+        [disabled]="onHoldBtnDisable === true"></button>
+    </div>
+    } @else if(item.recommendedForValue !== 'REJEC' &&
+    item.permitApplicationRecommendationId === 0 && parentObj.blnIsAssignedOfficer
+    === 'Y') {
+    <div class="end pt2">
+      <button class="btn-secondary" appButton="Complete" (click)="saveRecommendation(item, l)"></button>
+    </div>
+    }
+    @if(item.recommendedForValue === 'REJEC'){
+    @if((item.recommendationValue !== 'REFCC' &&
+    item.recommendationValue !== 'REFIN' &&
+    item.recommendationValue !== 'SECAS') &&(
+    item.parentRecommendationValue !== 'REFCC' &&
+    item.parentRecommendationValue !== 'REFIN' &&
+    item.parentRecommendationValue !== 'SECAS')){
+    <div class="flex-1 relative h100">
+      <div class="checkbox-success-container pt16">
+        <ul>
+          @for (reject of item.plstentPermitApplicationRecommendationRejectReason;
+          track $index) {
+          <li>
+            <div class="checkbox-success">
+              <mat-checkbox class="mat-checks" (change)="changeRejectionLst($event, reject, $index)"
+                [checked]="reject.isChecked === 'Y'" [disabled]="
+                          item.permitApplicationRecommendationId > 0 &&
+                          item.recommendationValue !== 'ONHLD'">
+                @if(reject.reasonValue === 'ACPIS'){
+                <app-input-placer [(data)]="item.plstentPermitApplicationRecommendationRejectReason[$index]"
+                  [errorTrue]="errorTrue" [binder]="['sectionSuffix1', 'sectionSuffix2']" [readonly]="false"
+                  (dataChange)="getInputData($event)"></app-input-placer>
+                @if(item.recommendedForValue === 'REJEC' && this.getRejectVal){
+                <div class="error-text pt3">
+                  <span class="error-text-icon">
+                    <ion-icon name="alert-circle-outline"></ion-icon>
+                  </span>
+                  Mandatory
+                </div>
+                }
+                }
+                @else {
+                {{ reject.reasonDescription }}
+  
+                }
+              </mat-checkbox>
+            </div>
+          </li>
+          }
+        </ul>
+      </div>
+      @if(item.permitApplicationRecommendationId > 0){
+      @for (reject of item.plstentPermitApplicationRecommendationRejectReason;
+      track $index) {
+      @if(reject.isChecked === 'Y' && reject.reasonValue === 'OTHER'){
+      <div class="col-md-12 pt16">
+        <app-input-control designType="textarea" [maxCharacterLength]="true"
+          [maxLength]="appSetting.environment.wordLimits" label="Other Reason" className="textarea"
+          [(ngModel)]="reject.otherReason" name="otherReason" [btnClicked]="true" [noEmoji]="true"></app-input-control>
+      </div>
+      }
+      }
+      }
+  
+      @if(isReasonOther && item.permitApplicationRecommendationId === 0){
+      <div class="col-md-12 pt16">
+        <app-input-control designType="textarea" [maxCharacterLength]="true"
+          [maxLength]="appSetting.environment.wordLimits" label="Other Reason" className="textarea"
+          [(ngModel)]="otherReason" name="otherReason" [noEmoji]="true"></app-input-control>
+      </div>
+      }
+    </div>
+    }
+  
+    }
+  
+    @if(item.recommendedForValue === 'REJEC' &&
+    item.permitApplicationRecommendationId === 0 && parentObj.blnIsAssignedOfficer
+    === 'Y'){
+    <div class="end">
+      <button class="btn-secondary" appButton="Complete" (click)="saveRecommendation(item, l)"></button>
+    </div>
+    }
+  
+    @if (item.plstentPermitApplicationRecommendationOnhold.length > 0) {
+    <div class="d-flex accord-body-header mt8">
+      <div class="pointer tab-header primary-txt-color pb8 pt8">
+        Reason for On Hold & Customer Response
+      </div>
+    </div>
+    }
+  
+    @if(item.recommendationValue === "ONHLD" || isReasonAvail){
+    @for(reason of
+    item.plstentPermitApplicationRecommendationOnhold; track reason; let i=$index){
+    <div class="col-md-12">
+      <row>
+        @for(rejectReason of reason.plstentPermitApplicationRecommendationOnholdReason; track $index){
+        <div class="col-md-6">
+          <app-check-box [objArray]="[{label: rejectReason.onholdReasonDescription, trueValue: 'Y', falseValue: 'N'}]"
+            [(ngModel)]="rejectReason.isChecked" name="isChecked{{$index}}" type="dualHorCheck">
+          </app-check-box>
+        </div>
+        @if(rejectReason.onholdReasonValue === 'OTHER' && rejectReason.isChecked === 'Y'){
+        <div>
+          <app-input-control designType="textareaDoc" label="Other Reason" [(ngModel)]="reason.otherReason"
+            name="otherReason" className="textarea1" [required]="true" [errorTrue]="errorTrue" [noEmoji]="true"
+            [maxCharacterLength]="true" [maxLength]="appSetting.environment.wordLimits">
+          </app-input-control>
+        </div>
+        }
+        }
+      </row>
+  
+    </div>
+    <div class="col-md-12 pt16">
+      <app-input-control designType="textarea" [maxCharacterLength]="true" [maxLength]="appSetting.environment.wordLimits"
+        label="Reason for On Hold" className="textarea" [(ngModel)]="reason.reasonForOnhold" name="reasonForOnhold"
+        [noEmoji]="true" [required]="true" [errorTrue]="errorTrue"
+        [btnClicked]="item.permitApplicationRecommendationId > 0"></app-input-control>
+    </div>
+    @if(reason.permitApplicationRecommendationOnholdId > 0 && reason.isResponded === 'Y'){
+    <div class="col-md-12 pt16">
+      <app-input-control designType="textarea" [maxCharacterLength]="true" [maxLength]="appSetting.environment.wordLimits"
+        label="Customer Response" className="textarea" [(ngModel)]="
+            reason.pentPermitApplicationRecommendationCustomerResponse
+              .customerResponse
+          " name="customerResponse" [noEmoji]="true"></app-input-control>
+    </div>
+    <!-- @if(reason.plstentPermitApplicationRecommendationCustomerResponseDocumentDetail.length > 0){ -->
+    <table class="application-table pt16">
+      <thead class="app-table-header">
+        <tr class="app-table-header-row">
+          <th class="app-table-header-cell">Document No</th>
+          <th class="app-table-header-cell">Expiry Date</th>
+  
+          <th class="app-table-header-cell">
+            File Name
+            <div class="header-cell-subtitle pt8">File Size</div>
+          </th>
+          <th class="app-table-header-cell">
+            Uploaded Date/Time
+            <!-- <div class="header-cell-subtitle pt8">Expiry Date</div> -->
+          </th>
+          <!-- <th class="app-table-header-cell">
+              Status
+              <div class="header-cell-subtitle pt8">Changed By</div>
+            </th> -->
+          <th class="app-table-header-cell">Action</th>
+        </tr>
+      </thead>
+      <tbody class="app-table-body">
+        @for(doc of
+        reason.pentPermitApplicationRecommendationCustomerResponse.pentPermitApplicationRecommendationCustomerResponseDocument.plstentPermitApplicationRecommendationCustomerResponseDocumentDetail;
+        track doc; let a = $index){
+        <tr class="app-table-row">
+          <td class="cell-content">
+            {{ doc.documentRefNo }}
+          </td>
+          <td class="cell-content">
+            {{ doc.issuedDate | appDate }}
+          </td>
+          <td class="cell-content">
+            {{ doc.pentDocumentFile.documentFileName }}
+            <div class="table-cell-subtitle pt8">
+              {{ doc.pentDocumentFile.documentSize | byteToMb }}
+            </div>
+          </td>
+          <td class="cell-content">
+            {{ doc.createdDate }}
+            <!-- <div class="table-cell-subtitle pt8">
+                ({{ doc.expiryDate | appDate }})
+              </div> -->
+          </td>
+          <!-- <td class="cell-content">
+              {{ doc.documentStatusDescription }}
+              <div class="table-cell-subtitle pt8">
+                {{ doc.changedByFullName }}
+              </div>
+            </td> -->
+          <td class="cell-content">
+            <div class="vw-action" (click)="openCustomerResponseDoc(doc, i)">
+              <span>View</span>
+            </div>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+    <!-- } -->
+    }
+    @if(reason.permitApplicationRecommendationOnholdId === 0 && parentObj.blnIsAssignedOfficer
+    === 'Y'){
+    <row>
+      <div class="col-md-3 pt8 ">
+        <app-input-control type="date" label="Response Till Date" [(ngModel)]="reason.onholdResponseTillDate"
+          name="onholdResponseTillDate" [required]="true" [errorTrue]="errorTrue"></app-input-control>
+      </div>
+      <div class="col-md-9 pt8 vh-center">
+        <button class="btn-secondary" appButton="Save and Send Reason " (click)="saveRecommendation(item, l)"></button>
+      </div>
+    </row>
+    }
+    @if(reason.permitApplicationRecommendationOnholdId > 0){
+    <row>
+      <div class="col-md-3 pt8">
+        <app-input-control type="date" label="Response Till Date" [required]="true" [errorTrue]="errorTrue"
+          [(ngModel)]="reason.onholdResponseTillDate" name="onholdResponseTillDate"
+          [btnClicked]="item.permitApplicationRecommendationId > 0"></app-input-control>
+      </div>
+    </row>
+    }
+    }
+    }
+    } @else {
+    <div class="v-flex h100">
+      @for (checkLst of item.plstentPermitApplicationRecommendationCheckList; track
+      $index) {
+      <div class="flex-1 relative h100">
+        <app-check-box type="horCheck" [label]="checkLst.checkListDescription" [objArray]="[
+          { label: 'Yes', trueValue: 'Y', falseValue: '' },
+          { label: 'No', trueValue: 'N', falseValue: '' }
+        ]" [(ngModel)]="checkLst.isChecked" name="isChecked{{$index}}" (eventChange)="getChecked($event, $index)"
+          [btnClicked]="item.permitApplicationRecommendationId > 0 && item.recommendationValue !== 'ONHLD'"></app-check-box>
+      </div>
+      } @if(item.permitApplicationRecommendationId === 0 &&
+      parentObj.blnIsAssignedOfficer === 'Y'){
+      <div class="end">
+        <button class="btn-secondary" appButton="Complete" (click)="saveRecommendation(item, l)"></button>
+      </div>
+      }
+    </div>
+    }
+  </form>
+  
+  <ng-template #viewDocumentTemplate>
+    <div class="v-flex relative h100 slide-template">
+      <div class="slide-header header-padding between border-bottom-line m7px">
+        <div class="slide-label">
+          Supporting Document {{permitDocDetail.pentDocumentFile.documentFileName}}
+        </div>
+        <div (click)="dialog.closeDialog()" class="cursor-pointer">
+          <ion-icon name="close-circle"></ion-icon>
+        </div>
+      </div>
+      <div class="flex-1">
+        <div class="d-flex h100">
+          <div class="document-chamber">
+            <div class="view-doc">
+              <div class="ab p16 justify-content-center">
+                @if(docType === "application/pdf"){
+                <object [data]="url | appSafe: 'resourceUrl'" type='application/pdf'></object>
+                <!-- <object [data]="
+                  permitDocDetail.pentDocumentFile.fileContent
+                    | appSafe : 'resourceUrl'
+                " type="application/pdf"></object> -->
+                } @else {
+                <img class="doc-img-wd" [src]="url" />
+                }
+              </div>
+            </div>
+          </div>
+          <div class="v-flex h100 w400px p-2">
+            <div class="flex-1 relative w100">
+              <div class="ab">
+                <div class="rel">
+                  <form #l="ngForm" autocomplete="off" class="h100 pr10px">
+                    <app-input-control designType="textarea" label="Comments" [(ngModel)]="permitDocDetail.comment" name="comment"
+                    className="textarea1" [btnClicked]="parentObj.blnIsAssignedOfficer === 'N'" [required]="true" [errorTrue]="errorTrue" [noEmoji]="true" [maxCharacterLength]="true" [maxLength]="appSetting.environment.wordLimits">
+                   </app-input-control>
+  
+                          @for(reason of permitDocDetail.plstentPermitApplicationRecommendationCustomerResponseDocumentDetailRejectionReason; track $index){
+                            <app-check-box [label]="reason.reasonDescription"
+                              [objArray]="[{label: '', trueValue: 'Y', falseValue: 'N'}]"
+                              type="horValueDoc" [btnClicked]="parentObj.blnIsAssignedOfficer === 'N'"
+                              [(ngModel)]="reason.isChecked" name="isChecked{{$index}}"
+                              [required]="true" [errorTrue]="errorTrue" >
+                            </app-check-box>
+  
+                            @if(reason.reasonValue === 'OTHER' && reason.isChecked === 'Y'){
+                              <div>
+                                <app-input-control designType="textareaDoc" label="Other Reason" [(ngModel)]="reason.otherReason" name="otherReason"
+                                className="textarea1" [btnClicked]="parentObj.blnIsAssignedOfficer === 'N'" [required]="true" [errorTrue]="errorTrue" [noEmoji]="true" [maxCharacterLength]="true" [maxLength]="appSetting.environment.wordLimits">
+                              </app-input-control>
+                              </div>  
+                            }
+                          }
+                        <!-- </scroll>
+                      </div>   -->
+                    </form>
+                </div>
+              </div>
+              </div>
+            @if(parentObj.blnIsAssignedOfficer === 'Y'){
+              <div class="doc-vw-cmt align-items-center gap10 pb8">
+                <button class="btn-approve w100" appButton="Approve" (click)="saveResponsePermitDoc(l,'APPRV')"></button>
+                <button class="btn-reject pl2 w100" appButton="Reject" (click)="saveResponsePermitDoc(l,'REJEC')"></button>
+              </div>
+            }
+            <!-- <div class=" "> -->
+  
+            <!-- </div> -->
+            <!-- </div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  
+  
+  <ng-template #viewTemplate>
+    <div class="v-flex relative h100 slide-template">
+      <div class="slide-header header-padding between border-bottom-line m7px">
+        <div class="slide-label">
+          {{docName}}
+        </div>
+        <div (click)="dialog.closeDialog()" class="cursor-pointer">
+          <ion-icon name="close-circle"></ion-icon>
+        </div>
+      </div>
+      <div class="flex-1">
+        <div class="d-flex h100">
+          <div class="document-chamber">
+            <div class="view-doc">
+              <div class="ab p16 justify-content-center">
+                @if(docType === "application/pdf"){
+                <object [data]="url | appSafe: 'resourceUrl'" type='application/pdf'></object>
+                } @else {
+                <img class="doc-img-wd" [src]="url" />
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>

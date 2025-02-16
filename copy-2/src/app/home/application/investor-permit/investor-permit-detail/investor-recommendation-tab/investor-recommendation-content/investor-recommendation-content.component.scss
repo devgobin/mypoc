@@ -1,0 +1,56 @@
+.error-danger{
+	color: #bd0b0b;;
+}
+
+.after-upload{
+	min-height: 159px;
+    border: 1px solid #006b00;
+    background-color: #deffde;
+	padding: 10px;
+	font-size: 13px;
+	font-weight: 500;
+    align-items: center;
+	border-radius: 5px;
+	display: flex;
+    flex-direction: column;
+    height: 100%;
+
+	ion-icon{
+		color: rgb(184, 1, 1)
+	}
+}
+.mt-10{
+  margin-top: -10px;
+}
+
+
+.error-text {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+	color: #BE1622;
+	font-size: 12px;
+	font-weight: 400;
+
+	.error-text-icon {
+	  height: 0.875rem;
+	  width: 0.875rem;
+	  display: flex;
+	  align-items: center;
+
+	  svg {
+		height: 0.875rem;
+		width: 0.875rem;
+	  }
+	}
+  }
+
+  .checkbox-success{
+	display: flex;
+	align-items: center;
+   //  justify-content: center;
+ }
+
+ .c-danger{
+	color: #BE1622;
+ }

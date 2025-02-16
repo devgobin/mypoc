@@ -1,0 +1,192 @@
+<div class="home-padding h100">
+  <div class="v-flex card h100">
+    <div class="header-panel between">
+      <div class="header-label">
+        My Task / Workflow List
+      </div>
+      <button class="home-btn-primary" appButton="Filters" (click)="openSearchTemplates()"></button>
+    </div>
+
+    <div class="flex-1 relative">
+      <scroll>
+        <app-table [pagination]="pagination" [columns]="myTaskColumns" [columnsName]="myTaskColumnsName"
+          (pageChanged)="pageChanged($event)" [hidePaginator]="true" [hideSelectAll]="true"
+          [dataSource]="successLst.searchResult" [pagination]="pagination" (sortChanged)="sortChanged($event)"
+          [sortColumnsName]="sortAgentRegColumns">
+
+          <ng-template cellHeaderDef="workflowName">
+            <div class="pb8">
+              Workflow Name
+            </div>
+            <div class="table-sub-heading">
+              Status
+            </div>
+          </ng-template>
+          <ng-template cellHeaderDef="sourceName">
+            <div class="pb8">
+              Source Name
+            </div>
+            <div class="table-sub-heading">
+              Source Ref No
+            </div>
+          </ng-template>
+          <ng-template cellHeaderDef="stepName">
+            <div class="pb8">
+              Current Task
+            </div>
+            <div class="table-sub-heading">
+              Task Status
+            </div>
+          </ng-template>
+          <ng-template cellHeaderDef="assignedDateTime">
+            <div class="pb8">
+              Assigned Date
+            </div>
+            <div class="table-sub-heading">
+              Total Days TAT
+            </div>
+          </ng-template>
+          <ng-template cellHeaderDef="completedTatInWords">
+            <div class="pb8">
+              Completed Date TAT
+            </div>
+            <div class="table-sub-heading">
+              Remaining Days TAT
+            </div>
+          </ng-template>
+          <ng-template cellDef="workflowName" let-element>
+            <div class="table-cell-greysNeutral">
+              {{element.workflowName}}
+            </div>
+            <div>
+              <app-status-text [statusValue]="element.workflowStatusDescription"></app-status-text>
+            </div>
+          </ng-template>
+          <ng-template cellDef="sourceName" let-element>
+            <div class="table-cell-greysNeutral" [class.isQualified]="element.isQualifiedEmployer === 'Y'">
+              {{element.sourceName}}
+            </div>
+            <div class="table-cell-greysNeutral1">
+              {{element.sourceRefNo}}
+            </div>
+          </ng-template>
+          <ng-template cellDef="stepName" let-element>
+            <div class="table-cell-greysNeutral">
+              {{element.stepName}}
+            </div>
+            <div>
+              <app-status-text [statusValue]="element.stepStatusDescription"></app-status-text>
+            </div>
+          </ng-template>
+          <ng-template cellDef="assignedDateTime" let-element>
+            <div class="table-cell-greysNeutral">
+              {{element.assignedDateTime | appDate : 'datetime'}}
+            </div>
+            <div class="table-cell-greysNeutral1">
+              {{element.totalTatInWords}}
+            </div>
+          </ng-template>
+          <ng-template cellDef="completedTatInWords" let-element>
+            <div class="table-cell-greysNeutral">
+              {{element.completedTatInWords}}
+            </div>
+            <div class="table-cell-greysNeutral1">
+              {{element.remainingTatInWords}}
+            </div>
+          </ng-template>
+          <ng-template cellDef="action" let-element>
+            @if(element.sourceRefValue === 'AGTRE'){
+            <div (click)="openAgentSearch(element.sourcePrimaryKey)">
+              Open
+            </div>
+            }
+            @if(element.sourceRefValue === 'EMPRE'){
+            <div (click)="openEmployerSearch(element.sourcePrimaryKey)">
+              Open
+            </div>
+            }
+            @if(element.sourceRefValue === 'PERAP' || element.sourceRefValue === 'APPER'){
+            <div (click)="openWorkPermitScreen(element.sourcePrimaryKey)">
+              Open
+            </div>
+            }
+            @if(element.sourceRefValue === 'INPER' || element.sourceRefValue === 'APPIN'){
+            <div (click)="openInvestorPermitScreen(element.sourcePrimaryKey)">
+              Open
+            </div>
+            }
+            @if(element.sourceRefValue === 'VISAP' || element.sourceRefValue === 'VPAPL'){
+            <div (click)="openVisitorsPermitScreen(element.sourcePrimaryKey)">
+              Open
+            </div>
+            }
+            @if(element.sourceRefValue === 'STUPR' || element.sourceRefValue === 'STYAL'){
+            <div (click)="openStudyPermitScreen(element.sourcePrimaryKey)">
+              Open
+            </div>
+            }
+            @if(element.sourceRefValue === 'RESPR' || element.sourceRefValue === 'REAPL'){
+              <div (click)="openResidentPermitScreen(element.sourcePrimaryKey)">
+                Open
+              </div>
+              }
+            @if(element.sourceRefValue === 'EMBRE'){
+              <div (click)="openEmbassyRegScreen(element.sourcePrimaryKey)">
+                Open
+              </div>
+              }
+          </ng-template>
+        </app-table>
+      </scroll>
+    </div>
+  </div>
+</div>
+
+<ng-template #mytaskSearchTemplate>
+  <div class="v-flex h100 search-template">
+    <div class="search-header between">
+      <div class="search-label">
+        Advanced Search
+      </div>
+      <div (click)="dialog.closeDialog()" class="cursor-pointer">
+        <ion-icon name="close-circle"></ion-icon>
+      </div>
+    </div>
+    <div class="search-container">
+      <form #l="ngForm" autocomplete="off" class="h100" (submit)="implementsearch()">
+        <row>
+          <div class="col-md-6">
+            <app-input-control type="text" label="Workflow Name" className="white-input"
+              [(ngModel)]="searchParams.workflowName" name="workflowName"></app-input-control>
+          </div>
+          <div class="col-md-6">
+            <app-input-control type="text" className="white-input" label="Source Name"
+              [(ngModel)]="searchParams.sourceName" name="sourceName"></app-input-control>
+          </div>
+          <div class="col-md-6">
+            <app-input-control type="text" className="white-input" label="Source Ref No"
+              [(ngModel)]="searchParams.sourceRefNo" name="sourceRefNo"></app-input-control>
+          </div>
+          <div class="col-md-6">
+            <app-input-control type="select" className="white-input" label="Workflow Status"
+              [(ngModel)]="searchParams.statusValue" name="statusValue"
+              [items]="initialData.DDLWorkflowValues.DDLWorkflowStatus" key="constant"
+              keyName="description"></app-input-control>
+          </div>
+          <!-- <div class="col-md-6">
+              <app-input-control type="date" className="white-input" label="Assgn Date (from)"
+                [(ngModel)]="searchParams" name="assignedDateTimeFrom"></app-input-control>
+            </div>
+            <div class="col-md-6">
+              <app-input-control type="date" className="white-input" label="Assgn Date (to)"
+                [(ngModel)]="searchParams" name="assignedDateTimeTo"></app-input-control>
+            </div> -->
+        </row>
+        <div class="end">
+          <a class="btn-grey" appButton="Clear" (click)="clearAllSearch()"></a>
+          <button class="btn-secondary" appButton="Search" type="submit" (click)="implementsearch()"></button>
+        </div>
+      </form>
+    </div>
+  </div>
+</ng-template>

@@ -1,0 +1,161 @@
+<div class="home-padding h100">
+	<div class="v-flex card h100 home-margin">
+		<div class="header-panel between">
+			<div class="header-label">
+				Summary Report
+			</div>
+			@if(providerTypeParams.lstentBasedOnProviderTypeAndDate.length > 0){
+				<div class="ml-auto p-1">
+					<button class="home-btn-secondary" appButton="Export Excel" (click)="exportExcel()"></button>
+				</div>
+			}
+		</div>
+		
+		<form #l="ngForm" (ngSubmit)="loadProviderTypeData(l)" class="report-search">
+			<row>
+				<div class="col-md-3">
+					<app-input-control className="white-input" type="date" label="Start Date" [required]="true"
+						[errorTrue]="errorTrue" [(ngModel)]="startDate" name="startDate"></app-input-control>
+				</div>
+				<div class="col-md-3">
+					<app-input-control className="white-input" type="date" label="End Date" [required]="true"
+						[errorTrue]="errorTrue" [(ngModel)]="endDate" [minDate]="startDate"
+						name="endDate"></app-input-control>
+				</div>
+				<div class="col-md-6">
+					<div class="end h100">
+						<a class="btn-primary" appButton="Clear" (click)="clearAllSearch()"></a>
+						<button class="btn-secondary" appButton="Search"></button>
+					</div>
+				</div>
+			</row>
+		</form>
+		<div class="flex-1 relative">
+			<scroll>
+				<table class="application-table">
+					<thead class="app-table-header">
+						<tr class="app-table-header-row">
+							<th class="app-table-header-cell">Transaction Date</th>
+							<th class="app-table-header-cell text-right">Mpaisa</th>
+							<th class="app-table-header-cell text-right">Mpaisa Charges</th>
+							<th class="app-table-header-cell text-right">Mpaisa Total</th>
+							<th class="app-table-header-cell text-right">Master</th>
+							<th class="app-table-header-cell text-right">Master Charges</th>
+							<th class="app-table-header-cell text-right">Master Total</th>
+							<th class="app-table-header-cell text-right">Visa</th>
+							<th class="app-table-header-cell text-right">Visa Charges</th>
+							<th class="app-table-header-cell text-right">Visa Total</th>
+							<th class="app-table-header-cell text-right">BSP Debit Card</th>
+							<th class="app-table-header-cell text-right">BSP Debit Card Charges</th>
+							<th class="app-table-header-cell text-right">BSP Debit Card Total</th>
+							<th class="app-table-header-cell text-right">Total With Charges</th>
+						</tr>
+					</thead>
+					<tbody class="app-table-body">
+						@for(item of
+						providerTypeParams.lstentBasedOnProviderTypeAndDate;
+						track $index){
+						<tr class="app-table-row">
+							<td class="cell-content"> 
+								<div class="hl-route" (click)="navSummaryDetail(item.transactionDate)">
+									{{ item.transactionDate | appDate }}
+								</div>
+							</td>
+							<td class="cell-content text-right">
+								{{ item.mpaisa }}
+							</td>
+							<td class="cell-content text-right">
+								{{ item.mpaisaCharges }}
+							</td>
+							<td class="cell-content text-right">
+								{{ item.mpaisaTotal }}
+							</td>
+							<td class="cell-content text-right">
+								{{ item.master }}
+							</td>
+							<td class="cell-content text-right">
+								{{ item.masterCharges }}
+							</td>
+							<td class="cell-content text-right">
+								{{ item.masterTotal }}
+							</td>
+							<td class="cell-content text-right">
+								{{ item.visa }}
+							</td>
+							<td class="cell-content text-right">
+								{{ item.visaCharges }}
+							</td>
+							<td class="cell-content text-right">
+								{{ item.visaTotal }}
+							</td>
+							<td class="cell-content text-right">
+								{{ item.bspDebitCard }}
+							</td>
+							<td class="cell-content text-right">
+								{{ item.bspDebitCardCharges }}
+							</td>
+							<td class="cell-content text-right">
+								{{ item.bspDebitCardTotal }}
+							</td>
+							<td class="cell-content text-right">
+								{{ item.totalWithCharges }}
+							</td>
+						</tr>
+						}
+					</tbody>
+					@if(providerTypeParams.lstentBasedOnProviderTypeAndDate.length > 0){
+						<tfoot class="app-table-body">
+							<tr class="app-table-row">
+								<td class="cell-content total-fnt">
+									Total
+								</td>
+								<td class="cell-content ft-fnt">
+									{{providerTypeParams.lentBasedOnProviderType.mpaisa}}
+								</td>
+								<td class="cell-content ft-fnt">
+									{{providerTypeParams.lentBasedOnProviderType.mpaisaCharges}}
+								</td>
+								<td class="cell-content ft-fnt">
+									{{providerTypeParams.lentBasedOnProviderType.mpaisaTotal}}
+								</td>
+								<td class="cell-content ft-fnt">
+									{{providerTypeParams.lentBasedOnProviderType.master}}
+								</td>
+								<td class="cell-content ft-fnt">
+									{{providerTypeParams.lentBasedOnProviderType.masterCharges}}
+								</td>
+								<td class="cell-content ft-fnt">
+									{{providerTypeParams.lentBasedOnProviderType.masterTotal}}
+								</td>
+								<td class="cell-content ft-fnt">
+									{{providerTypeParams.lentBasedOnProviderType.visa}}
+								</td>
+								<td class="cell-content ft-fnt">
+									{{providerTypeParams.lentBasedOnProviderType.visaCharges}}
+								</td>
+								<td class="cell-content ft-fnt">
+									{{providerTypeParams.lentBasedOnProviderType.visaTotal}}
+								</td>
+								<td class="cell-content ft-fnt">
+									{{providerTypeParams.lentBasedOnProviderType.bspDebitCard}}
+								</td>
+								<td class="cell-content ft-fnt">
+									{{providerTypeParams.lentBasedOnProviderType.bspDebitCardCharges}}
+								</td>
+								<td class="cell-content ft-fnt">
+									{{providerTypeParams.lentBasedOnProviderType.bspDebitCardTotal}}
+								</td>
+								<td class="cell-content ft-fnt">
+									{{providerTypeParams.lentBasedOnProviderType.totalWithCharges}}
+								</td>
+							</tr>
+						</tfoot>
+					}
+				</table>
+				@if(providerTypeParams.lstentBasedOnProviderTypeAndDate.length === 0){
+					<app-empty-state></app-empty-state>
+				}
+			</scroll>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,228 @@
+<div class=" body-pattern h100">
+	<div class="v-flex card h100 home-margin">
+		<div class="header-panel between">
+			<div class="header-label">
+				{{screenName}}
+				<!-- 
+			@if(type === 'APPEL'){
+			}
+			@else{
+				Work Permit Category: {{screenName}}
+			} -->
+			</div>
+			<div class="slot-center gap16">
+				@if(activeList.length > 0) {
+				<button class="btn-grey" appButton="Open" (click)="openDetail()"></button>
+				}
+				<button class="home-btn-secondary" appButton="Export To Excel"
+					(click)="downloadWorkPermitSearchScreenResultData()"></button>
+				<button class="home-btn-primary" appButton="Filters" (click)="openSearchTemplates()"></button>
+			</div>
+		</div>
+		<div class="flex-1 relative">
+			<scroll>
+				<app-table [pagination]="pagination" [columns]="categoriesColumns" [columnsName]="categoriesColumnsName"
+					(pageChanged)="pageChanged($event)" (onSelect)="onSelected($event)" 
+					columnID="permitApplicationId" [hidePaginator]="true" [hideSelectAll]="false"
+					[verticalLineRemove]="true" [dataSource]="tableData" (sortChanged)="sortChanged($event)"
+					[sortColumnsName]="sortinvestorPermitRegColumns">
+					<ng-template cellHeaderDef="permitApplicationNo" class="vertical-base">
+						<div class="p-1">
+							Application No
+						</div>
+						<div class="pb8 plr8 table-sub-heading">
+							Reference No
+						</div>
+					</ng-template>
+					<ng-template cellDef="permitApplicationNo" let-element>
+						<div class="p-1">
+							{{element.permitNo ? element.permitNo : '-'}}
+						</div>
+						<div class="pb8 plr8 sub-value">{{element.permitRefNo ? element.permitRefNo : '-'}}</div>
+					</ng-template>
+
+					<ng-template cellHeaderDef="permitType" class="vertical-base">
+						<div class="p-1">
+							Permit Type
+						</div>
+						<div class="pb8 plr8 table-sub-heading">
+							Application Type
+						</div>
+					</ng-template>
+					<ng-template cellDef="permitType" let-element>
+						<div class="p-1">
+							{{element.permitTypeDescription ? element.permitTypeDescription : '-'}}
+						</div>
+						<div class="pb8 plr8 sub-value">{{element.applicationTypeDescription ?
+							element.applicationTypeDescription : '-'}}</div>
+					</ng-template>
+					<ng-template cellHeaderDef="applicantName" class="vertical-base">
+						<div class="p-1">
+							Applicant Name
+						</div>
+						<div class="pb8 plr8 table-sub-heading">
+							Passport No
+						</div>
+					</ng-template>
+					<ng-template cellDef="applicantName" let-element>
+						<div class="p-1">
+							{{element.applicantName ? element.applicantName : '-'}}
+						</div>
+						<div class="pb8 plr8 sub-value">
+							{{element.passportNumber ? element.passportNumber : '-'}}
+						</div>
+					</ng-template>
+					<ng-template cellHeaderDef="paymentDate">
+						<div class="p-1">
+							Payment Date
+						</div>
+						<div class="pb8 plr8 table-sub-heading">
+							Receipt No
+						</div>
+					</ng-template>
+					<ng-template cellDef="paymentDate" let-element>
+						<div class="p-1">
+							{{element.paymentReceiptDate ? (element.paymentReceiptDate | appDate) : '-'}}
+						</div>
+						<div class="pb8 plr8 sub-value">
+							{{element.paymentReceiptNo ? element.paymentReceiptNo : '-'}}
+						</div>
+					</ng-template>
+
+					<ng-template cellHeaderDef="paymentAmount">
+						<div class="p-1 text-right">
+							Payment Amount (FJD)
+						</div>
+						<div class="pb8 plr8 table-sub-heading text-right">
+							Payment Status
+						</div>
+					</ng-template>
+					<ng-template cellDef="paymentAmount" let-element>
+						<div class="p-1 left-align">
+							{{element.paymentAmount}}
+						</div>
+						<div class="pb8 plr8 left-align sub-value">
+							{{element.paymentStatusDescription ? element.paymentStatusDescription : '-'}}
+						</div>
+					</ng-template>
+
+					<!-- <ng-template cellDef="applicationNo" let-element>
+			  <div class="p-1 table-cell-link">
+				{{element.applicationNo}}
+			  </div>
+  
+			</ng-template>
+			<ng-template cellDef="applicantName" let-element>
+			  <div class="p-1 table-cell-link">
+				{{element.applicantName}}
+			  </div>
+  
+			</ng-template> -->
+
+
+					<ng-template cellHeaderDef="status">
+						<div class="p-1">
+							Status
+						</div>
+						<div class="pb8 plr8  table-sub-heading">
+							TAT
+						</div>
+					</ng-template>
+					<ng-template cellDef="status" let-element>
+						<app-status-text [statusValue]="element.statusDescription ? element.statusDescription: '-'"
+							class="slot-center">
+						</app-status-text>
+						<div class="table-sub-cell slot-center">
+							<tat-update [(completedTat)]="element.completedTat" [(totalTat)]="element.totalTat"
+								[workFlowId]="element.workFlowId"></tat-update>
+							<!-- {{element.completedTat}} / {{element.totalTat}} Days -->
+						</div>
+					</ng-template>
+					<ng-template cellDef="action" let-element>
+						<div class="action-icon">
+							<ion-icon src="assets/svg/open-icon.svg" matTooltip="open"
+								(click)="onSingleSelected(element.permitApplicationId)"></ion-icon>
+							@if(element.statusDescription === 'Approved'){
+							<ion-icon name="print-outline" color="primary" class="fnt17" matTooltip="Print"
+								(click)="printPermit(element.permitApplicationId)"></ion-icon>
+							}
+						</div>
+					</ng-template>
+				</app-table>
+			</scroll>
+		</div>
+	</div>
+</div>
+
+<ng-template #searchTemplate>
+	<div class="v-flex h100 search-template">
+		<div class="search-header between">
+			<div class="search-label">
+				Advanced <span>Search</span>
+			</div>
+			<div (click)="dialog.closeDialog()" class="cursor-pointer">
+				<ion-icon name="close-circle"></ion-icon>
+			</div>
+		</div>
+		<div class="search-container">
+			<form #l="ngForm" autocomplete="off" class="h100" (ngSubmit)="implementSearch()">
+				<row>
+					<div class="col-md-4">
+						<app-input-control type="text" label="Reference No" className="white-input"
+							[(ngModel)]="searchParams.permitNumber" name="permitNumber">
+						</app-input-control>
+					</div>
+					<div class="col-md-4">
+						<app-input-control type="text" className="white-input" label="Application No"
+							[(ngModel)]="searchParams.registrationRefNo" name="registrationRefNo">
+						</app-input-control>
+					</div>
+					<div class="col-md-4">
+						<app-input-control type="text" className="white-input" label="Applicant Name"
+							name="applicantName" [(ngModel)]="searchParams.applicantName">
+						</app-input-control>
+					</div>
+					<div class="col-md-4">
+						<app-input-control type="text" className="white-input" label="Passport No"
+							[(ngModel)]="searchParams.passportNumber" name="passportNumber.">
+						</app-input-control>
+					</div>
+					<div class="col-md-4">
+						<app-input-control type="select" className="white-input" label="Permit Type"
+							[(ngModel)]="searchParams.permitTypeValue" key="constant" keyName="description"
+							[items]="initialData.DDLValues.DDLPermitType" [btnClicked]="true"
+							name="permitTypeValue"></app-input-control>
+					</div>
+					<div class="col-md-4">
+						<app-input-control type="select" className="white-input" label="Application Type"
+							[(ngModel)]="searchParams.applicationTypeValue" key="constant" keyName="description"
+							[items]="initialData.DDLValues.DDLApplicationType"
+							name="applicationTypeValue"></app-input-control>
+					</div>
+					<div class="col-md-4">
+						<app-input-control type="date" className="white-input" label="Payment Date"
+							[(ngModel)]="searchParams.paymentDateFrom" name="paymentDateFrom"></app-input-control>
+					</div>
+					<div class="col-md-4">
+						<app-input-control type="date" className="white-input" label="Start Date"
+							[(ngModel)]="searchParams.startDateFrom" name="startDateFrom"></app-input-control>
+					</div>
+					<div class="col-md-4">
+						<app-input-control type="date" className="white-input" label="End Date"
+							[(ngModel)]="searchParams.endDateTo" name="endDateTo"></app-input-control>
+					</div>
+				</row>
+				<div class="end">
+					<a class="btn-grey" appButton="Clear" (click)="clearAllSearch()"></a>
+					<button class="btn-secondary" appButton="Search"></button>
+				</div>
+			</form>
+		</div>
+	</div>
+</ng-template>
+
+<ng-template #viewPermit>
+	<div class="h100 ">
+		<object [data]="fileURL | appSafe: 'resourceUrl'" type='application/pdf' class="w100 h100"></object>
+	</div>
+</ng-template>

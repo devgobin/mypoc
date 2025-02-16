@@ -1,0 +1,155 @@
+.value {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(89, 89, 89, 0.9);
+  }
+  .value1 {
+    font-size: 15px;
+    font-weight: 500;
+    color: rgb(0, 0, 0);
+  }
+  .slot-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .slot-right-content {
+    color: #595959;
+    font-size: 13px;
+    font-weight: 500;
+  
+    span {
+      color: #2874fc;
+      font-size: 14px;
+      font-weight: 400;
+    }
+  }
+  .g36 {
+    gap: 36px;
+  }
+  .dis-flex {
+    display: flex;
+  }
+  
+  .upload {
+    // height: 152px;
+    margin-bottom: 17px;
+    border: 1px solid #00000040;
+    border-radius: 7px;
+    margin-top: 21px;
+  }
+  .pointer {
+    cursor: pointer;
+    &:hover {
+      color: rgba(40, 116, 252, 1);
+    }
+  }
+  
+  //testing
+  .tab-header {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 18px;
+    letter-spacing: 0.01em;
+    color: rgba(133, 133, 133, 0.77);
+  }
+  
+  .text-color {
+    color: rgba(40, 116, 252, 1);
+    text-decoration: underline;
+  }
+  .f12 {
+    font-size: 12px;
+    font-weight: 400;
+    color: #495057;
+  }
+  
+  .justify-between {
+    justify-content: space-between;
+  }
+  
+  .label {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 14px;
+    letter-spacing: 0.01em;
+    color:rgba(89, 89, 89, 0.9);
+    span {
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 15px;
+      color: rgba(40, 116, 252, 1);
+  
+    }
+  }
+  .end {
+      display: flex;
+      justify-content: end;
+      align-items: center;
+  }
+  .text{
+  
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(89, 89, 89, 0.9);
+  }
+
+  .check-label-ass {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    text-align: left;
+    color: #212121;
+}
+
+.home-card-panel {
+  padding: 8px 15px !important;
+}
+
+.permit-card {
+  // margin: 7px 7px 7px 7px;
+  // border: 0.5px solid #969696;
+  // background: #F6F6F6;
+  border-radius: 5px;
+  // padding: 8px 15px;
+
+  .fle {
+      display: flex;
+      // align-items: self-start;
+      justify-content: space-between;
+      // flex-wrap: wrap;
+  }
+
+  .item-content {
+
+      // flex: 1;
+
+      table {
+
+
+          td,
+          th {
+              padding-top: 4px;
+              padding-bottom: 4px;
+              font-size: 13px;
+              font-weight: 500;
+              line-height: 13px;
+              text-align: left;
+              color: #595959E5;
+
+              &:last-child {
+                  font-weight: 500;
+                  color: #000000 !important;
+                  display: flex;
+                  align-items: center;
+                  // gap: 20px;
+              }
+          }
+      }
+  }
+
+}
+
+.minH400 {
+  min-height: 400px !important;
+}

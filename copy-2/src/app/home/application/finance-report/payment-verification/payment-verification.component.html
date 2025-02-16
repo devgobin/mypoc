@@ -1,0 +1,66 @@
+<div class="home-padding h100" parentId="BSPYS" appAccess="BSPYS">
+  <div class="v-flex card h100 home-margin">
+    <div class="header-panel between">
+      <div class="header-label">
+        BSP Payment Verification
+      </div>
+      <div class="d-flex gap16">
+        <button class="home-btn-primary" appButton="Filters" (click)="openSearchTemplates()"></button>
+      </div>
+    </div>
+    <div class="flex-1 relative">
+      <scroll>
+        <app-table [pagination]="pagination" [columns]="paymentColumns" [columnsName]="paymentColumnName"
+          (pageChanged)="pageChanged($event)" [hidePaginator]="true" [hideSelectAll]="true" [verticalLineRemove]="true"
+          [dataSource]="searchResult.searchResult" [sortColumnsName]="sortAgentRegColumns"
+          (sortChanged)="sortChanged($event)">
+          <ng-template let-element cellDef="transactionInitiationTime">
+              <div>
+                {{element.transactionInitiationTime }}
+              </div>
+          </ng-template>
+          <ng-template let-element cellDef="actions">
+            <div class="slot-center gap-16">
+              <button class="btn-pass" appButton="Pass"
+                (click)="verifyOnlinePaymentTransaction(element, 'SUCSS')" appButtonAccess="BSPBT"></button>
+              <button class="btn-fail" appButton="Fail"
+                (click)="verifyOnlinePaymentTransaction(element, 'FAILR')" appButtonAccess="BSFBT"></button>
+            </div>
+          </ng-template>
+        </app-table>
+      </scroll>
+    </div>
+  </div>
+</div>
+
+<ng-template #paymentSearch>
+  <div class="v-flex h100 search-template">
+    <div class="search-header between">
+      <div class="search-label">
+        Advanced Search
+      </div>
+      <div (click)="dialog.closeDialog()" class="cursor-pointer">
+        <ion-icon name="close-circle"></ion-icon>
+      </div>
+    </div>
+    <div class="search-container">
+      <form #l="ngForm" autocomplete="off" class="h100" (ngSubmit)="implementSearch()">
+        <row>
+          <div class="col-md-4">
+            <app-input-control type="text" label="Application No" [(ngModel)]="searchParams.sourceRefNo"
+              name="sourceRefNo" className="white-input"></app-input-control>
+          </div>
+          <div class="col-md-4">
+            <app-input-control type="text" label="Payment Transaction No" [(ngModel)]="searchParams.paymentTransactionNo"
+              name="paymentTransactionNo" className="white-input" ></app-input-control>
+          </div>
+
+        </row>
+        <div class="end">
+          <a class="btn-grey" appButton="Clear" (click)="clearAllSearch()"></a>
+          <button class="btn-secondary" appButton="Search" type='submit'></button>
+        </div>
+      </form>
+    </div>
+  </div>
+</ng-template>

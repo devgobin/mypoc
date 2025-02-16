@@ -1,0 +1,76 @@
+<div class="home-padding h100">
+	<div class="v-flex card h100 home-margin">
+		<div class="header-panel between">
+			<div class="header-label">
+				Online Summary Report Detail
+			</div>
+			@if(providerTypeDetailParams.ilstentDetailForProviderTypeAndDate.length > 0){
+				<div class="ml-auto p-1">
+					<button class="home-btn-secondary" appButton="Export Excel" (click)="exportExcel()"></button>
+				</div>
+			}
+		</div>
+        <form #l="ngForm" (ngSubmit)="loadProviderTypeData(l)" class="report-search">
+		  <row>
+			<div class="col-md-3">
+				<app-input-control className="white-input" type="date" label="Start Date"
+				  [required]="true" [errorTrue]="errorTrue"
+				  [(ngModel)]="startDate"
+				   name="startDate"></app-input-control>
+			</div>
+			<div class="col-md-3">
+				<app-input-control className="white-input" type="date" label="End Date"
+				  [required]="true" [errorTrue]="errorTrue"
+				  [(ngModel)]="endDate" [minDate]="startDate"
+				   name="endDate"></app-input-control>
+			</div>
+			<div class="col-md-3">
+				<app-input-control type="select" className="white-input" label="Provider Name"
+					[(ngModel)]="providerTypeValue" name="providerTypeValue"
+					[items]="initialData.DDLValues.DDLProviderType" key="constant"
+					keyName="description"></app-input-control>
+			</div>
+			<div class="col-md-3">
+              <div class="end h100">
+				<a class="btn-primary" appButton="Clear" (click)="clearAllSearch()"></a>
+                <button class="btn-secondary" appButton="Search"></button>
+			  </div>
+			</div>
+		  </row>
+        </form>
+		<div class="flex-1 relative">
+			<scroll>
+				<app-table panelClass="home-table" [columnsName]=" paymentColumnName" [columns]=" paymentColumns"
+					[hidePaginator]="false" [hideSelectAll]="true" [verticalLineRemove]="true"
+					[dataSource]="providerTypeDetailParams.ilstentDetailForProviderTypeAndDate"[hidePaginator]="false">
+					<ng-template cellHeaderDef="transactionAmount">
+						<div class="p-1">
+							Transaction Amount (FJD)
+						</div>
+				    </ng-template>
+					<ng-template cellHeaderDef="transactionFees">
+						<div class="p-1">
+							Transaction Fee (FJD)
+						</div>
+				    </ng-template>
+					<ng-template cellHeaderDef="totalTransactionAmount">
+						<div class="p-1">
+							Total Transaction Amount (FJD)
+						</div>
+				    </ng-template>
+
+					<ng-template cellHeaderDef="transactionInitiationTime">
+						<div class="p-1">
+							Transaction Initiation Time
+						</div>
+				    </ng-template>
+				    <ng-template cellDef="transactionInitiationTime" let-element>
+					<div class="p-1">
+						{{element.transactionInitiationTime | appDate:'datetime' }}
+					</div>
+				  </ng-template>
+				</app-table>
+			</scroll>
+		</div>
+	</div>
+</div>
