@@ -1,169 +1,83 @@
-Here are 5 color schemes designed for ngx-charts with a minimum of 5 colors, focusing on clean and visually pleasing palettes for data visualization:
-
-1. Vibrant Scheme (Inspired by the First Image)
-
-['#3D8BFD', '#28C76F', '#FFC107', '#FFA726', '#FF5252']
-
-2. Soft Pastels
-
-['#A0D7E7', '#A8E6CF', '#FFD66B', '#FFABAB', '#D5AAFF']
-
-3. Modern Contrast
-
-['#0057FF', '#00E676', '#FFC400', '#FF7043', '#D32F2F']
-
-4. Dark Mode-Friendly Palette
-
-['#00B8D9', '#36CFC9', '#FFC53D', '#FF8A80', '#FF5252']
-
-5. Monochromatic Blues
-
-['#003F5C', '#2F4B7C', '#665191', '#A05195', '#D45087']
-
-These schemes are suitable for ngx-charts and can be applied to visualizations like bar charts, pie charts, or line graphs. If you’d like, I can help you integrate these schemes into your Angular project.
-
-If you prefer softer monochromatic color schemes that avoid harsh contrasts, here are gentler color palettes that gradually transition through subtle shades:
-
-1. Soft Blue Palette (Calming & Minimal)
-
-colorScheme = {
-  domain: ['#e3f2fd', '#bbdefb', '#90caf9', '#64b5f6', '#42a5f5']
-};
-
-	•	Why: Gentle and pleasing on the eyes, good for professional dashboards.
-
-2. Gentle Green Palette (Natural & Relaxing)
-
-colorScheme = {
-  domain: ['#e8f5e9', '#c8e6c9', '#a5d6a7', '#81c784', '#66bb6a']
-};
-
-	•	Why: Soothing shades that feel fresh without overwhelming contrast.
-
-3. Warm Beige & Orange Palette (Soft Warmth)
-
-colorScheme = {
-  domain: ['#fff3e0', '#ffe0b2', '#ffcc80', '#ffb74d', '#ffa726']
-};
-
-	•	Why: Friendly, warm, and welcoming palette suitable for dashboards focused on performance metrics.
-
-4. Subtle Purple Palette (Elegant & Understated)
-
-colorScheme = {
-  domain: ['#f3e5f5', '#e1bee7', '#ce93d8', '#ba68c8', '#ab47bc']
-};
-
-	•	Why: Adds elegance without overwhelming contrast.
-
-5. Neutral Gray Palette (Minimalistic & Balanced)
-
-colorScheme = {
-  domain: ['#f5f5f5', '#e0e0e0', '#bdbdbd', '#9e9e9e', '#757575']
-};
-
-	•	Why: Ideal for clean and minimalist dashboard designs.
-
-Final Notes
-
-These palettes are designed to avoid strong contrasts and create a visually balanced experience. You can adjust view sizes and other properties to further fine-tune how ngx-charts renders colors.
-
-
-
-Here are some visually appealing monochromatic and gradient-based color scheme suggestions for your ngx-charts:
-
-1. Monochromatic Greens (Fresh & Clean)
-
-colorScheme = {
-  domain: ['#004d40', '#00796b', '#009688', '#26a69a', '#80cbc4']
-};
-
-	•	Why: Works well for dashboards focused on growth, progress, or success indicators.
-
-2. Monochromatic Purples (Modern & Sophisticated)
-
-colorScheme = {
-  domain: ['#4a148c', '#6a1b9a', '#8e24aa', '#ba68c8', '#e1bee7']
-};
-
-	•	Why: Stylish and elegant with a modern vibe.
-
-3. Monochromatic Reds (Attention-Grabbing)
-
-colorScheme = {
-  domain: ['#b71c1c', '#d32f2f', '#f44336', '#ef9a9a', '#ffcdd2']
-};
-
-	•	Why: Great for highlighting issues or critical KPIs.
-
-4. Gradient Blues (Sleek & Professional)
-
-colorScheme = {
-  domain: ['#0d47a1', '#1976d2', '#2196f3', '#64b5f6', '#bbdefb']
-};
-
-	•	Why: Professional, clean, and visually calming.
-
-5. Monochromatic Grays (Neutral & Minimalistic)
-
-colorScheme = {
-  domain: ['#424242', '#616161', '#757575', '#bdbdbd', '#e0e0e0']
-};
-
-	•	Why: Excellent for minimalist designs and dashboards with subtle emphasis.
-
-These schemes are great for maintaining consistency while drawing user attention effectively. Let me know if you’d like help applying or tweaking any specific scheme.
-
-
-
-
-Colors: ['#5A9BD5', '#ED7D31', '#A5A5A5', '#FFC000', '#4472C4']
-	•	Why: Balanced and clean colors suitable for corporate dashboards.
-
-2. Contrast & High Visibility
-	•	Domain Colors: ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF6361']
-	•	Why: Strong contrast makes data visually distinct.
-
-3. Cool Tones
-	•	Domain Colors: ['#2196F3', '#00BCD4', '#4CAF50', '#FF9800', '#F44336']
-	•	Why: Calm colors that provide a modern, minimalistic design.
-
-4. Monochromatic Blues
-	•	Domain Colors: ['#1565C0', '#1E88E5', '#42A5F5', '#90CAF9', '#BBDEFB']
-	•	Why: Elegant with consistent shades for a sleek look.
-
-
-
-
-
-
-*** Settings ***
-Library           Process
-Library           keyboard_control.py
-Library           OperatingSystem
-
-*** Variables ***
-${PROJECT_PATH}    C:/GOBI/FCL/webapi_fioscl_v2.dvr.get/vz.fioscl.dvr.get.csproj
-${TARGET_FRAMEWORK}    net8.0
-
-*** Test Cases ***
-Automate Upgrade Assistant
-    Log To Console    Starting upgrade-assistant automation...
-
-    # Run the upgrade-assistant command
-    ${process}=    Start Process    powershell.exe    -ArgumentList upgrade-assistant upgrade "${PROJECT_PATH}" --target-framework "${TARGET_FRAMEWORK}"    shell=True
-    Sleep    3s    # Wait for the process to open the UI
-
-    # Simulate key presses for selecting "In-place project upgrade"
-    Log To Console    Simulating key presses...
-    Press Down
-    Sleep    1s
-    Press Enter
-
-    # Wait for the process to complete
-    Wait For Process    ${process}    timeout=60s
-    ${rc}=    Get Process Result    ${process}
-    Log To Console    Return Code: ${rc}
-
-    Run Keyword If    '${rc}' == '0'    Log To Console    Upgrade completed successfully!
-    Run Keyword If    '${rc}' != '0'    Fail    Upgrade failed!
+.timeline {
+    padding-top: 20px;
+    position: relative;
+    padding-left: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .timeline-item {
+    display: flex;
+    align-items: flex-start;
+  }
+  
+//   .timeline-marker {
+//     width: 15px;
+//     height: 15px;
+//     background-color: white;
+//     border: 2px solid #1976d2;
+//     border-radius: 50%;
+//     position: relative;
+//     margin-right: 15px;
+//   }
+  
+  .timeline-marker {
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border: 2px solid #1976d2; /* Outer border */
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+  }
+  
+  .inner-dot {
+    width: 8px; /* Size of the inner dot */
+    height: 8px;
+    background-color: #1976d2; /* Same as border color */
+    border-radius: 50%;
+  }
+  .timeline-item:not(:last-child) .timeline-marker::after {
+    content: "";
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    background: #1976d2;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .timeline-content h3 {
+    font-size: 16px;
+    // font-weight: bold;
+    // margin: 0;
+  }
+  
+  .timeline-content ul {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 5px;
+  }
+  
+  .timeline-content li {
+    font-size: 14px;
+  }
+
+   <div class="timeline">
+                            <div class="timeline-item" *ngFor="let step of steps; let i = index">
+                              <div class="timeline-marker">
+                                <div class="inner-dot"></div> <!-- Inner dot inside the marker -->
+                              </div>
+                              <div class="timeline-content">
+                                <h3>{{ step.title }}</h3>
+                                <ul>
+                                  <li *ngFor="let detail of step.details">- {{ detail }}</li>
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
