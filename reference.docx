@@ -110,7 +110,8 @@ import { MatButtonModule } from '@angular/material/button';
 
                                                 <!-- Email Template -->
                                                 <div class="col-md-12">
-                                                    <label class="mat-label">E-Mail Template<span
+                     
+<label class="mat-label">E-Mail Template<span
                                                             class="required">*</span></label>
                                                     <quill-editor formControlName="EmailTemplate"
                                                         required></quill-editor>
@@ -121,8 +122,86 @@ import { MatButtonModule } from '@angular/material/button';
 
                                 </mat-tab-group>
                             </div>
-                        </mat-tab>
+                        </mat-tab>o
 
+
+
+
+
+public class CustomBase64Decoder
+{
+    static readonly char[] cd64 = "|$$$}rstuvwxyz{$$$$$$$>?@ABCDEFGHIJKLMNOPQRSTUVW$$$$$$XYZ[\\]^_'abcdefghijklmnopq".ToCharArray();
+
+    static int GetDataLength(int codeLength)
+    {
+        return (codeLength * 3) / 4;
+    }
+
+    static int GetCd64Value(char c)
+    {
+        if (c < 43 || c > 122)
+            return -1;
+
+        char v = cd64[c - 43];
+        if (v == '$')
+            return -1;
+
+        return v - 61; // Matches `v = (unsigned char)((v == 'S') ? 0 : v - 61);`
+    }
+
+    static void DecodeBlock(byte[] input, byte[] output)
+    {
+        output[0] = (byte)((input[0] << 2) | (input[1] >> 4));
+        output[1] = (byte)((input[1] << 4) | (input[2] >> 2));
+        output[2] = (byte)(((input[2] << 6) & 0xC0) | input[3]);
+    }
+
+    public static int Decode(string inCode, out byte[] outData)
+    {
+        int codeLength = inCode.Length;
+        byte[] inBuf = new byte[4];
+        byte[] outBuf = new byte[3];
+        List<byte> result = new List<byte>();
+
+        int j = 0, k = 0;
+
+        while (k < codeLength)
+        {
+            int len = 0;
+            for (int i = 0; i < 4 && k < codeLength; i++)
+            {
+                int v = 0;
+                while (k < codeLength && v <= 0)
+                {
+                    char ch = inCode[k++];
+                    v = GetCd64Value(ch);
+                }
+
+                if (v >= 0)
+                {
+                    inBuf[i] = (byte)(v);
+                    len++;
+                }
+                else
+                {
+                    inBuf[i] = 0;
+                }
+            }
+
+            if (len > 0)
+            {
+                DecodeBlock(inBuf, outBuf);
+                for (int i = 0; i < len - 1; i++)
+                {
+                    result.Add(outBuf[i]);
+                }
+            }
+        }
+
+        outData = result.ToArray();
+        return outData.Length;
+    }
+}
 
 
 
