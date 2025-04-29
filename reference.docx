@@ -253,4 +253,86 @@ public class CustomBase64Decoder
         result.programId = BitConverter.ToUInt32(raw, 4);
         return result;
     }
+
+
+
+
+using System;
+using System.Buffers.Binary;
+using System.Runtime.InteropServices;
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct PVR_DBRec
+{
+    public uint pvr_id;
+    public uint programId;
+}
+
+public static class CustomDecoder
+{
+    static readonly string cd64 = "|$$$}rstuvwxyz{$$$$$$$>?@ABCDEFGHIJKLMNOPQRSTUVW$$$$$$XYZ[\\]^_’abcdefghijklmnopq";
+    static readonly byte[] decodeMap = BuildDecodeMap();
+
+    private static byte[] BuildDecodeMap()
+    {
+        var map = new byte[128];
+        for (int i = 0; i < map.Length; i++)
+            map[i] = 0xFF;
+
+        for (int i = 0; i < cd64.Length; i++)
+        {
+            if (cd64[i] < 128)
+                map[cd64[i]] = (byte)i;
+        }
+        return map;
+    }
+
+    public static byte[] DecodeString(string input)
+    {
+        int inputLength = input.Length;
+        int outLength = inputLength - inputLength / 4;
+        byte[] output = new byte[outLength];
+
+        int inPos = 0, outPos = 0;
+
+        while (inPos + 4 <= inputLength)
+        {
+            byte[] c = new byte[4];
+            for (int i = 0; i < 4; i++)
+            {
+                char ch = input[inPos + i];
+                c[i] = ch < 128 ? decodeMap[ch] : (byte)0xFF;
+            }
+
+            if (c[0] == 0xFF || c[1] == 0xFF)
+                break;
+
+            output[outPos++] = (byte)((c[0] << 2) | ((c[1] & 0x30) >> 4));
+
+            if (c[2] == 0xFF)
+                break;
+
+            output[outPos++] = (byte)(((c[1] & 0x0F) << 4) | ((c[2] & 0x3C) >> 2));
+
+            if (c[3] == 0xFF)
+                break;
+
+            output[outPos++] = (byte)(((c[2] & 0x03) << 6) | c[3]);
+
+            inPos += 4;
+        }
+
+        Array.Resize(ref output, outPos);
+        return output;
+    }
+
+    public static T FromBytes<T>(byte[] data) where T : struct
+    {
+        if (data.Length < Marshal.SizeOf<T>())
+            throw new ArgumentException("Byte array too small for struct.");
+
+        return MemoryMarshal.Read<T>(data.AsSpan());
+    }
+}
+
 }
