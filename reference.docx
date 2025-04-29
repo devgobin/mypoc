@@ -199,10 +199,58 @@ public class CustomBase64Decoder
         }
 
         outData = result.ToArray();
-        return outData.Length;
+        return using System;
+using System.Collections.Generic;
+using System.Text;
+
+public class CustomBase64Decoder
+{
+    private static readonly string cd64 = "|$$$}rstuvwxyz{$$$$$$$>?@ABCDEFGHIJKLMNOPQRSTUVW$$$$$$XYZ[\\]^_'abcdefghijklmnopq";
+
+    private static byte[] CustomDecode(string encoded)
+    {
+        List<byte> output = new List<byte>();
+        int[] charLookup = new int[256];
+
+        for (int i = 0; i < charLookup.Length; i++)
+            charLookup[i] = -1;
+
+        for (int i = 0; i < cd64.Length; i++)
+        {
+            char c = cd64[i];
+            if (c != '$') charLookup[c] = i;
+        }
+
+        int bits = 0, bitBuffer = 0;
+
+        foreach (char c in encoded)
+        {
+            if (c == '$') continue;  // skip filler
+            int val = charLookup[c];
+            if (val == -1) continue;
+
+            bitBuffer = (bitBuffer << 6) | val;
+            bits += 6;
+
+            if (bits >= 8)
+            {
+                bits -= 8;
+                output.Add((byte)((bitBuffer >> bits) & 0xFF));
+            }
+        }
+
+        return output.ToArray();
+    }
+
+    public static PVR_DBRec DecodeToStruct(string encoded)
+    {
+        byte[] raw = CustomDecode(encoded);
+        if (raw.Length < 8)
+            throw new ArgumentException("Encoded data too short");
+
+        PVR_DBRec result;
+        result.pvr_id = BitConverter.ToUInt32(raw, 0);
+        result.programId = BitConverter.ToUInt32(raw, 4);
+        return result;
     }
 }
-
-
-
-
