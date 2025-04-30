@@ -1,338 +1,169 @@
-<div class="d-flex align-items-center h-100">
-    <div class="title">{{service.title}}</div>
-    <span class="spacer"></span>
-    <div class="pb-2">
-        <span>User</span>
-        <button mat-icon-button [matMenuTriggerFor]="menu">
-            <img src="assets/useravatar.jpg" class="avatar" alt="User Avatar" />
-        </button>
-    </div>
-</div>
-
-<mat-menu #menu="matMenu">
-    <button mat-menu-item (click)="logout()">
-        <mat-icon>logout</mat-icon>
-        <span>Logout</span>
-    </button>
-</mat-menu>
-
-.title{
-    color: #000000;
-    font-weight: 500;
-    font-size: 19px;
-}
-
-.spacer {
-    flex: 1;
-  }
-  
-  .avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-  }
-
- imports: [
-    CommonModule,
-    RouterModule.forChild(routes),
-    MatToolbarModule,
-    MatMenuModule,
-    MatIconModule,
-    MatButtonModule,
-  ],
-
-
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { HeaderComponent } from './header.component';
-import { Routes, RouterModule } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-
-
-
-
-
-
- <mat-tab label="History" class="h-100">
-                            <div class="content-body p-3">
-                                <mat-tab-group class="h-100">
-
-                                    <!-- Trigger Notification Tab -->
-                                    <mat-tab label="Trigger Notification" class="h-100">
-                                        <div class="container-fluid">
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <label class="tab-title">Select Notification Type and Group</label>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <!-- Select Notification Type -->
-                                                <div class="col-md-6 d-flex">
-                                                    <mat-form-field appearance="outline" class="w-100">
-                                                        <mat-label>Select Notification Type<span
-                                                                class="required">*</span></mat-label>
-                                                        <mat-select formControlName="selectedItems" multiple required>
-                                                            <mat-option value="df">df</mat-option>
-                                                        </mat-select>
-                                                    </mat-form-field>
-                                                </div>
-
-                                                <!-- Select Group -->
-                                                <div class="col-md-6 d-flex">
-                                                    <mat-form-field appearance="outline" class="w-100">
-                                                        <mat-label>Select Group<span
-                                                                class="required">*</span></mat-label>
-                                                        <mat-select formControlName="selectedGroups" multiple required>
-                                                            <mat-option value="hgg">hgg</mat-option>
-                                                        </mat-select>
-                                                    </mat-form-field>
-                                                </div>
-                                            </div>
-
-                                            <div class="row mt-3">
-                                                <!-- Selected Groups (optional future content) -->
-                                            </div>
-
-                                            <div class="row">
-                                                <!-- Email Subject -->
-                                                <div class="col-md-12">
-                                                    <mat-form-field appearance="outline" class="w-100">
-                                                        <mat-label>Email Subject<span
-                                                                class="required">*</span></mat-label>
-                                                        <textarea matInput formControlName="EmailSubject"
-                                                            required></textarea>
-                                                    </mat-form-field>
-                                                </div>
-
-                                                <!-- Email Template -->
-                                                <div class="col-md-12">
-                     
-<label class="mat-label">E-Mail Template<span
-                                                            class="required">*</span></label>
-                                                    <quill-editor formControlName="EmailTemplate"
-                                                        required></quill-editor>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </mat-tab>
-
-                                </mat-tab-group>
-                            </div>
-                        </mat-tab>o
-
-
-
-
-
-public class CustomBase64Decoder
-{
-    static readonly char[] cd64 = "|$$$}rstuvwxyz{$$$$$$$>?@ABCDEFGHIJKLMNOPQRSTUVW$$$$$$XYZ[\\]^_'abcdefghijklmnopq".ToCharArray();
-
-    static int GetDataLength(int codeLength)
-    {
-        return (codeLength * 3) / 4;
-    }
-
-    static int GetCd64Value(char c)
-    {
-        if (c < 43 || c > 122)
-            return -1;
-
-        char v = cd64[c - 43];
-        if (v == '$')
-            return -1;
-
-        return v - 61; // Matches `v = (unsigned char)((v == 'S') ? 0 : v - 61);`
-    }
-
-    static void DecodeBlock(byte[] input, byte[] output)
-    {
-        output[0] = (byte)((input[0] << 2) | (input[1] >> 4));
-        output[1] = (byte)((input[1] << 4) | (input[2] >> 2));
-        output[2] = (byte)(((input[2] << 6) & 0xC0) | input[3]);
-    }
-
-    public static int Decode(string inCode, out byte[] outData)
-    {
-        int codeLength = inCode.Length;
-        byte[] inBuf = new byte[4];
-        byte[] outBuf = new byte[3];
-        List<byte> result = new List<byte>();
-
-        int j = 0, k = 0;
-
-        while (k < codeLength)
-        {
-            int len = 0;
-            for (int i = 0; i < 4 && k < codeLength; i++)
-            {
-                int v = 0;
-                while (k < codeLength && v <= 0)
-                {
-                    char ch = inCode[k++];
-                    v = GetCd64Value(ch);
-                }
-
-                if (v >= 0)
-                {
-                    inBuf[i] = (byte)(v);
-                    len++;
-                }
-                else
-                {
-                    inBuf[i] = 0;
-                }
-            }
-
-            if (len > 0)
-            {
-                DecodeBlock(inBuf, outBuf);
-                for (int i = 0; i < len - 1; i++)
-                {
-                    result.Add(outBuf[i]);
-                }
-            }
-        }
-
-        outData = result.ToArray();
-        return using System;
-using System.Collections.Generic;
-using System.Text;
-
-public class CustomBase64Decoder
-{
-    private static readonly string cd64 = "|$$$}rstuvwxyz{$$$$$$$>?@ABCDEFGHIJKLMNOPQRSTUVW$$$$$$XYZ[\\]^_'abcdefghijklmnopq";
-
-    private static byte[] CustomDecode(string encoded)
-    {
-        List<byte> output = new List<byte>();
-        int[] charLookup = new int[256];
-
-        for (int i = 0; i < charLookup.Length; i++)
-            charLookup[i] = -1;
-
-        for (int i = 0; i < cd64.Length; i++)
-        {
-            char c = cd64[i];
-            if (c != '$') charLookup[c] = i;
-        }
-
-        int bits = 0, bitBuffer = 0;
-
-        foreach (char c in encoded)
-        {
-            if (c == '$') continue;  // skip filler
-            int val = charLookup[c];
-            if (val == -1) continue;
-
-            bitBuffer = (bitBuffer << 6) | val;
-            bits += 6;
-
-            if (bits >= 8)
-            {
-                bits -= 8;
-                output.Add((byte)((bitBuffer >> bits) & 0xFF));
-            }
-        }
-
-        return output.ToArray();
-    }
-
-    public static PVR_DBRec DecodeToStruct(string encoded)
-    {
-        byte[] raw = CustomDecode(encoded);
-        if (raw.Length < 8)
-            throw new ArgumentException("Encoded data too short");
-
-        PVR_DBRec result;
-        result.pvr_id = BitConverter.ToUInt32(raw, 0);
-        result.programId = BitConverter.ToUInt32(raw, 4);
-        return result;
-    }
-
-
-
-
 using System;
-using System.Buffers.Binary;
 using System.Runtime.InteropServices;
 
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct PVR_DBRec
+namespace PvrDatabase
 {
-    public uint pvr_id;
-    public uint programId;
-}
-
-public static class CustomDecoder
-{
-    static readonly string cd64 = "|$$$}rstuvwxyz{$$$$$$$>?@ABCDEFGHIJKLMNOPQRSTUVW$$$$$$XYZ[\\]^_’abcdefghijklmnopq";
-    static readonly byte[] decodeMap = BuildDecodeMap();
-
-    private static byte[] BuildDecodeMap()
+    // Constants
+    public static class PvrConstants
     {
-        var map = new byte[128];
-        for (int i = 0; i < map.Length; i++)
-            map[i] = 0xFF;
+        public const int MAX_DVR_FILENAME_LEN = 256; // Adjust as needed
+        public const int MAX_PGM_NAME_LEN = 256; // Adjust as needed
+        public const int MAX_PGM_DESC_LEN = 512; // Adjust as needed
+        public const int MAX_TRANSFER_CLIENT = 10; // Adjust as needed
+        public const int MAX_TRNSD_CLIENTID_LEN = 64; // Adjust as needed
+        public const int MAX_CLIENTID_LEN = 64; // Adjust as needed
+    }
 
-        for (int i = 0; i < cd64.Length; i++)
+    // Series Data Structure
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct PVR_SeriesData
+    {
+        public ushort numbgrToKeep;    // Episodes to keep
+        public byte seriesFlags;      // Record New Only, etc.
+        public byte dayMask;          // Days to record
+        public byte matchHour;        // Added 11/22/04
+        public byte matchMinute;
+        
+        public uint RecHistoryCause;  // Modified by muthuk 18 Sep 2008
+        public uint unused2;
+        public uint unused3;
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PvrConstants.MAX_PGM_NAME_LEN)]
+        public string aucSeriesName;  // Name for the Series
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PvrConstants.MAX_PGM_DESC_LEN)]
+        public string aucSeriesDescription; // Description
+    }
+
+    // Sync and Go Data Structure
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct PVR_SyncNGoData
+    {
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PvrConstants.MAX_DVR_FILENAME_LEN)]
+        public string dvrFileName;
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PvrConstants.MAX_DVR_FILENAME_LEN)]
+        public string trnsdfFileName;
+
+        public byte transcodeType;
+        public byte resolution;
+        public byte audiolang;
+        public byte transdStatus;
+        public ushort bitRate;
+        public ushort syncFlags;
+        
+        [MarshalAs(UnmanagedType.I1)]
+        public bool bDVSEnabled;
+        
+        [MarshalAs(UnmanagedType.I1)]
+        public bool bAdaptionEnabled;
+        
+        public ushort copyCount;
+        public uint unused1;
+        public uint unused2;
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PvrConstants.MAX_PGM_NAME_LEN)]
+        public string aucProgName;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_TRANSFER_CLIENT * PvrConstants.MAX_TRNSD_CLIENTID_LEN)]
+        public byte[] unused3;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_TRANSFER_CLIENT * PvrConstants.MAX_TRNSD_CLIENTID_LEN)]
+        public byte[] unused4;
+    }
+
+    // Instance Data Structure
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct PVR_InstanceData
+    {
+        public long planned_RecStart;        // time_t in C# is long
+        public uint planned_RecDuration;
+        public long estDeletion;
+        public double recStart;              // HIRES_Time as double
+        public double recDuration;
+        public double pbPosition;
+        public uint platformContentID;
+        
+        public uint RecHistoryCause;
+        public uint unused2;
+        
+        public ushort instanceFlags;
+        public ushort unused4;
+        public uint fromParentID;
+    }
+
+    // Main PVR Database Record Structure
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct PVR_DBRec
+    {
+        // Event & Showtime Info
+        public uint pvr_id;                  // Unique PVR_ID (based on counter)
+        public uint programID;               // System-wide unique identifier
+        public uint ui32SeriesID;            // Mercury Series ID
+        public long guideStartSeconds;       // Starting time in seconds since 1970
+        public long scheduleTime;            // Time recording was scheduled
+
+        [StructLayout(LayoutKind.Explicit)]
+        public struct PVR_DataUnion
         {
-            if (cd64[i] < 128)
-                map[cd64[i]] = (byte)i;
+            [FieldOffset(0)]
+            public PVR_InstanceData instanceData;
+            
+            [FieldOffset(0)]
+            public PVR_SeriesData seriesData;
+            
+            [FieldOffset(0)]
+            public PVR_SyncNGoData syncData;
         }
-        return map;
-    }
-
-    public static byte[] DecodeString(string input)
-    {
-        int inputLength = input.Length;
-        int outLength = inputLength - inputLength / 4;
-        byte[] output = new byte[outLength];
-
-        int inPos = 0, outPos = 0;
-
-        while (inPos + 4 <= inputLength)
+        
+        public PVR_DataUnion pvrData;
+        
+        public ushort dataLen;               // Length of VarData
+        public ushort title;                 // Name offset into vardata
+        public ushort shortDescription;      // Plot summary offset
+        public ushort filenameRoot;          // Filename Root offset
+        public ushort moreInfo;              // Offset into vardata
+        public ushort serviceID;            // BBA serviceID
+        public ushort dispChannel;          // Display Channel
+        public ushort guideRunningTime;     // 1..65535 in minutes
+        public ushort qualifiers;           // ShowTimeQualifiers
+        public ushort callLetters;          // Service Call Letters offset
+        public ushort pvrFlags;
+        public byte category;               // Category/genre
+        public byte eventFlags;             // EventInfoFlags
+        public byte showtimeFlags1;          // ShowtimeFlags
+        
+        // Bitfield handling for ratings
+        private byte _ratingByte;
+        
+        public byte MpaaRating
         {
-            byte[] c = new byte[4];
-            for (int i = 0; i < 4; i++)
-            {
-                char ch = input[inPos + i];
-                c[i] = ch < 128 ? decodeMap[ch] : (byte)0xFF;
-            }
-
-            if (c[0] == 0xFF || c[1] == 0xFF)
-                break;
-
-            output[outPos++] = (byte)((c[0] << 2) | ((c[1] & 0x30) >> 4));
-
-            if (c[2] == 0xFF)
-                break;
-
-            output[outPos++] = (byte)(((c[1] & 0x0F) << 4) | ((c[2] & 0x3C) >> 2));
-
-            if (c[3] == 0xFF)
-                break;
-
-            output[outPos++] = (byte)(((c[2] & 0x03) << 6) | c[3]);
-
-            inPos += 4;
+            get => (byte)(_ratingByte & 0x0F);      // Lower 4 bits
+            set => _ratingByte = (byte)((_ratingByte & 0xF0) | (value & 0x0F));
         }
-
-        Array.Resize(ref output, outPos);
-        return output;
+        
+        public byte SvldRating
+        {
+            get => (byte)((_ratingByte & 0xF0) >> 4); // Upper 4 bits
+            set => _ratingByte = (byte)((_ratingByte & 0x0F) | ((value & 0x0F) << 4));
+        }
+        
+        public byte contentAdvisory;
+        public byte pvrRecordType;
+        public byte earlyMinutes;            // Minutes to start early
+        public byte lateMinutes;             // Minutes to end late
+        public byte recordQuality;          // Currently unused
+        
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PvrConstants.MAX_CLIENTID_LEN)]
+        public string ClientID;
+        
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PvrConstants.MAX_CLIENTID_LEN)]
+        public string eventClientId;
+        
+        public uint unused5;
+        public uint unused6;
+        
+        // Variable length data - in C# we'll handle this differently
+        public IntPtr vardata;  // Pointer to variable length data
     }
-
-    public static T FromBytes<T>(byte[] data) where T : struct
-    {
-        if (data.Length < Marshal.SizeOf<T>())
-            throw new ArgumentException("Byte array too small for struct.");
-
-        return MemoryMarshal.Read<T>(data.AsSpan());
-    }
-}
-
 }
