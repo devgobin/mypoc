@@ -1,336 +1,260 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Text;
 
-namespace PvrDatabase
+public class Program
 {
-    public static class PvrConstants
+    public static void Main()
     {
-        public const int MAX_DVR_FILENAME_LEN = 256;
-        public const int MAX_PGM_NAME_LEN = 256;
-        public const int MAX_PGM_DESC_LEN = 512;
-        public const int MAX_TRANSFER_CLIENT = 10;
-        public const int MAX_TRNSD_CLIENTID_LEN = 64;
-        public const int MAX_CLIENTID_LEN = 64;
-        public const int MAX_ASSET_ROOT_FILENAME_LENGTH = 128;
-    }
-
-    public enum PVR_RecordType : byte
-    {
-        PVR_RT_Instance = 0,
-        PVR_RT_TimebasedSeries = 1,
-        PVR_RT_SyncNGo = 2
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct PVR_SeriesData
-    {
-        public ushort numbgrToKeep;    // Episodes to keep
-        public byte seriesFlags;      // Record New Only, etc.
-        public byte dayMask;          // Days to record
-        public byte matchHour;        // Added 11/22/04
-        public byte matchMinute;
-        public uint RecHistoryCause;  // Modified by muthuk 18 Sep 2008
-        public uint unused2;
-        public uint unused3;
-
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_PGM_NAME_LEN)]
-        public byte[] aucSeriesName;  // Name for the Series
-
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_PGM_DESC_LEN)]
-        public byte[] aucSeriesDescription; // Description
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct PVR_SyncNGoData
-    {
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_DVR_FILENAME_LEN)]
-        public byte[] dvrFileName;
-
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_DVR_FILENAME_LEN)]
-        public byte[] trnsdfFileName;
-
-        public byte transcodeType;
-        public byte resolution;
-        public byte audiolang;
-        public byte transdStatus;
-        public ushort bitRate;
-        public ushort syncFlags;
+        // Example encoded data (replace with your actual Base64 string)
+        string encodedData = "Vk1TAAAABQAAAAEAAQAKAAAAVk1TAAAAAQAAAAEAAAAFAAAA..."; // Truncated for example
         
-        [MarshalAs(UnmanagedType.U1)]
-        public bool bDVSEnabled;
-        
-        [MarshalAs(UnmanagedType.U1)]
-        public bool bAdaptionEnabled;
-        
-        public ushort copyCount;
-        public uint unused1;
-        public uint unused2;
-
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_PGM_NAME_LEN)]
-        public byte[] aucProgName;
-
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_TRANSFER_CLIENT * PvrConstants.MAX_TRNSD_CLIENTID_LEN)]
-        public byte[] unused3;
-
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_TRANSFER_CLIENT * PvrConstants.MAX_TRNSD_CLIENTID_LEN)]
-        public byte[] unused4;
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct PVR_InstanceData
-    {
-        public long planned_RecStart;        // time_t in C# is long
-        public uint planned_RecDuration;
-        public long estDeletion;
-        public double recStart;              // HIRES_Time as double
-        public double recDuration;
-        public double pbPosition;
-        public uint platformContentID;
-        public uint RecHistoryCause;
-        public uint unused2;
-        public ushort instanceFlags;
-        public ushort unused4;
-        public uint fromParentID;
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct PVR_LegacyDBRec
-    {
-        public uint pvr_id;
-        public uint programID;
-        public uint ui32SeriesID;
-        public long guideStartSeconds;
-        public long scheduleTime;
-        
-        [StructLayout(LayoutKind.Explicit)]
-        public struct PVR_DataUnion
+        try
         {
-            [FieldOffset(0)]
-            public PVR_InstanceData instanceData;
+            // 1. Decode the data
+            List<PVR_DBRec> seriesRecords = PVRSeriesDecoder.DecodeSeriesData(encodedData);
             
-            [FieldOffset(0)]
-            public PVR_SeriesData seriesData;
+            // 2. Print the decoded records
+            Console.WriteLine($"Decoded {seriesRecords.Count} series records:");
+            Console.WriteLine("==========================================");
             
-            [FieldOffset(0)]
-            public PVR_SyncNGoData syncData;
-        }
-        
-        public PVR_DataUnion pvrData;
-        
-        public ushort dataLen;
-        public ushort title;
-        public ushort shortDescription;
-        public ushort filenameRoot;
-        public ushort moreInfo;
-        public ushort serviceID;
-        public ushort dispChannel;
-        public ushort guideRunningTime;
-        public ushort qualifiers;
-        public ushort callLetters;
-        public ushort pvrFlags;
-        public byte category;
-        public byte eventFlags;
-        public byte showtimeFlags1;
-        private byte _ratingByte;
-        public byte contentAdvisory;
-        public PVR_RecordType pvrRecordType;
-        public byte earlyMinutes;
-        public byte lateMinutes;
-        public byte recordQuality;
-        
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_CLIENTID_LEN)]
-        public byte[] ClientID;
-        
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_CLIENTID_LEN)]
-        public byte[] eventClientId;
-        
-        public uint unused5;
-        public uint unused6;
-        
-        // Variable length data
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1)]
-        public byte[] vardata;
-
-        public byte MpaaRating
-        {
-            get => (byte)(_ratingByte & 0x0F);
-            set => _ratingByte = (byte)((_ratingByte & 0xF0) | (value & 0x0F));
-        }
-        
-        public byte SvldRating
-        {
-            get => (byte)((_ratingByte & 0xF0) >> 4);
-            set => _ratingByte = (byte)((_ratingByte & 0x0F) | ((value & 0x0F) << 4));
-        }
-    }
-
-    // Modern version of the structure with proper variable-length data handling
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct PVR_DBRec
-    {
-        public uint pvr_id;
-        public uint programID;
-        public uint ui32SeriesID;
-        public long guideStartSeconds;
-        public long scheduleTime;
-        
-        // Union represented as the largest possible member
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1024)] // Size of largest union member
-        public byte[] pvrDataUnionBuffer;
-        
-        public ushort dataLen;
-        public ushort title;
-        public ushort shortDescription;
-        public ushort filenameRoot;
-        public ushort moreInfo;
-        public ushort serviceID;
-        public ushort dispChannel;
-        public ushort guideRunningTime;
-        public ushort qualifiers;
-        public ushort callLetters;
-        public ushort pvrFlags;
-        public byte category;
-        public byte eventFlags;
-        public byte showtimeFlags1;
-        private byte _ratingByte;
-        public byte contentAdvisory;
-        public PVR_RecordType pvrRecordType;
-        public byte earlyMinutes;
-        public byte lateMinutes;
-        public byte recordQuality;
-        
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_CLIENTID_LEN)]
-        public byte[] ClientID;
-        
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_CLIENTID_LEN)]
-        public byte[] eventClientId;
-        
-        public uint unused5;
-        public uint unused6;
-        
-        // Pointer to variable length data (must be marshaled separately)
-        public IntPtr vardata;
-
-        // Helper methods to access union data
-        public PVR_InstanceData GetInstanceData()
-        {
-            var handle = GCHandle.Alloc(pvrDataUnionBuffer, GCHandleType.Pinned);
-            try
+            foreach (var record in seriesRecords)
             {
-                return Marshal.PtrToStructure<PVR_InstanceData>(handle.AddrOfPinnedObject());
-            }
-            finally
-            {
-                handle.Free();
-            }
-        }
-
-        public PVR_SeriesData GetSeriesData()
-        {
-            var handle = GCHandle.Alloc(pvrDataUnionBuffer, GCHandleType.Pinned);
-            try
-            {
-                return Marshal.PtrToStructure<PVR_SeriesData>(handle.AddrOfPinnedObject());
-            }
-            finally
-            {
-                handle.Free();
-            }
-        }
-
-        public PVR_SyncNGoData GetSyncNGoData()
-        {
-            var handle = GCHandle.Alloc(pvrDataUnionBuffer, GCHandleType.Pinned);
-            try
-            {
-                return Marshal.PtrToStructure<PVR_SyncNGoData>(handle.AddrOfPinnedObject());
-            }
-            finally
-            {
-                handle.Free();
-            }
-        }
-
-        public byte[] GetVariableData()
-        {
-            if (vardata == IntPtr.Zero || dataLen == 0)
-                return null;
-
-            byte[] data = new byte[dataLen];
-            Marshal.Copy(vardata, data, 0, dataLen);
-            return data;
-        }
-
-        public string GetTitle()
-        {
-            var varData = GetVariableData();
-            if (varData != null && title < varData.Length)
-            {
-                int length = 0;
-                while (title + length < varData.Length && varData[title + length] != 0)
-                    length++;
-                return Encoding.UTF8.GetString(varData, title, length);
-            }
-            return string.Empty;
-        }
-
-        // Similar methods can be added for other variable-length fields
-        // like shortDescription, filenameRoot, etc.
-    }
-
-    public class PvrDataHelper
-    {
-        public static PVR_DBRec[] ParseFromBase64(string base64Data)
-        {
-            byte[] decodedData = Convert.FromBase64String(base64Data);
-            return ParseFromBytes(decodedData);
-        }
-
-        public static PVR_DBRec[] ParseFromBytes(byte[] data)
-        {
-            List<PVR_DBRec> records = new List<PVR_DBRec>();
-            int position = 0;
-            int structSize = Marshal.SizeOf(typeof(PVR_DBRec)) - 4; // Adjust for vardata pointer
-
-            while (position + structSize <= data.Length)
-            {
-                // Allocate memory for the struct
-                IntPtr ptr = Marshal.AllocHGlobal(structSize);
-                try
+                Console.WriteLine($"Record ID: {record.pvr_id}");
+                Console.WriteLine($"Series ID: {record.ui32SeriesID}");
+                Console.WriteLine($"Title: {record.GetTitle()}");
+                Console.WriteLine($"Description: {record.GetShortDescription()}");
+                Console.WriteLine($"Channel: {record.dispChannel}");
+                Console.WriteLine($"Start Time: {DateTimeOffset.FromUnixTimeSeconds(record.quideStartSeconds)}");
+                Console.WriteLine($"Duration: {record.quideRunningTime} minutes");
+                Console.WriteLine($"Record Type: {record.pvrRecordType}");
+                
+                if (record.pvrRecordType == 1) // Assuming 1 means series
                 {
-                    // Copy the fixed portion
-                    Marshal.Copy(data, position, ptr, structSize);
-                    PVR_DBRec rec = Marshal.PtrToStructure<PVR_DBRec>(ptr);
-
-                    // Handle variable data
-                    if (rec.dataLen > 0 && position + structSize + rec.dataLen <= data.Length)
-                    {
-                        rec.vardata = Marshal.AllocHGlobal(rec.dataLen);
-                        Marshal.Copy(data, position + structSize, rec.vardata, rec.dataLen);
-                        position += rec.dataLen;
-                    }
-
-                    records.Add(rec);
-                    position += structSize;
+                    Console.WriteLine($"Series Name: {Encoding.ASCII.GetString(record.pvrData.seriesData.aucSeriesName).TrimEnd('\0')}");
+                    Console.WriteLine($"Episodes to Keep: {record.pvrData.seriesData.numbgrToKeep}");
                 }
-                finally
-                {
-                    Marshal.FreeHGlobal(ptr);
-                }
+                
+                Console.WriteLine("------------------------------------------");
             }
-
-            return records.ToArray();
         }
-
-        public static void FreeRecords(PVR_DBRec[] records)
+        catch (Exception ex)
         {
-            foreach (var rec in records)
-            {
-                if (rec.vardata != IntPtr.Zero)
-                {
-                    Marshal.FreeHGlobal(rec.vardata);
-                }
-            }
+            Console.WriteLine($"Error decoding data: {ex.Message}");
         }
     }
 }
+
+public static class PVRSeriesDecoder
+{
+    private static readonly string cd64 = "|$$$}rstuvwxyz{$$$$$$$>?@ABCDEFGHIJKLMNOPQRSTUVW$$$$$$XYZ[\\]^_`abcdefghijklmnopq";
+
+    public static List<PVR_DBRec> DecodeSeriesData(string base64EncodedData)
+    {
+        // 1. First decode the custom Base64 format
+        byte[] decodedData = CustomBase64Decode(base64EncodedData);
+        if (decodedData == null || decodedData.Length < 4)
+            throw new ApplicationException("Invalid data - too short");
+
+        List<PVR_DBRec> records = new List<PVR_DBRec>();
+        int position = 0;
+
+        // 2. Check VMS header (3 bytes + null terminator)
+        string vmsHeader = Encoding.ASCII.GetString(decodedData, position, 3);
+        position += 4;
+        if (vmsHeader != "VMS")
+            throw new ApplicationException("Invalid VMS header");
+
+        // 3. Read platform ID and number of series
+        uint platformId = BitConverter.ToUInt32(decodedData, position);
+        position += 4;
+        int numSeries = BitConverter.ToInt32(decodedData, position);
+        position += 4;
+
+        // 4. Parse each series record
+        for (int i = 0; i < numSeries; i++)
+        {
+            if (position + Marshal.SizeOf(typeof(PVR_DBRec)) > decodedData.Length)
+                throw new ApplicationException("Incomplete record data");
+
+            // Read fixed portion
+            PVR_DBRec record = ByteArrayToStructure<PVR_DBRec>(decodedData, ref position);
+
+            // Read variable data
+            if (record.dataLen > 0)
+            {
+                if (position + record.dataLen > decodedData.Length)
+                    throw new ApplicationException("Incomplete variable data");
+
+                record.VarData = new byte[record.dataLen];
+                Array.Copy(decodedData, position, record.VarData, 0, record.dataLen);
+                position += record.dataLen;
+            }
+
+            records.Add(record);
+        }
+
+        return records;
+    }
+
+    private static byte[] CustomBase64Decode(string input)
+    {
+        if (string.IsNullOrEmpty(input)) return null;
+
+        byte[] inBlock = new byte[4];
+        byte[] outBlock = new byte[3];
+        List<byte> output = new List<byte>();
+
+        int i, len, k = 0;
+        while (k < input.Length)
+        {
+            len = 0;
+            for (i = 0; i < 4 && k < input.Length; i++)
+            {
+                byte v = 0;
+                while (k < input.Length && v == 0)
+                {
+                    v = (byte)input[k++];
+                    if (v >= 43 && v <= 122)
+                    {
+                        v = (byte)cd64[v - 43];
+                        v = (v == '$') ? (byte)0 : (byte)(v - 61);
+                    }
+                    else
+                    {
+                        v = 0;
+                    }
+                }
+
+                if (k <= input.Length && v != 0)
+                {
+                    len++;
+                    inBlock[i] = (byte)(v - 1);
+                }
+                else
+                {
+                    inBlock[i] = 0;
+                }
+            }
+
+            if (len > 0)
+            {
+                DecodeBlock(inBlock, outBlock);
+                for (i = 0; i < len - 1; i++)
+                    output.Add(outBlock[i]);
+            }
+        }
+
+        return output.ToArray();
+    }
+
+    private static void DecodeBlock(byte[] input, byte[] output)
+    {
+        output[0] = (byte)((input[0] << 2) | (input[1] >> 4));
+        output[1] = (byte)((input[1] << 4) | (input[2] >> 2));
+        output[2] = (byte)(((input[2] << 6) & 0xc0) | input[3]);
+    }
+
+    private static T ByteArrayToStructure<T>(byte[] bytes, ref int position) where T : struct
+    {
+        int size = Marshal.SizeOf(typeof(T));
+        if (position + size > bytes.Length)
+            throw new ArgumentException("Not enough bytes");
+
+        IntPtr ptr = Marshal.AllocHGlobal(size);
+        try
+        {
+            Marshal.Copy(bytes, position, ptr, size);
+            position += size;
+            return (T)Marshal.PtrToStructure(ptr, typeof(T));
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(ptr);
+        }
+    }
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct PVR_DBRec
+{
+    public uint pvr_id;
+    public uint programID;
+    public uint ui32SeriesID;
+    public long quideStartSeconds;
+    public long scheduleTime;
+    public PVR_DataUnion pvrData;
+    public ushort dataLen;
+    public ushort title;
+    public ushort shortDescription;
+    public ushort filenameRoot;
+    public ushort moreInfo;
+    public ushort serviceID;
+    public ushort dispChannel;
+    public ushort quideRunningTime;
+    public ushort qualifiers;
+    public ushort callLetters;
+    public ushort pvrFlags;
+    public byte category;
+    public byte eventFlags;
+    public byte showtimeFlags1;
+    public byte mpaaRating_svldRating; // Combined for C#
+    public byte contentAdvisory;
+    public byte pvrRecordType;
+    public byte earlyMinutes;
+    public byte lateMinutes;
+    public byte recordQuality;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+    public byte[] ClientID;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+    public byte[] eventClientId;
+    public uint unusedS;
+    public uint unused6;
+    public byte[] VarData; // Not part of original struct, added for C#
+
+    // Helper methods to access string fields
+    public string GetTitle()
+    {
+        if (VarData == null || title >= VarData.Length) return string.Empty;
+        int end = Array.IndexOf(VarData, (byte)0, title);
+        return Encoding.UTF8.GetString(VarData, title, (end > 0) ? end - title : VarData.Length - title);
+    }
+
+    public string GetShortDescription()
+    {
+        if (VarData == null || shortDescription >= VarData.Length) return string.Empty;
+        int end = Array.IndexOf(VarData, (byte)0, shortDescription);
+        return Encoding.UTF8.GetString(VarData, shortDescription, (end > 0) ? end - shortDescription : VarData.Length - shortDescription);
+    }
+}
+
+[StructLayout(LayoutKind.Explicit, Pack = 1)]
+public struct PVR_DataUnion
+{
+    [FieldOffset(0)]
+    public PVR_InstanceData instanceData;
+    [FieldOffset(0)]
+    public PVR_SeriesData seriesData;
+    [FieldOffset(0)]
+    public PVR_SyncNGoData syncData;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct PVR_SeriesData
+{
+    public ushort numbgrToKeep;
+    public byte seriesFlags;
+    public byte dayMask;
+    public byte matchHour;
+    public byte matchMinute;
+    public uint ReCHistoryCause;
+    public uint unused2;
+    public uint unused3;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 128)]
+    public byte[] aucSeriesName;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
+    public byte[] aucSeriesDescription;
+}
+
+// Other struct definitions (PVR_InstanceData, PVR_SyncNGoData) would go here
