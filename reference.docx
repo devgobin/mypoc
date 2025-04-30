@@ -1,260 +1,232 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Text;
 
-public class Program
+public class DVRDecoder
 {
-    public static void Main()
+    // Define the PVR_DBRec structure in C#
+    public struct PVR_DBRec
     {
-        // Example encoded data (replace with your actual Base64 string)
-        string encodedData = "Vk1TAAAABQAAAAEAAQAKAAAAVk1TAAAAAQAAAAEAAAAFAAAA..."; // Truncated for example
-        
-        try
-        {
-            // 1. Decode the data
-            List<PVR_DBRec> seriesRecords = PVRSeriesDecoder.DecodeSeriesData(encodedData);
-            
-            // 2. Print the decoded records
-            Console.WriteLine($"Decoded {seriesRecords.Count} series records:");
-            Console.WriteLine("==========================================");
-            
-            foreach (var record in seriesRecords)
-            {
-                Console.WriteLine($"Record ID: {record.pvr_id}");
-                Console.WriteLine($"Series ID: {record.ui32SeriesID}");
-                Console.WriteLine($"Title: {record.GetTitle()}");
-                Console.WriteLine($"Description: {record.GetShortDescription()}");
-                Console.WriteLine($"Channel: {record.dispChannel}");
-                Console.WriteLine($"Start Time: {DateTimeOffset.FromUnixTimeSeconds(record.quideStartSeconds)}");
-                Console.WriteLine($"Duration: {record.quideRunningTime} minutes");
-                Console.WriteLine($"Record Type: {record.pvrRecordType}");
-                
-                if (record.pvrRecordType == 1) // Assuming 1 means series
-                {
-                    Console.WriteLine($"Series Name: {Encoding.ASCII.GetString(record.pvrData.seriesData.aucSeriesName).TrimEnd('\0')}");
-                    Console.WriteLine($"Episodes to Keep: {record.pvrData.seriesData.numbgrToKeep}");
-                }
-                
-                Console.WriteLine("------------------------------------------");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error decoding data: {ex.Message}");
-        }
+        public uint pvr_id;    
+        public uint programID;    
+        public uint ui32SeriesID; 
+        public long quideStartSeconds; 
+        public long scheduleTime;  
+        public PVR_InstanceData pvrData; 
+        public ushort dataLen;    
+        public ushort title;    
+        public ushort shortDescription;    
+        public ushort filenameRoot;    
+        public ushort moreInfo;    
+        public ushort serviceID;    
+        public ushort dispChannel;    
+        public ushort quideRunningTime;    
+        public ushort qualifiers;    
+        public ushort callLetters;    
+        public ushort pvrFlags;    
+        public byte category;    
+        public byte eventFlags;    
+        public byte showtimeFlags1;    
+        public byte mpaaRating;    
+        public byte svldRating;    
+        public byte contentAdvisory;    
+        public byte pvrRecordType;    
+        public byte earlyMinutes;    
+        public byte lateMinutes;    
+        public byte recordQuality;    
+        public string ClientID;    
+        public string eventClientId;    
+        public uint unusedS;    
+        public uint unused6;    
+        public string vardata;    
     }
-}
 
-public static class PVRSeriesDecoder
-{
+    public struct PVR_InstanceData
+    {
+        public long planned_RecStart;
+        public uint planned_RecDuration;
+        public long estDeletion;
+        public HIRES_Time recStart;
+        public HIRES_Time recDuration;
+        public HIRES_Time pbPosition;
+        public uint platformContentID;
+        public uint RecHistoryCause;
+        public uint unused2;
+        public ushort instanceFlags;
+        public ushort unused4;
+        public uint fromParentID;
+    }
+
+    public struct HIRES_Time
+    {
+        public uint Seconds;
+        public uint Milliseconds;
+    }
+
     private static readonly string cd64 = "|$$$}rstuvwxyz{$$$$$$$>?@ABCDEFGHIJKLMNOPQRSTUVW$$$$$$XYZ[\\]^_`abcdefghijklmnopq";
 
-    public static List<PVR_DBRec> DecodeSeriesData(string base64EncodedData)
+    // Get the data length from the base64 encoded string
+    private static int GetDataLength(int codeLength)
     {
-        // 1. First decode the custom Base64 format
-        byte[] decodedData = CustomBase64Decode(base64EncodedData);
-        if (decodedData == null || decodedData.Length < 4)
-            throw new ApplicationException("Invalid data - too short");
-
-        List<PVR_DBRec> records = new List<PVR_DBRec>();
-        int position = 0;
-
-        // 2. Check VMS header (3 bytes + null terminator)
-        string vmsHeader = Encoding.ASCII.GetString(decodedData, position, 3);
-        position += 4;
-        if (vmsHeader != "VMS")
-            throw new ApplicationException("Invalid VMS header");
-
-        // 3. Read platform ID and number of series
-        uint platformId = BitConverter.ToUInt32(decodedData, position);
-        position += 4;
-        int numSeries = BitConverter.ToInt32(decodedData, position);
-        position += 4;
-
-        // 4. Parse each series record
-        for (int i = 0; i < numSeries; i++)
-        {
-            if (position + Marshal.SizeOf(typeof(PVR_DBRec)) > decodedData.Length)
-                throw new ApplicationException("Incomplete record data");
-
-            // Read fixed portion
-            PVR_DBRec record = ByteArrayToStructure<PVR_DBRec>(decodedData, ref position);
-
-            // Read variable data
-            if (record.dataLen > 0)
-            {
-                if (position + record.dataLen > decodedData.Length)
-                    throw new ApplicationException("Incomplete variable data");
-
-                record.VarData = new byte[record.dataLen];
-                Array.Copy(decodedData, position, record.VarData, 0, record.dataLen);
-                position += record.dataLen;
-            }
-
-            records.Add(record);
-        }
-
-        return records;
+        return codeLength - codeLength / 4;
     }
 
-    private static byte[] CustomBase64Decode(string input)
+    // Decoding function for base64 using the cd64 map
+    private static void DecodeBlock(byte[] input, byte[] output)
     {
-        if (string.IsNullOrEmpty(input)) return null;
+        output[0] = (byte)(input[0] << 2 | input[1] >> 4);
+        output[1] = (byte)(input[1] << 4 | input[2] >> 2);
+        output[2] = (byte)((input[2] << 6) | input[3]);
+    }
 
-        byte[] inBlock = new byte[4];
-        byte[] outBlock = new byte[3];
-        List<byte> output = new List<byte>();
+    private static int Base64Decode(string inputCode, int codeLength, ref byte[] outputData)
+    {
+        byte[] input = new byte[4], output = new byte[3];
+        int i = 0, len = 0, j = 0, k = 0;
 
-        int i, len, k = 0;
-        while (k < input.Length)
+        int outputLength = GetDataLength(codeLength);
+        outputData = new byte[outputLength + 1];
+        j = 0;
+
+        while (k < codeLength)
         {
-            len = 0;
-            for (i = 0; i < 4 && k < input.Length; i++)
+            for (len = 0; i < 4 && k < codeLength; i++)
             {
                 byte v = 0;
-                while (k < input.Length && v == 0)
+                while (k < codeLength && v == 0)
                 {
-                    v = (byte)input[k++];
-                    if (v >= 43 && v <= 122)
+                    v = (byte)inputCode[k++];
+                    v = (byte)((v < 43 || v > 122) ? 0 : cd64[v - 43]);
+                    if (v != 0) v = (byte)((v == '$') ? 0 : v - 61);
+                }
+
+                if (k < codeLength)
+                {
+                    len++;
+                    if (v != 0)
                     {
-                        v = (byte)cd64[v - 43];
-                        v = (v == '$') ? (byte)0 : (byte)(v - 61);
+                        input[i] = (byte)(v - 1);
                     }
                     else
                     {
-                        v = 0;
+                        input[i] = 0;
                     }
-                }
-
-                if (k <= input.Length && v != 0)
-                {
-                    len++;
-                    inBlock[i] = (byte)(v - 1);
-                }
-                else
-                {
-                    inBlock[i] = 0;
                 }
             }
 
             if (len > 0)
             {
-                DecodeBlock(inBlock, outBlock);
+                DecodeBlock(input, output);
                 for (i = 0; i < len - 1; i++)
-                    output.Add(outBlock[i]);
+                {
+                    outputData[j++] = output[i];
+                }
             }
         }
 
-        return output.ToArray();
+        return j;
     }
 
-    private static void DecodeBlock(byte[] input, byte[] output)
+    // Main function that mimics ProcessSrsExportRequest to decode and extract PVR_DBRec structs
+    public static List<PVR_DBRec> ProcessSrsExportRequest(string encodedData)
     {
-        output[0] = (byte)((input[0] << 2) | (input[1] >> 4));
-        output[1] = (byte)((input[1] << 4) | (input[2] >> 2));
-        output[2] = (byte)(((input[2] << 6) & 0xc0) | input[3]);
-    }
+        byte[] decodedData = null;
+        int decodedLength = Base64Decode(encodedData, encodedData.Length, ref decodedData);
 
-    private static T ByteArrayToStructure<T>(byte[] bytes, ref int position) where T : struct
-    {
-        int size = Marshal.SizeOf(typeof(T));
-        if (position + size > bytes.Length)
-            throw new ArgumentException("Not enough bytes");
+        List<PVR_DBRec> records = new List<PVR_DBRec>();
+        int index = 0;
 
-        IntPtr ptr = Marshal.AllocHGlobal(size);
-        try
+        while (index < decodedLength)
         {
-            Marshal.Copy(bytes, position, ptr, size);
-            position += size;
-            return (T)Marshal.PtrToStructure(ptr, typeof(T));
+            PVR_DBRec rec = new PVR_DBRec();
+
+            // Read PVR_DBRec fields
+            rec.pvr_id = BitConverter.ToUInt32(decodedData, index);
+            rec.programID = BitConverter.ToUInt32(decodedData, index + 4);
+            rec.ui32SeriesID = BitConverter.ToUInt32(decodedData, index + 8);
+            rec.quideStartSeconds = BitConverter.ToInt64(decodedData, index + 12);
+            rec.scheduleTime = BitConverter.ToInt64(decodedData, index + 20);
+
+            // Nested structure: PVR_InstanceData
+            rec.pvrData = new PVR_InstanceData
+            {
+                planned_RecStart = BitConverter.ToInt64(decodedData, index + 28),
+                planned_RecDuration = BitConverter.ToUInt32(decodedData, index + 36),
+                estDeletion = BitConverter.ToInt64(decodedData, index + 40),
+                recStart = new HIRES_Time
+                {
+                    Seconds = BitConverter.ToUInt32(decodedData, index + 48),
+                    Milliseconds = BitConverter.ToUInt32(decodedData, index + 52)
+                },
+                recDuration = new HIRES_Time
+                {
+                    Seconds = BitConverter.ToUInt32(decodedData, index + 56),
+                    Milliseconds = BitConverter.ToUInt32(decodedData, index + 60)
+                },
+                pbPosition = new HIRES_Time
+                {
+                    Seconds = BitConverter.ToUInt32(decodedData, index + 64),
+                    Milliseconds = BitConverter.ToUInt32(decodedData, index + 68)
+                },
+                platformContentID = BitConverter.ToUInt32(decodedData, index + 72),
+                RecHistoryCause = BitConverter.ToUInt32(decodedData, index + 76),
+                unused2 = BitConverter.ToUInt32(decodedData, index + 80),
+                instanceFlags = BitConverter.ToUInt16(decodedData, index + 84),
+                unused4 = BitConverter.ToUInt16(decodedData, index + 86),
+                fromParentID = BitConverter.ToUInt32(decodedData, index + 88)
+            };
+
+            // Reading remaining fields
+            rec.dataLen = BitConverter.ToUInt16(decodedData, index + 92);
+            rec.title = BitConverter.ToUInt16(decodedData, index + 94);
+            rec.shortDescription = BitConverter.ToUInt16(decodedData, index + 96);
+            rec.filenameRoot = BitConverter.ToUInt16(decodedData, index + 98);
+            rec.moreInfo = BitConverter.ToUInt16(decodedData, index + 100);
+            rec.serviceID = BitConverter.ToUInt16(decodedData, index + 102);
+            rec.dispChannel = BitConverter.ToUInt16(decodedData, index + 104);
+            rec.quideRunningTime = BitConverter.ToUInt16(decodedData, index + 106);
+            rec.qualifiers = BitConverter.ToUInt16(decodedData, index + 108);
+            rec.callLetters = BitConverter.ToUInt16(decodedData, index + 110);
+            rec.pvrFlags = BitConverter.ToUInt16(decodedData, index + 112);
+            rec.category = decodedData[index + 114];
+            rec.eventFlags = decodedData[index + 115];
+            rec.showtimeFlags1 = decodedData[index + 116];
+            rec.mpaaRating = decodedData[index + 117];
+            rec.svldRating = decodedData[index + 118];
+            rec.contentAdvisory = decodedData[index + 119];
+            rec.pvrRecordType = decodedData[index + 120];
+            rec.earlyMinutes = decodedData[index + 121];
+            rec.lateMinutes = decodedData[index + 122];
+            rec.recordQuality = decodedData[index + 123];
+
+            // ClientID and eventClientId (assuming they are strings)
+            rec.ClientID = Encoding.ASCII.GetString(decodedData, index + 124, 32).Trim('\0');
+            rec.eventClientId = Encoding.ASCII.GetString(decodedData, index + 156, 32).Trim('\0');
+
+            // Reading unused and vardata fields
+            rec.unusedS = BitConverter.ToUInt32(decodedData, index + 188);
+            rec.unused6 = BitConverter.ToUInt32(decodedData, index + 192);
+            rec.vardata = Encoding.ASCII.GetString(decodedData, index + 196, rec.dataLen - 4); // Assumed vardata length is based on dataLen
+
+            records.Add(rec);
+            index += 200; // Adjust according to the total size of PVR_DBRec
         }
-        finally
+
+        return records;
+    }
+}
+
+// Example Usage:
+class Program
+{
+    static void Main(string[] args)
+    {
+        string encodedData = "<Your Base64 Encoded Data Here>";
+        List<DVRDecoder.PVR_DBRec> records = DVRDecoder.ProcessSrsExportRequest(encodedData);
+
+        foreach (var record in records)
         {
-            Marshal.FreeHGlobal(ptr);
+            Console.WriteLine($"PVR_ID: {record.pvr_id}, ProgramID: {record.programID}, SeriesID: {record.ui32SeriesID}");
         }
     }
 }
-
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct PVR_DBRec
-{
-    public uint pvr_id;
-    public uint programID;
-    public uint ui32SeriesID;
-    public long quideStartSeconds;
-    public long scheduleTime;
-    public PVR_DataUnion pvrData;
-    public ushort dataLen;
-    public ushort title;
-    public ushort shortDescription;
-    public ushort filenameRoot;
-    public ushort moreInfo;
-    public ushort serviceID;
-    public ushort dispChannel;
-    public ushort quideRunningTime;
-    public ushort qualifiers;
-    public ushort callLetters;
-    public ushort pvrFlags;
-    public byte category;
-    public byte eventFlags;
-    public byte showtimeFlags1;
-    public byte mpaaRating_svldRating; // Combined for C#
-    public byte contentAdvisory;
-    public byte pvrRecordType;
-    public byte earlyMinutes;
-    public byte lateMinutes;
-    public byte recordQuality;
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-    public byte[] ClientID;
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-    public byte[] eventClientId;
-    public uint unusedS;
-    public uint unused6;
-    public byte[] VarData; // Not part of original struct, added for C#
-
-    // Helper methods to access string fields
-    public string GetTitle()
-    {
-        if (VarData == null || title >= VarData.Length) return string.Empty;
-        int end = Array.IndexOf(VarData, (byte)0, title);
-        return Encoding.UTF8.GetString(VarData, title, (end > 0) ? end - title : VarData.Length - title);
-    }
-
-    public string GetShortDescription()
-    {
-        if (VarData == null || shortDescription >= VarData.Length) return string.Empty;
-        int end = Array.IndexOf(VarData, (byte)0, shortDescription);
-        return Encoding.UTF8.GetString(VarData, shortDescription, (end > 0) ? end - shortDescription : VarData.Length - shortDescription);
-    }
-}
-
-[StructLayout(LayoutKind.Explicit, Pack = 1)]
-public struct PVR_DataUnion
-{
-    [FieldOffset(0)]
-    public PVR_InstanceData instanceData;
-    [FieldOffset(0)]
-    public PVR_SeriesData seriesData;
-    [FieldOffset(0)]
-    public PVR_SyncNGoData syncData;
-}
-
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct PVR_SeriesData
-{
-    public ushort numbgrToKeep;
-    public byte seriesFlags;
-    public byte dayMask;
-    public byte matchHour;
-    public byte matchMinute;
-    public uint ReCHistoryCause;
-    public uint unused2;
-    public uint unused3;
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 128)]
-    public byte[] aucSeriesName;
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
-    public byte[] aucSeriesDescription;
-}
-
-// Other struct definitions (PVR_InstanceData, PVR_SyncNGoData) would go here
