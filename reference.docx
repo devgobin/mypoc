@@ -1,169 +1,153 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace PvrDatabase
+// Constants (update these based on actual C++ values)
+public const int MAX_CLIENTID_LEN = 64;
+public const int MAX_PGM_NAME_LEN = 128;
+public const int MAX_PGM_DESC_LEN = 256;
+public const int MAX_DVR_FILENAME_LEN = 256;
+public const int MAX_TRANSFER_CLIENT = 4;
+public const int MAX_TRNSD_CLIENTID_LEN = 64;
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct PVR_DBRec
 {
-    // Constants
-    public static class PvrConstants
+    public uint pvr_id;
+    public uint programID;
+    public uint ui32SeriesID;
+    public long quideStartSeconds;
+    public long scheduleTime;
+
+    // Include all possible PVRData structs (only one will be valid at a time)
+    public PVR_InstanceData instanceData;
+    public PVR_SeriesData seriesData;
+    public PVR_SyncNGoData syncData;
+
+    public ushort dataLen;
+    public ushort title;
+    public ushort shortDescription;
+    public ushort filenameRoot;
+    public ushort moreInfo;
+    public ushort serviceID;
+    public ushort dispChannel;
+    public ushort quideRunningTime;
+    public ushort qualifiers;
+    public ushort callLetters;
+    public ushort pvrFlags;
+    public byte category;
+    public byte eventFlags;
+    public byte showtimeFlags1;
+
+    private byte ratingsPacked; // bitfield: 4 bits each for mpaa and svld ratings
+
+    public byte contentAdvisory;
+    public byte pvrRecordType;
+    public byte earlyMinutes;
+    public byte lateMinutes;
+    public byte recordQuality;
+
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAX_CLIENTID_LEN)]
+    public string ClientID;
+
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAX_CLIENTID_LEN)]
+    public string eventClientId;
+
+    public uint unusedS;
+    public uint unused6;
+
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1)]
+    public byte[] vardata;
+
+    // Accessors for the packed bitfield
+    public byte MpaaRating
     {
-        public const int MAX_DVR_FILENAME_LEN = 256; // Adjust as needed
-        public const int MAX_PGM_NAME_LEN = 256; // Adjust as needed
-        public const int MAX_PGM_DESC_LEN = 512; // Adjust as needed
-        public const int MAX_TRANSFER_CLIENT = 10; // Adjust as needed
-        public const int MAX_TRNSD_CLIENTID_LEN = 64; // Adjust as needed
-        public const int MAX_CLIENTID_LEN = 64; // Adjust as needed
+        get => (byte)(ratingsPacked & 0x0F);
+        set => ratingsPacked = (byte)((ratingsPacked & 0xF0) | (value & 0x0F));
     }
 
-    // Series Data Structure
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct PVR_SeriesData
+    public byte SvldRating
     {
-        public ushort numbgrToKeep;    // Episodes to keep
-        public byte seriesFlags;      // Record New Only, etc.
-        public byte dayMask;          // Days to record
-        public byte matchHour;        // Added 11/22/04
-        public byte matchMinute;
-        
-        public uint RecHistoryCause;  // Modified by muthuk 18 Sep 2008
-        public uint unused2;
-        public uint unused3;
-
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PvrConstants.MAX_PGM_NAME_LEN)]
-        public string aucSeriesName;  // Name for the Series
-
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PvrConstants.MAX_PGM_DESC_LEN)]
-        public string aucSeriesDescription; // Description
+        get => (byte)((ratingsPacked >> 4) & 0x0F);
+        set => ratingsPacked = (byte)((ratingsPacked & 0x0F) | ((value & 0x0F) << 4));
     }
+}
 
-    // Sync and Go Data Structure
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct PVR_SyncNGoData
-    {
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PvrConstants.MAX_DVR_FILENAME_LEN)]
-        public string dvrFileName;
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct PVR_SeriesData
+{
+    public ushort numbgrToKeep;
+    public byte seriesFlags;
+    public byte dayMask;
+    public byte matchHour;
+    public byte matchMinute;
 
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PvrConstants.MAX_DVR_FILENAME_LEN)]
-        public string trnsdfFileName;
+#if DVRHISTORY_ENABLED
+    public uint ReCHistoryCause;
+#else
+    public uint unused1;
+#endif
 
-        public byte transcodeType;
-        public byte resolution;
-        public byte audiolang;
-        public byte transdStatus;
-        public ushort bitRate;
-        public ushort syncFlags;
-        
-        [MarshalAs(UnmanagedType.I1)]
-        public bool bDVSEnabled;
-        
-        [MarshalAs(UnmanagedType.I1)]
-        public bool bAdaptionEnabled;
-        
-        public ushort copyCount;
-        public uint unused1;
-        public uint unused2;
+    public uint unused2;
+    public uint unused3;
 
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PvrConstants.MAX_PGM_NAME_LEN)]
-        public string aucProgName;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_PGM_NAME_LEN)]
+    public byte[] aucSeriesName;
 
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_TRANSFER_CLIENT * PvrConstants.MAX_TRNSD_CLIENTID_LEN)]
-        public byte[] unused3;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_PGM_DESC_LEN)]
+    public byte[] aucSeriesDescription;
+}
 
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_TRANSFER_CLIENT * PvrConstants.MAX_TRNSD_CLIENTID_LEN)]
-        public byte[] unused4;
-    }
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct PVR_SyncNGoData
+{
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_DVR_FILENAME_LEN)]
+    public byte[] dvrFileName;
 
-    // Instance Data Structure
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct PVR_InstanceData
-    {
-        public long planned_RecStart;        // time_t in C# is long
-        public uint planned_RecDuration;
-        public long estDeletion;
-        public double recStart;              // HIRES_Time as double
-        public double recDuration;
-        public double pbPosition;
-        public uint platformContentID;
-        
-        public uint RecHistoryCause;
-        public uint unused2;
-        
-        public ushort instanceFlags;
-        public ushort unused4;
-        public uint fromParentID;
-    }
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_DVR_FILENAME_LEN)]
+    public byte[] trnsdfFileName;
 
-    // Main PVR Database Record Structure
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct PVR_DBRec
-    {
-        // Event & Showtime Info
-        public uint pvr_id;                  // Unique PVR_ID (based on counter)
-        public uint programID;               // System-wide unique identifier
-        public uint ui32SeriesID;            // Mercury Series ID
-        public long guideStartSeconds;       // Starting time in seconds since 1970
-        public long scheduleTime;            // Time recording was scheduled
+    public byte transcodeType;
+    public byte resolution;
+    public byte audiolang;
+    public byte transdStatus;
+    public ushort bitRate;
+    public ushort syncFlags;
+    public bool bDVSEnabled;
+    public bool bAdaptionEnabled;
+    public ushort copyCount;
+    public uint unused1;
+    public uint unused2;
 
-        [StructLayout(LayoutKind.Explicit)]
-        public struct PVR_DataUnion
-        {
-            [FieldOffset(0)]
-            public PVR_InstanceData instanceData;
-            
-            [FieldOffset(0)]
-            public PVR_SeriesData seriesData;
-            
-            [FieldOffset(0)]
-            public PVR_SyncNGoData syncData;
-        }
-        
-        public PVR_DataUnion pvrData;
-        
-        public ushort dataLen;               // Length of VarData
-        public ushort title;                 // Name offset into vardata
-        public ushort shortDescription;      // Plot summary offset
-        public ushort filenameRoot;          // Filename Root offset
-        public ushort moreInfo;              // Offset into vardata
-        public ushort serviceID;            // BBA serviceID
-        public ushort dispChannel;          // Display Channel
-        public ushort guideRunningTime;     // 1..65535 in minutes
-        public ushort qualifiers;           // ShowTimeQualifiers
-        public ushort callLetters;          // Service Call Letters offset
-        public ushort pvrFlags;
-        public byte category;               // Category/genre
-        public byte eventFlags;             // EventInfoFlags
-        public byte showtimeFlags1;          // ShowtimeFlags
-        
-        // Bitfield handling for ratings
-        private byte _ratingByte;
-        
-        public byte MpaaRating
-        {
-            get => (byte)(_ratingByte & 0x0F);      // Lower 4 bits
-            set => _ratingByte = (byte)((_ratingByte & 0xF0) | (value & 0x0F));
-        }
-        
-        public byte SvldRating
-        {
-            get => (byte)((_ratingByte & 0xF0) >> 4); // Upper 4 bits
-            set => _ratingByte = (byte)((_ratingByte & 0x0F) | ((value & 0x0F) << 4));
-        }
-        
-        public byte contentAdvisory;
-        public byte pvrRecordType;
-        public byte earlyMinutes;            // Minutes to start early
-        public byte lateMinutes;             // Minutes to end late
-        public byte recordQuality;          // Currently unused
-        
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PvrConstants.MAX_CLIENTID_LEN)]
-        public string ClientID;
-        
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PvrConstants.MAX_CLIENTID_LEN)]
-        public string eventClientId;
-        
-        public uint unused5;
-        public uint unused6;
-        
-        // Variable length data - in C# we'll handle this differently
-        public IntPtr vardata;  // Pointer to variable length data
-    }
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_PGM_NAME_LEN)]
+    public byte[] aucProgName;
+
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_TRANSFER_CLIENT * MAX_TRNSD_CLIENTID_LEN)]
+    public byte[] unused3;
+
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_TRANSFER_CLIENT * MAX_TRNSD_CLIENTID_LEN)]
+    public byte[] unused4;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct PVR_InstanceData
+{
+    public long planned_RecStart;
+    public uint planned_RecDuration;
+    public long estDeletion;
+    public double recStart;
+    public double recDuration;
+    public double pbPosition;
+    public uint platformContentID;
+
+#if DVRHISTORY_ENABLED
+    public uint RecHistoryCause;
+    public uint unused2;
+#else
+    public uint unused1;
+    public uint unused2;
+#endif
+
+    public ushort instanceFlags;
+    public ushort unused4;
+    public uint fromParentID;
 }
