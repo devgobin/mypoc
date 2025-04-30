@@ -4,74 +4,106 @@ using System.Text;
 
 public class DVRDecoder
 {
-    // Define the PVR_DBRec structure in C#
+    // Define PVR_DBRec structure in C#
     public struct PVR_DBRec
     {
-        public uint pvr_id;    
-        public uint programID;    
-        public uint ui32SeriesID; 
-        public long quideStartSeconds; 
-        public long scheduleTime;  
-        public PVR_InstanceData pvrData; 
-        public ushort dataLen;    
-        public ushort title;    
-        public ushort shortDescription;    
-        public ushort filenameRoot;    
-        public ushort moreInfo;    
-        public ushort serviceID;    
-        public ushort dispChannel;    
-        public ushort quideRunningTime;    
-        public ushort qualifiers;    
-        public ushort callLetters;    
-        public ushort pvrFlags;    
-        public byte category;    
-        public byte eventFlags;    
-        public byte showtimeFlags1;    
-        public byte mpaaRating;    
-        public byte svldRating;    
-        public byte contentAdvisory;    
-        public byte pvrRecordType;    
-        public byte earlyMinutes;    
-        public byte lateMinutes;    
-        public byte recordQuality;    
-        public string ClientID;    
-        public string eventClientId;    
-        public uint unusedS;    
-        public uint unused6;    
-        public string vardata;    
+        public uint pvr_id;            // Unique PVR_ID (based on counter)
+        public uint programID;         // System-wide unique identifier for this programID
+        public uint ui32SeriesID;      // Mercury Series ID
+        public long quideStartSeconds; // Starting time in seconds since 1970 - copied from IPG
+        public long scheduleTime;      // Time recording was scheduled
+        public PVR_InstanceData pvrData; // PVR_InstanceData or PVR_SeriesData or PVR_SyncNGoData (union in C++)
+        public ushort dataLen;         // Length of VarData
+        public ushort title;           // Name of the program. (offset into vardata)
+        public ushort shortDescription; // Plot summary, etc. (offset into vardata)
+        public ushort filenameRoot;    // Filename Root (offset into vardata)
+        public ushort moreInfo;        // Offset into vardata
+        public ushort serviceID;       // BBA service ID representing channel that the event is on
+        public ushort dispChannel;     // DispChannel
+        public ushort quideRunningTime; // Time in minutes from IPG data
+        public ushort qualifiers;       // Showtime qualifiers
+        public ushort callLetters;     // Service Call Letters (offset into vardata)
+        public ushort pvrFlags;        // PVR flags
+        public byte category;          // Category/genre of the program
+        public byte eventFlags;        // Event flags
+        public byte showtimeFlags1;    // Showtime flags
+        public byte mpaaRating;        // MPAA Rating (bitfield)
+        public byte svldRating;        // SVLD Rating (bitfield)
+        public byte contentAdvisory;   // Content advisory flags
+        public byte pvrRecordType;     // PVR Record Type
+        public byte earlyMinutes;      // Minutes to start early (preferred)
+        public byte lateMinutes;       // Minutes to end late (preferred)
+        public byte recordQuality;     // Record Quality (unused)
+        public string ClientID;        // Client ID
+        public string eventClientId;   // Event Client ID
+        public uint unusedS;           // Unused field
+        public uint unused6;           // Unused field
+        public string vardata;         // Pointer to variable length data
     }
 
+    // Define the PVR_InstanceData structure in C#
     public struct PVR_InstanceData
     {
-        public long planned_RecStart;
-        public uint planned_RecDuration;
-        public long estDeletion;
-        public HIRES_Time recStart;
-        public HIRES_Time recDuration;
-        public HIRES_Time pbPosition;
-        public uint platformContentID;
-        public uint RecHistoryCause;
-        public uint unused2;
-        public ushort instanceFlags;
-        public ushort unused4;
-        public uint fromParentID;
+        public long planned_RecStart;  // Planned record start time
+        public uint planned_RecDuration; // Planned record duration
+        public long estDeletion;       // Estimated deletion time
+        public HIRES_Time recStart;    // Actual record start time
+        public HIRES_Time recDuration; // Actual record duration
+        public HIRES_Time pbPosition;  // Playback position
+        public uint platformContentID; // Platform content ID
+        public uint RecHistoryCause;   // Record history cause
+        public uint unused2;           // Unused field
+        public ushort instanceFlags;   // Instance flags
+        public ushort unused4;         // Unused field
+        public uint fromParentID;      // From parent ID
     }
 
+    // Define the HIRES_Time structure in C#
     public struct HIRES_Time
     {
-        public uint Seconds;
-        public uint Milliseconds;
+        public uint Seconds;           // Seconds field
+        public uint Milliseconds;      // Milliseconds field
     }
 
-    private static readonly string cd64 = "|$$$}rstuvwxyz{$$$$$$$>?@ABCDEFGHIJKLMNOPQRSTUVW$$$$$$XYZ[\\]^_`abcdefghijklmnopq";
+    // The following fields represent the union types (PVR_SeriesData, PVR_SyncNGoData)
+    public struct PVR_SeriesData
+    {
+        public ushort numbgrToKeep;    // Episodes to keep
+        public byte seriesFlags;       // Record new on/off
+        public byte dayMask;           // Days to record
+        public byte matchHour;         // Match hour for recording
+        public byte matchMinute;       // Match minute for recording
+        public uint unused1;           // Unused field
+        public uint unused2;           // Unused field
+        public uint unused3;           // Unused field
+        public string aucSeriesName;   // Series name
+        public string aucSeriesDescription; // Series description
+    }
 
-    // Get the data length from the base64 encoded string
+    public struct PVR_SyncNGoData
+    {
+        public string dvrFileName;     // DVR file name
+        public string trnsdfFileName;  // Transcoded file name
+        public byte transcodeType;     // Transcode type
+        public byte resolution;        // Resolution
+        public byte audiolang;         // Audio language
+        public byte transdStatus;      // Transcode status
+        public ushort bitRate;         // Bit rate
+        public ushort syncFlags;       // Sync flags
+        public bool bDVSEnabled;       // DVSE enabled flag
+        public bool bAdaptionEnabled;  // Adaption enabled flag
+        public ushort copyCount;       // Copy count
+        public uint unused1;           // Unused field
+        public uint unused2;           // Unused field
+        public string aucProgName;     // Program name
+    }
+
+    // Base64 decoding helper methods
     private static int GetDataLength(int codeLength)
     {
         return codeLength - codeLength / 4;
     }
 
-    // Decoding function for base64 using the cd64 map
     private static void DecodeBlock(byte[] input, byte[] output)
     {
         output[0] = (byte)(input[0] << 2 | input[1] >> 4);
@@ -127,27 +159,40 @@ public class DVRDecoder
         return j;
     }
 
-    // Main function that mimics ProcessSrsExportRequest to decode and extract PVR_DBRec structs
+    // Process the encoded string and validate header, structure, and data
     public static List<PVR_DBRec> ProcessSrsExportRequest(string encodedData)
     {
         byte[] decodedData = null;
         int decodedLength = Base64Decode(encodedData, encodedData.Length, ref decodedData);
 
+        // Perform Header Validation
+        if (decodedLength < 12)
+        {
+            throw new Exception("Invalid encoded data (header too short).");
+        }
+
+        // List to store decoded records
         List<PVR_DBRec> records = new List<PVR_DBRec>();
         int index = 0;
 
         while (index < decodedLength)
         {
+            if (decodedLength - index < 200)
+            {
+                break;
+            }
+
             PVR_DBRec rec = new PVR_DBRec();
 
-            // Read PVR_DBRec fields
+            // Read PVR_DBRec fields from byte array
             rec.pvr_id = BitConverter.ToUInt32(decodedData, index);
             rec.programID = BitConverter.ToUInt32(decodedData, index + 4);
             rec.ui32SeriesID = BitConverter.ToUInt32(decodedData, index + 8);
             rec.quideStartSeconds = BitConverter.ToInt64(decodedData, index + 12);
             rec.scheduleTime = BitConverter.ToInt64(decodedData, index + 20);
 
-            // Nested structure: PVR_InstanceData
+            // Handle union fields (PVR_InstanceData, PVR_SeriesData, PVR_SyncNGoData)
+            // Choose which union data to parse based on context (e.g., instanceData, seriesData, etc.)
             rec.pvrData = new PVR_InstanceData
             {
                 planned_RecStart = BitConverter.ToInt64(decodedData, index + 28),
@@ -176,7 +221,7 @@ public class DVRDecoder
                 fromParentID = BitConverter.ToUInt32(decodedData, index + 88)
             };
 
-            // Reading remaining fields
+            // Read additional fields (dataLen, title, shortDescription, etc.)
             rec.dataLen = BitConverter.ToUInt16(decodedData, index + 92);
             rec.title = BitConverter.ToUInt16(decodedData, index + 94);
             rec.shortDescription = BitConverter.ToUInt16(decodedData, index + 96);
@@ -198,18 +243,17 @@ public class DVRDecoder
             rec.earlyMinutes = decodedData[index + 121];
             rec.lateMinutes = decodedData[index + 122];
             rec.recordQuality = decodedData[index + 123];
-
-            // ClientID and eventClientId (assuming they are strings)
             rec.ClientID = Encoding.ASCII.GetString(decodedData, index + 124, 32).Trim('\0');
             rec.eventClientId = Encoding.ASCII.GetString(decodedData, index + 156, 32).Trim('\0');
-
-            // Reading unused and vardata fields
             rec.unusedS = BitConverter.ToUInt32(decodedData, index + 188);
             rec.unused6 = BitConverter.ToUInt32(decodedData, index + 192);
-            rec.vardata = Encoding.ASCII.GetString(decodedData, index + 196, rec.dataLen - 4); // Assumed vardata length is based on dataLen
 
+            // Assuming vardata starts after unused fields
+            rec.vardata = Encoding.ASCII.GetString(decodedData, index + 196, rec.dataLen - 4);
+
+            // Add record to list
             records.Add(rec);
-            index += 200; // Adjust according to the total size of PVR_DBRec
+            index += 200; // Move index by record size
         }
 
         return records;
