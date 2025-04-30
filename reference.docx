@@ -11,41 +11,44 @@ namespace PvrDatabase
         public const int MAX_TRANSFER_CLIENT = 10;
         public const int MAX_TRNSD_CLIENTID_LEN = 64;
         public const int MAX_CLIENTID_LEN = 64;
-        
-        // Calculate the maximum size needed for the union
-        public const int MAX_UNION_SIZE = 1024; // Adjust based on your largest struct
+        public const int MAX_ASSET_ROOT_FILENAME_LENGTH = 128;
     }
 
-    // Series Data Structure with explicit layout
+    public enum PVR_RecordType : byte
+    {
+        PVR_RT_Instance = 0,
+        PVR_RT_TimebasedSeries = 1,
+        PVR_RT_SyncNGo = 2
+    }
+
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct PVR_SeriesData
     {
-        public ushort numbgrToKeep;
-        public byte seriesFlags;
-        public byte dayMask;
-        public byte matchHour;
+        public ushort numbgrToKeep;    // Episodes to keep
+        public byte seriesFlags;      // Record New Only, etc.
+        public byte dayMask;          // Days to record
+        public byte matchHour;        // Added 11/22/04
         public byte matchMinute;
-        public uint RecHistoryCause;
+        public uint RecHistoryCause;  // Modified by muthuk 18 Sep 2008
         public uint unused2;
         public uint unused3;
-        
+
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_PGM_NAME_LEN)]
-        public byte[] aucSeriesName;
-        
+        public byte[] aucSeriesName;  // Name for the Series
+
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_PGM_DESC_LEN)]
-        public byte[] aucSeriesDescription;
+        public byte[] aucSeriesDescription; // Description
     }
 
-    // Sync and Go Data Structure with explicit layout
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct PVR_SyncNGoData
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_DVR_FILENAME_LEN)]
         public byte[] dvrFileName;
-        
+
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_DVR_FILENAME_LEN)]
         public byte[] trnsdfFileName;
-        
+
         public byte transcodeType;
         public byte resolution;
         public byte audiolang;
@@ -62,25 +65,24 @@ namespace PvrDatabase
         public ushort copyCount;
         public uint unused1;
         public uint unused2;
-        
+
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_PGM_NAME_LEN)]
         public byte[] aucProgName;
-        
+
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_TRANSFER_CLIENT * PvrConstants.MAX_TRNSD_CLIENTID_LEN)]
         public byte[] unused3;
-        
+
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_TRANSFER_CLIENT * PvrConstants.MAX_TRNSD_CLIENTID_LEN)]
         public byte[] unused4;
     }
 
-    // Instance Data Structure
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct PVR_InstanceData
     {
-        public long planned_RecStart;
+        public long planned_RecStart;        // time_t in C# is long
         public uint planned_RecDuration;
         public long estDeletion;
-        public double recStart;
+        public double recStart;              // HIRES_Time as double
         public double recDuration;
         public double pbPosition;
         public uint platformContentID;
@@ -91,9 +93,8 @@ namespace PvrDatabase
         public uint fromParentID;
     }
 
-    // Main PVR Database Record Structure
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct PVR_DBRec
+    public struct PVR_LegacyDBRec
     {
         public uint pvr_id;
         public uint programID;
@@ -101,9 +102,20 @@ namespace PvrDatabase
         public long guideStartSeconds;
         public long scheduleTime;
         
-        // Replace union with byte array and manual access methods
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_UNION_SIZE)]
-        public byte[] pvrDataBuffer;
+        [StructLayout(LayoutKind.Explicit)]
+        public struct PVR_DataUnion
+        {
+            [FieldOffset(0)]
+            public PVR_InstanceData instanceData;
+            
+            [FieldOffset(0)]
+            public PVR_SeriesData seriesData;
+            
+            [FieldOffset(0)]
+            public PVR_SyncNGoData syncData;
+        }
+        
+        public PVR_DataUnion pvrData;
         
         public ushort dataLen;
         public ushort title;
@@ -121,7 +133,7 @@ namespace PvrDatabase
         public byte showtimeFlags1;
         private byte _ratingByte;
         public byte contentAdvisory;
-        public byte pvrRecordType;
+        public PVR_RecordType pvrRecordType;
         public byte earlyMinutes;
         public byte lateMinutes;
         public byte recordQuality;
@@ -134,53 +146,10 @@ namespace PvrDatabase
         
         public uint unused5;
         public uint unused6;
-        public IntPtr vardata;
-
-        // Helper methods to access union data
-        public PVR_InstanceData GetInstanceData()
-        {
-            var handle = GCHandle.Alloc(pvrDataBuffer, GCHandleType.Pinned);
-            try
-            {
-                return (PVR_InstanceData)Marshal.PtrToStructure(
-                    handle.AddrOfPinnedObject(), 
-                    typeof(PVR_InstanceData));
-            }
-            finally
-            {
-                handle.Free();
-            }
-        }
-
-        public PVR_SeriesData GetSeriesData()
-        {
-            var handle = GCHandle.Alloc(pvrDataBuffer, GCHandleType.Pinned);
-            try
-            {
-                return (PVR_SeriesData)Marshal.PtrToStructure(
-                    handle.AddrOfPinnedObject(), 
-                    typeof(PVR_SeriesData));
-            }
-            finally
-            {
-                handle.Free();
-            }
-        }
-
-        public PVR_SyncNGoData GetSyncNGoData()
-        {
-            var handle = GCHandle.Alloc(pvrDataBuffer, GCHandleType.Pinned);
-            try
-            {
-                return (PVR_SyncNGoData)Marshal.PtrToStructure(
-                    handle.AddrOfPinnedObject(), 
-                    typeof(PVR_SyncNGoData));
-            }
-            finally
-            {
-                handle.Free();
-            }
-        }
+        
+        // Variable length data
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1)]
+        public byte[] vardata;
 
         public byte MpaaRating
         {
@@ -192,6 +161,176 @@ namespace PvrDatabase
         {
             get => (byte)((_ratingByte & 0xF0) >> 4);
             set => _ratingByte = (byte)((_ratingByte & 0x0F) | ((value & 0x0F) << 4));
+        }
+    }
+
+    // Modern version of the structure with proper variable-length data handling
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct PVR_DBRec
+    {
+        public uint pvr_id;
+        public uint programID;
+        public uint ui32SeriesID;
+        public long guideStartSeconds;
+        public long scheduleTime;
+        
+        // Union represented as the largest possible member
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1024)] // Size of largest union member
+        public byte[] pvrDataUnionBuffer;
+        
+        public ushort dataLen;
+        public ushort title;
+        public ushort shortDescription;
+        public ushort filenameRoot;
+        public ushort moreInfo;
+        public ushort serviceID;
+        public ushort dispChannel;
+        public ushort guideRunningTime;
+        public ushort qualifiers;
+        public ushort callLetters;
+        public ushort pvrFlags;
+        public byte category;
+        public byte eventFlags;
+        public byte showtimeFlags1;
+        private byte _ratingByte;
+        public byte contentAdvisory;
+        public PVR_RecordType pvrRecordType;
+        public byte earlyMinutes;
+        public byte lateMinutes;
+        public byte recordQuality;
+        
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_CLIENTID_LEN)]
+        public byte[] ClientID;
+        
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_CLIENTID_LEN)]
+        public byte[] eventClientId;
+        
+        public uint unused5;
+        public uint unused6;
+        
+        // Pointer to variable length data (must be marshaled separately)
+        public IntPtr vardata;
+
+        // Helper methods to access union data
+        public PVR_InstanceData GetInstanceData()
+        {
+            var handle = GCHandle.Alloc(pvrDataUnionBuffer, GCHandleType.Pinned);
+            try
+            {
+                return Marshal.PtrToStructure<PVR_InstanceData>(handle.AddrOfPinnedObject());
+            }
+            finally
+            {
+                handle.Free();
+            }
+        }
+
+        public PVR_SeriesData GetSeriesData()
+        {
+            var handle = GCHandle.Alloc(pvrDataUnionBuffer, GCHandleType.Pinned);
+            try
+            {
+                return Marshal.PtrToStructure<PVR_SeriesData>(handle.AddrOfPinnedObject());
+            }
+            finally
+            {
+                handle.Free();
+            }
+        }
+
+        public PVR_SyncNGoData GetSyncNGoData()
+        {
+            var handle = GCHandle.Alloc(pvrDataUnionBuffer, GCHandleType.Pinned);
+            try
+            {
+                return Marshal.PtrToStructure<PVR_SyncNGoData>(handle.AddrOfPinnedObject());
+            }
+            finally
+            {
+                handle.Free();
+            }
+        }
+
+        public byte[] GetVariableData()
+        {
+            if (vardata == IntPtr.Zero || dataLen == 0)
+                return null;
+
+            byte[] data = new byte[dataLen];
+            Marshal.Copy(vardata, data, 0, dataLen);
+            return data;
+        }
+
+        public string GetTitle()
+        {
+            var varData = GetVariableData();
+            if (varData != null && title < varData.Length)
+            {
+                int length = 0;
+                while (title + length < varData.Length && varData[title + length] != 0)
+                    length++;
+                return Encoding.UTF8.GetString(varData, title, length);
+            }
+            return string.Empty;
+        }
+
+        // Similar methods can be added for other variable-length fields
+        // like shortDescription, filenameRoot, etc.
+    }
+
+    public class PvrDataHelper
+    {
+        public static PVR_DBRec[] ParseFromBase64(string base64Data)
+        {
+            byte[] decodedData = Convert.FromBase64String(base64Data);
+            return ParseFromBytes(decodedData);
+        }
+
+        public static PVR_DBRec[] ParseFromBytes(byte[] data)
+        {
+            List<PVR_DBRec> records = new List<PVR_DBRec>();
+            int position = 0;
+            int structSize = Marshal.SizeOf(typeof(PVR_DBRec)) - 4; // Adjust for vardata pointer
+
+            while (position + structSize <= data.Length)
+            {
+                // Allocate memory for the struct
+                IntPtr ptr = Marshal.AllocHGlobal(structSize);
+                try
+                {
+                    // Copy the fixed portion
+                    Marshal.Copy(data, position, ptr, structSize);
+                    PVR_DBRec rec = Marshal.PtrToStructure<PVR_DBRec>(ptr);
+
+                    // Handle variable data
+                    if (rec.dataLen > 0 && position + structSize + rec.dataLen <= data.Length)
+                    {
+                        rec.vardata = Marshal.AllocHGlobal(rec.dataLen);
+                        Marshal.Copy(data, position + structSize, rec.vardata, rec.dataLen);
+                        position += rec.dataLen;
+                    }
+
+                    records.Add(rec);
+                    position += structSize;
+                }
+                finally
+                {
+                    Marshal.FreeHGlobal(ptr);
+                }
+            }
+
+            return records.ToArray();
+        }
+
+        public static void FreeRecords(PVR_DBRec[] records)
+        {
+            foreach (var rec in records)
+            {
+                if (rec.vardata != IntPtr.Zero)
+                {
+                    Marshal.FreeHGlobal(rec.vardata);
+                }
+            }
         }
     }
 }
