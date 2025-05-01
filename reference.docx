@@ -1,276 +1,844 @@
+#warning // !!! IMPORTANT: Review and replace ALL placeholder constants below with actual values from your C++ environment !!!
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 
-public class DVRDecoder
+// --- Constants (Define based on your C++ code) ---
+public static class PvrConstants
 {
-    // Define PVR_DBRec structure in C#
-    public struct PVR_DBRec
+#warning // Verify MAX_CLIENTID_LEN value
+    public const int MAX_CLIENTID_LEN = 64; // Example size - REPLACE WITH ACTUAL VALUE
+#warning // Verify MAX_PGM_NAME_LEN value
+    public const int MAX_PGM_NAME_LEN = 256; // Example size - REPLACE WITH ACTUAL VALUE
+#warning // Verify MAX_PGM_DESC_LEN value
+    public const int MAX_PGM_DESC_LEN = 1024; // Example size - REPLACE WITH ACTUAL VALUE
+#warning // Verify MAX_DVR_FILENAME_LEN value
+    public const int MAX_DVR_FILENAME_LEN = 256; // Example size - REPLACE WITH ACTUAL VALUE
+#warning // Verify MAX_TRANSFER_CLIENT value
+    public const int MAX_TRANSFER_CLIENT = 4; // Example size - REPLACE WITH ACTUAL VALUE
+#warning // Verify MAX_TRNSD_CLIENTID_LEN value
+    public const int MAX_TRNSD_CLIENTID_LEN = 64; // Example size - REPLACE WITH ACTUAL VALUE
+
+    // Sizes needed for calculating offsets and union size
+#warning // Verify sizes of fundamental types for your C++ target platform
+    // Assumes 64-bit platform where time_t=long=8 bytes, HIRES_Time=double=8 bytes
+    public const int SizeOf_time_t = 8;
+    public const int SizeOf_HIRES_Time = 8;
+    public const int SizeOf_ui32 = 4;
+    public const int SizeOf_ui16 = 2;
+    public const int SizeOf_ui8 = 1;
+    public const int SizeOf_bool = 1; // C++ bool size can vary, often 1. Marshal.SizeOf(typeof(bool)) is safer if unsure.
+}
+
+// --- Enum Placeholders ---
+#warning // !!! IMPORTANT: Verify PvrRecordType enum values match your C++ PVRRecordTypes_E enum !!!
+public enum PvrRecordType // Placeholder values - REPLACE WITH ACTUAL VALUES
+{
+    UNKNOWN = 0, // Default/Unknown
+    INSTANCE_DATA = 1, // GUESS - REPLACE
+    SERIES_DATA = 2, // GUESS - REPLACE
+    SYNC_N_GO_DATA = 3, // GUESS - REPLACE
+    TIMEBASED_SERIES = 4 // GUESS - From legacy check? Value needed if used.
+    // Add other types as defined in C++'s PVRRecordTypes_E
+}
+
+
+// --- Helper Methods ---
+public static class PvrHelpers
+{
+    // Helper to extract null-terminated string from a byte array at a given offset
+    public static string GetNullTerminatedString(byte[] data, int offset, Encoding encoding)
     {
-        public uint pvr_id;            // Unique PVR_ID (based on counter)
-        public uint programID;         // System-wide unique identifier for this programID
-        public uint ui32SeriesID;      // Mercury Series ID
-        public long quideStartSeconds; // Starting time in seconds since 1970 - copied from IPG
-        public long scheduleTime;      // Time recording was scheduled
-        public PVR_InstanceData pvrData; // PVR_InstanceData or PVR_SeriesData or PVR_SyncNGoData (union in C++)
-        public ushort dataLen;         // Length of VarData
-        public ushort title;           // Name of the program. (offset into vardata)
-        public ushort shortDescription; // Plot summary, etc. (offset into vardata)
-        public ushort filenameRoot;    // Filename Root (offset into vardata)
-        public ushort moreInfo;        // Offset into vardata
-        public ushort serviceID;       // BBA service ID representing channel that the event is on
-        public ushort dispChannel;     // DispChannel
-        public ushort quideRunningTime; // Time in minutes from IPG data
-        public ushort qualifiers;       // Showtime qualifiers
-        public ushort callLetters;     // Service Call Letters (offset into vardata)
-        public ushort pvrFlags;        // PVR flags
-        public byte category;          // Category/genre of the program
-        public byte eventFlags;        // Event flags
-        public byte showtimeFlags1;    // Showtime flags
-        public byte mpaaRating;        // MPAA Rating (bitfield)
-        public byte svldRating;        // SVLD Rating (bitfield)
-        public byte contentAdvisory;   // Content advisory flags
-        public byte pvrRecordType;     // PVR Record Type
-        public byte earlyMinutes;      // Minutes to start early (preferred)
-        public byte lateMinutes;       // Minutes to end late (preferred)
-        public byte recordQuality;     // Record Quality (unused)
-        public string ClientID;        // Client ID
-        public string eventClientId;   // Event Client ID
-        public uint unusedS;           // Unused field
-        public uint unused6;           // Unused field
-        public string vardata;         // Pointer to variable length data
-    }
+        if (data == null || offset < 0 || offset >= data.Length) return string.Empty;
 
-    // Define the PVR_InstanceData structure in C#
-    public struct PVR_InstanceData
-    {
-        public long planned_RecStart;  // Planned record start time
-        public uint planned_RecDuration; // Planned record duration
-        public long estDeletion;       // Estimated deletion time
-        public HIRES_Time recStart;    // Actual record start time
-        public HIRES_Time recDuration; // Actual record duration
-        public HIRES_Time pbPosition;  // Playback position
-        public uint platformContentID; // Platform content ID
-        public uint RecHistoryCause;   // Record history cause
-        public uint unused2;           // Unused field
-        public ushort instanceFlags;   // Instance flags
-        public ushort unused4;         // Unused field
-        public uint fromParentID;      // From parent ID
-    }
-
-    // Define the HIRES_Time structure in C#
-    public struct HIRES_Time
-    {
-        public uint Seconds;           // Seconds field
-        public uint Milliseconds;      // Milliseconds field
-    }
-
-    // The following fields represent the union types (PVR_SeriesData, PVR_SyncNGoData)
-    public struct PVR_SeriesData
-    {
-        public ushort numbgrToKeep;    // Episodes to keep
-        public byte seriesFlags;       // Record new on/off
-        public byte dayMask;           // Days to record
-        public byte matchHour;         // Match hour for recording
-        public byte matchMinute;       // Match minute for recording
-        public uint unused1;           // Unused field
-        public uint unused2;           // Unused field
-        public uint unused3;           // Unused field
-        public string aucSeriesName;   // Series name
-        public string aucSeriesDescription; // Series description
-    }
-
-    public struct PVR_SyncNGoData
-    {
-        public string dvrFileName;     // DVR file name
-        public string trnsdfFileName;  // Transcoded file name
-        public byte transcodeType;     // Transcode type
-        public byte resolution;        // Resolution
-        public byte audiolang;         // Audio language
-        public byte transdStatus;      // Transcode status
-        public ushort bitRate;         // Bit rate
-        public ushort syncFlags;       // Sync flags
-        public bool bDVSEnabled;       // DVSE enabled flag
-        public bool bAdaptionEnabled;  // Adaption enabled flag
-        public ushort copyCount;       // Copy count
-        public uint unused1;           // Unused field
-        public uint unused2;           // Unused field
-        public string aucProgName;     // Program name
-    }
-
-    // Base64 decoding helper methods
-    private static int GetDataLength(int codeLength)
-    {
-        return codeLength - codeLength / 4;
-    }
-
-    private static void DecodeBlock(byte[] input, byte[] output)
-    {
-        output[0] = (byte)(input[0] << 2 | input[1] >> 4);
-        output[1] = (byte)(input[1] << 4 | input[2] >> 2);
-        output[2] = (byte)((input[2] << 6) | input[3]);
-    }
-
-    private static int Base64Decode(string inputCode, int codeLength, ref byte[] outputData)
-    {
-        byte[] input = new byte[4], output = new byte[3];
-        int i = 0, len = 0, j = 0, k = 0;
-
-        int outputLength = GetDataLength(codeLength);
-        outputData = new byte[outputLength + 1];
-        j = 0;
-
-        while (k < codeLength)
+        int end = offset;
+        // Find null terminator or end of array
+        while (end < data.Length && data[end] != 0)
         {
-            for (len = 0; i < 4 && k < codeLength; i++)
-            {
-                byte v = 0;
-                while (k < codeLength && v == 0)
-                {
-                    v = (byte)inputCode[k++];
-                    v = (byte)((v < 43 || v > 122) ? 0 : cd64[v - 43]);
-                    if (v != 0) v = (byte)((v == '$') ? 0 : v - 61);
-                }
-
-                if (k < codeLength)
-                {
-                    len++;
-                    if (v != 0)
-                    {
-                        input[i] = (byte)(v - 1);
-                    }
-                    else
-                    {
-                        input[i] = 0;
-                    }
-                }
-            }
-
-            if (len > 0)
-            {
-                DecodeBlock(input, output);
-                for (i = 0; i < len - 1; i++)
-                {
-                    outputData[j++] = output[i];
-                }
-            }
+            end++;
         }
 
-        return j;
+        if (end == offset) return string.Empty; // Empty string or just null at offset
+
+        try
+        {
+            // Handle case where offset + length exceeds data bounds (shouldn't happen if dataLen is correct)
+             int length = Math.Min(end - offset, data.Length - offset);
+             if (length <=0) return string.Empty;
+
+            return encoding.GetString(data, offset, length);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"#Error decoding string at offset {offset} (max length {end - offset}): {ex.Message}");
+            return "STRING_DECODING_ERROR";
+        }
     }
 
-    // Process the encoded string and validate header, structure, and data
-    public static List<PVR_DBRec> ProcessSrsExportRequest(string encodedData)
+    // Helper to get string from fixed-size byte array property
+     public static string GetStringFromBytes(byte[] bytes, Encoding encoding)
     {
-        byte[] decodedData = null;
-        int decodedLength = Base64Decode(encodedData, encodedData.Length, ref decodedData);
+         if (bytes == null) return string.Empty;
+        int length = Array.IndexOf(bytes, (byte)0); // Find null terminator
+        if (length == -1) length = bytes.Length; // Use full length if no null found
+        return encoding.GetString(bytes, 0, length);
+    }
 
-        // Perform Header Validation
-        if (decodedLength < 12)
+     // Helper to read UInt16, potentially handling endianness based on isCisco flag
+     // Assumes isCisco=true requires byte swap if current platform is Little Endian
+     public static ushort ReadUInt16(BinaryReader reader, bool reverseBytesIfNeeded)
+    {
+        byte[] bytes = reader.ReadBytes(2);
+        if (reverseBytesIfNeeded && BitConverter.IsLittleEndian)
         {
-            throw new Exception("Invalid encoded data (header too short).");
+            // Assumes source (Cisco) is Big Endian, swap for Little Endian machine
+            Array.Reverse(bytes);
         }
+        // Add logic here if running on a Big Endian machine and need to potentially swap
+        // else if (reverseBytesIfNeeded && !BitConverter.IsLittleEndian) { /* Maybe swap? */ }
+        return BitConverter.ToUInt16(bytes, 0);
+    }
 
-        // List to store decoded records
-        List<PVR_DBRec> records = new List<PVR_DBRec>();
-        int index = 0;
-
-        while (index < decodedLength)
+    // Helper to read potentially null-terminated string for atoi simulation
+     public static string ReadNullTerminatedAsciiString(BinaryReader reader)
+    {
+        List<byte> bytes = new List<byte>();
+        byte b;
+        // Protect against reading past end of stream
+        while (reader.BaseStream.Position < reader.BaseStream.Length)
         {
-            if (decodedLength - index < 200)
-            {
-                break;
-            }
-
-            PVR_DBRec rec = new PVR_DBRec();
-
-            // Read PVR_DBRec fields from byte array
-            rec.pvr_id = BitConverter.ToUInt32(decodedData, index);
-            rec.programID = BitConverter.ToUInt32(decodedData, index + 4);
-            rec.ui32SeriesID = BitConverter.ToUInt32(decodedData, index + 8);
-            rec.quideStartSeconds = BitConverter.ToInt64(decodedData, index + 12);
-            rec.scheduleTime = BitConverter.ToInt64(decodedData, index + 20);
-
-            // Handle union fields (PVR_InstanceData, PVR_SeriesData, PVR_SyncNGoData)
-            // Choose which union data to parse based on context (e.g., instanceData, seriesData, etc.)
-            rec.pvrData = new PVR_InstanceData
-            {
-                planned_RecStart = BitConverter.ToInt64(decodedData, index + 28),
-                planned_RecDuration = BitConverter.ToUInt32(decodedData, index + 36),
-                estDeletion = BitConverter.ToInt64(decodedData, index + 40),
-                recStart = new HIRES_Time
-                {
-                    Seconds = BitConverter.ToUInt32(decodedData, index + 48),
-                    Milliseconds = BitConverter.ToUInt32(decodedData, index + 52)
-                },
-                recDuration = new HIRES_Time
-                {
-                    Seconds = BitConverter.ToUInt32(decodedData, index + 56),
-                    Milliseconds = BitConverter.ToUInt32(decodedData, index + 60)
-                },
-                pbPosition = new HIRES_Time
-                {
-                    Seconds = BitConverter.ToUInt32(decodedData, index + 64),
-                    Milliseconds = BitConverter.ToUInt32(decodedData, index + 68)
-                },
-                platformContentID = BitConverter.ToUInt32(decodedData, index + 72),
-                RecHistoryCause = BitConverter.ToUInt32(decodedData, index + 76),
-                unused2 = BitConverter.ToUInt32(decodedData, index + 80),
-                instanceFlags = BitConverter.ToUInt16(decodedData, index + 84),
-                unused4 = BitConverter.ToUInt16(decodedData, index + 86),
-                fromParentID = BitConverter.ToUInt32(decodedData, index + 88)
-            };
-
-            // Read additional fields (dataLen, title, shortDescription, etc.)
-            rec.dataLen = BitConverter.ToUInt16(decodedData, index + 92);
-            rec.title = BitConverter.ToUInt16(decodedData, index + 94);
-            rec.shortDescription = BitConverter.ToUInt16(decodedData, index + 96);
-            rec.filenameRoot = BitConverter.ToUInt16(decodedData, index + 98);
-            rec.moreInfo = BitConverter.ToUInt16(decodedData, index + 100);
-            rec.serviceID = BitConverter.ToUInt16(decodedData, index + 102);
-            rec.dispChannel = BitConverter.ToUInt16(decodedData, index + 104);
-            rec.quideRunningTime = BitConverter.ToUInt16(decodedData, index + 106);
-            rec.qualifiers = BitConverter.ToUInt16(decodedData, index + 108);
-            rec.callLetters = BitConverter.ToUInt16(decodedData, index + 110);
-            rec.pvrFlags = BitConverter.ToUInt16(decodedData, index + 112);
-            rec.category = decodedData[index + 114];
-            rec.eventFlags = decodedData[index + 115];
-            rec.showtimeFlags1 = decodedData[index + 116];
-            rec.mpaaRating = decodedData[index + 117];
-            rec.svldRating = decodedData[index + 118];
-            rec.contentAdvisory = decodedData[index + 119];
-            rec.pvrRecordType = decodedData[index + 120];
-            rec.earlyMinutes = decodedData[index + 121];
-            rec.lateMinutes = decodedData[index + 122];
-            rec.recordQuality = decodedData[index + 123];
-            rec.ClientID = Encoding.ASCII.GetString(decodedData, index + 124, 32).Trim('\0');
-            rec.eventClientId = Encoding.ASCII.GetString(decodedData, index + 156, 32).Trim('\0');
-            rec.unusedS = BitConverter.ToUInt32(decodedData, index + 188);
-            rec.unused6 = BitConverter.ToUInt32(decodedData, index + 192);
-
-            // Assuming vardata starts after unused fields
-            rec.vardata = Encoding.ASCII.GetString(decodedData, index + 196, rec.dataLen - 4);
-
-            // Add record to list
-            records.Add(rec);
-            index += 200; // Move index by record size
+             b = reader.ReadByte();
+             if (b == 0) break; // Null terminator found
+             bytes.Add(b);
         }
+        return Encoding.ASCII.GetString(bytes.ToArray());
+    }
 
-        return records;
+      // Helper to simulate reading int written by C++ sprintf followed by null terminator
+     public static int ReadIntFromString(BinaryReader reader)
+    {
+        string intStr = ReadNullTerminatedAsciiString(reader);
+        if (int.TryParse(intStr, out int result))
+        {
+            return result;
+        }
+        // Don't throw, maybe return 0 or log error, as C++ atoi might return 0 on failure
+        Console.WriteLine($"#Warning: Could not parse integer from string '{intStr}' read from stream. Returning 0.");
+        return 0;
+        // throw new FormatException($"Could not parse integer from string '{intStr}' read from stream.");
+    }
+
+    // Helper for bitfield extraction assuming Little Endian C++ source
+    public static void ExtractRatingsLE(byte ratingsByte, out byte mpaaRating, out byte svldRating)
+    {
+        mpaaRating = (byte)(ratingsByte & 0x0F); // Lower 4 bits
+        svldRating = (byte)((ratingsByte >> 4) & 0x0F); // Upper 4 bits
+    }
+
+    // Standard ISO-8859-1 to UTF-8 conversion
+    public static string ConvertIsoToUtf8(string isoString)
+    {
+         try
+         {
+             Encoding iso88591 = Encoding.GetEncoding("ISO-8859-1");
+             Encoding utf8 = Encoding.UTF8;
+             byte[] isoBytes = iso88591.GetBytes(isoString);
+             return utf8.GetString(isoBytes);
+         }
+         catch (Exception ex)
+         {
+             Console.WriteLine($"#Error converting ISO-8859-1 string to UTF-8: {ex.Message}");
+             return isoString; // Return original on error
+         }
     }
 }
 
-// Example Usage:
-class Program
-{
-    static void Main(string[] args)
-    {
-        string encodedData = "<Your Base64 Encoded Data Here>";
-        List<DVRDecoder.PVR_DBRec> records = DVRDecoder.ProcessSrsExportRequest(encodedData);
+// --- C# Struct/Class Definitions (Based on C++ structs provided) ---
 
-        foreach (var record in records)
+// Represents C++ PVR_InstanceData
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public class PvrInstanceData
+{
+    public long PlannedRecStart;
+    public uint PlannedRecDuration;
+    public long EstDeletion;
+    public double RecStart;
+    public double RecDuration;
+    public double PbPosition;
+    public uint PlatformContentID;
+#warning // Adjust based on DVRHISTORY_ENABLED in your C++ build
+    public uint RecHistoryCause; // Assuming DVRHISTORY_ENABLED
+    // public uint Unused1; // If DVRHISTORY_ENABLED is OFF
+    public uint Unused2;
+    public ushort InstanceFlags;
+    public ushort Unused4;
+    public uint FromParentID;
+
+    public static int StructSize = PvrConstants.SizeOf_time_t * 2 + PvrConstants.SizeOf_ui32 * 5 + PvrConstants.SizeOf_HIRES_Time * 3 + PvrConstants.SizeOf_ui16 * 2;
+
+    public static PvrInstanceData ReadFrom(BinaryReader reader)
+    {
+        var data = new PvrInstanceData();
+        data.PlannedRecStart = reader.ReadInt64();
+        data.PlannedRecDuration = reader.ReadUInt32();
+        data.EstDeletion = reader.ReadInt64();
+        data.RecStart = reader.ReadDouble();
+        data.RecDuration = reader.ReadDouble();
+        data.PbPosition = reader.ReadDouble();
+        data.PlatformContentID = reader.ReadUInt32();
+        data.RecHistoryCause = reader.ReadUInt32(); // Or Unused1
+        data.Unused2 = reader.ReadUInt32();
+        data.InstanceFlags = reader.ReadUInt16();
+        data.Unused4 = reader.ReadUInt16();
+        data.FromParentID = reader.ReadUInt32();
+        return data;
+    }
+}
+
+// Represents C++ PVR_SeriesData
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public class PvrSeriesData
+{
+    public ushort NumbgrToKeep;
+    public byte SeriesFlags;
+    public byte DayMask;
+    public byte MatchHour;
+    public byte MatchMinute;
+#warning // Adjust based on DVRHISTORY_ENABLED in your C++ build
+    public uint RecHistoryCause; // Assuming DVRHISTORY_ENABLED
+    // public uint Unused1; // If DVRHISTORY_ENABLED is OFF
+    public uint Unused2;
+    public uint Unused3;
+
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_PGM_NAME_LEN)]
+    public byte[] AucSeriesNameBytes;
+
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_PGM_DESC_LEN)]
+    public byte[] AucSeriesDescriptionBytes;
+
+#warning // Assuming UTF-8 for internal strings, adjust if needed. Check C++ source encoding.
+    public string AucSeriesName(Encoding enc) => PvrHelpers.GetStringFromBytes(AucSeriesNameBytes, enc);
+    public string AucSeriesDescription(Encoding enc) => PvrHelpers.GetStringFromBytes(AucSeriesDescriptionBytes, enc);
+
+    public static int StructSize = PvrConstants.SizeOf_ui16 + PvrConstants.SizeOf_ui8 * 4 + PvrConstants.SizeOf_ui32 * 3 + PvrConstants.MAX_PGM_NAME_LEN + PvrConstants.MAX_PGM_DESC_LEN;
+
+     public static PvrSeriesData ReadFrom(BinaryReader reader)
+     {
+         var data = new PvrSeriesData();
+         data.NumbgrToKeep = reader.ReadUInt16();
+         data.SeriesFlags = reader.ReadByte();
+         data.DayMask = reader.ReadByte();
+         data.MatchHour = reader.ReadByte();
+         data.MatchMinute = reader.ReadByte();
+         data.RecHistoryCause = reader.ReadUInt32(); // Or Unused1
+         data.Unused2 = reader.ReadUInt32();
+         data.Unused3 = reader.ReadUInt32();
+         data.AucSeriesNameBytes = reader.ReadBytes(PvrConstants.MAX_PGM_NAME_LEN);
+         data.AucSeriesDescriptionBytes = reader.ReadBytes(PvrConstants.MAX_PGM_DESC_LEN);
+         return data;
+     }
+}
+
+// Represents C++ PVR_SyncNGoData
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public class PvrSyncNGoData
+{
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_DVR_FILENAME_LEN)]
+    public byte[] DvrFileNameBytes;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_DVR_FILENAME_LEN)]
+    public byte[] TrnsdfFileNameBytes;
+    public byte TranscodeType;
+    public byte Resolution;
+    public byte Audiolang;
+    public byte TransdStatus;
+    public ushort BitRate;
+    public ushort SyncFlags;
+    public bool BDvsEnabled; // Marshalled as 1 byte typically
+    public bool BAdaptionEnabled;
+    public ushort CopyCount;
+    public uint Unused1;
+    public uint Unused2;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_PGM_NAME_LEN)]
+    public byte[] AucProgNameBytes;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_TRANSFER_CLIENT * PvrConstants.MAX_TRNSD_CLIENTID_LEN)]
+    public byte[] Unused3Bytes;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_TRANSFER_CLIENT * PvrConstants.MAX_TRNSD_CLIENTID_LEN)]
+    public byte[] Unused4Bytes;
+
+#warning // Assuming UTF-8 for internal strings, adjust if needed. Check C++ source encoding.
+    public string DvrFileName(Encoding enc) => PvrHelpers.GetStringFromBytes(DvrFileNameBytes, enc);
+    public string TrnsdfFileName(Encoding enc) => PvrHelpers.GetStringFromBytes(TrnsdfFileNameBytes, enc);
+    public string AucProgName(Encoding enc) => PvrHelpers.GetStringFromBytes(AucProgNameBytes, enc);
+
+    public static int StructSize = PvrConstants.MAX_DVR_FILENAME_LEN * 2 + PvrConstants.SizeOf_ui8 * 4 + PvrConstants.SizeOf_ui16 * 3 + PvrConstants.SizeOf_bool * 2 + PvrConstants.SizeOf_ui32 * 2 + PvrConstants.MAX_PGM_NAME_LEN + (PvrConstants.MAX_TRANSFER_CLIENT * PvrConstants.MAX_TRNSD_CLIENTID_LEN) * 2;
+
+     public static PvrSyncNGoData ReadFrom(BinaryReader reader)
+     {
+         var data = new PvrSyncNGoData();
+         data.DvrFileNameBytes = reader.ReadBytes(PvrConstants.MAX_DVR_FILENAME_LEN);
+         data.TrnsdfFileNameBytes = reader.ReadBytes(PvrConstants.MAX_DVR_FILENAME_LEN);
+         data.TranscodeType = reader.ReadByte();
+         data.Resolution = reader.ReadByte();
+         data.Audiolang = reader.ReadByte();
+         data.TransdStatus = reader.ReadByte();
+         data.BitRate = reader.ReadUInt16();
+         data.SyncFlags = reader.ReadUInt16();
+         // Read bools - assume 1 byte each from C++ Pack=1
+         data.BDvsEnabled = reader.ReadByte() != 0;
+         data.BAdaptionEnabled = reader.ReadByte() != 0;
+         data.CopyCount = reader.ReadUInt16();
+         data.Unused1 = reader.ReadUInt32();
+         data.Unused2 = reader.ReadUInt32();
+         data.AucProgNameBytes = reader.ReadBytes(PvrConstants.MAX_PGM_NAME_LEN);
+         data.Unused3Bytes = reader.ReadBytes(PvrConstants.MAX_TRANSFER_CLIENT * PvrConstants.MAX_TRNSD_CLIENTID_LEN);
+         data.Unused4Bytes = reader.ReadBytes(PvrConstants.MAX_TRANSFER_CLIENT * PvrConstants.MAX_TRNSD_CLIENTID_LEN);
+         return data;
+     }
+}
+
+// Represents C++ PVR_DBRec
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public class PvrDbRec
+{
+    // --- Fields from PVR_DBRec definition ---
+    public uint PvrId;
+    public uint ProgramID;
+    public uint Ui32SeriesID;
+    public long QuideStartSeconds;
+    public long ScheduleTime;
+
+    // --- Union Area Placeholder ---
+    // Field Offset determined by size calculation of preceding fields
+    // This area will be read/skipped, specific data stored in properties below.
+    private static readonly int UnionOffset = PvrConstants.SizeOf_ui32 * 3 + PvrConstants.SizeOf_time_t * 2; // Offset = 28 bytes (Check calc)
+    public static readonly int UnionSize = Math.Max(PvrInstanceData.StructSize, Math.Max(PvrSeriesData.StructSize, PvrSyncNGoData.StructSize));
+    public PvrInstanceData InstanceData { get; set; }
+    public PvrSeriesData SeriesData { get; set; }
+    public PvrSyncNGoData SyncData { get; set; }
+
+    // --- Fields *after* the union ---
+    // Offset = UnionOffset + UnionSize
+    public ushort DataLen; // Length of VarData block
+    public ushort TitleOffset; // Offset into VarData
+    public ushort ShortDescriptionOffset;
+    public ushort FilenameRootOffset;
+    public ushort MoreInfoOffset;
+    public ushort ServiceID;
+    public ushort DispChannel;
+    public ushort QuideRunningTime;
+    public ushort Qualifiers;
+    public ushort CallLettersOffset;
+    public ushort PvrFlags;
+    public byte Category;
+    public byte EventFlags;
+    public byte ShowtimeFlags1;
+    public byte RatingsByte; // Read the byte containing bitfields
+    public byte MpaaRating { get; private set; } // :4 extracted
+    public byte SvldRating { get; private set; } // :4 extracted
+    public byte ContentAdvisory;
+    public byte PvrRecordType; // Determines which union member is active
+    public byte EarlyMinutes;
+    public byte LateMinutes;
+    public byte RecordQuality;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_CLIENTID_LEN)]
+    public byte[] ClientIDBytes;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = PvrConstants.MAX_CLIENTID_LEN)]
+    public byte[] EventClientIdBytes;
+    public uint UnusedS;
+    public uint Unused6;
+
+    // --- Variable Data ---
+    public byte[] VarData { get; set; }
+
+    // --- Extracted String Properties from VarData ---
+    public string Title { get; private set; }
+    public string ShortDescription { get; private set; }
+    public string FilenameRoot { get; private set; }
+    public string MoreInfo { get; private set; }
+    public string CallLetters { get; private set; }
+
+#warning // Assuming UTF-8 for internal strings, adjust if needed. Check C++ source encoding.
+    private static readonly Encoding DefaultStringEncoding = Encoding.UTF8; // Or Encoding.ASCII, Encoding.GetEncoding("ISO-8859-1") etc.
+
+    public string ClientID => PvrHelpers.GetStringFromBytes(ClientIDBytes, DefaultStringEncoding);
+    public string EventClientId => PvrHelpers.GetStringFromBytes(EventClientIdBytes, DefaultStringEncoding);
+
+    public void ExtractStringsFromVarData()
+    {
+        // Use DefaultStringEncoding or allow passing specific encoding
+        Title = PvrHelpers.GetNullTerminatedString(VarData, TitleOffset, DefaultStringEncoding);
+        ShortDescription = PvrHelpers.GetNullTerminatedString(VarData, ShortDescriptionOffset, DefaultStringEncoding);
+        FilenameRoot = PvrHelpers.GetNullTerminatedString(VarData, FilenameRootOffset, DefaultStringEncoding);
+        MoreInfo = PvrHelpers.GetNullTerminatedString(VarData, MoreInfoOffset, DefaultStringEncoding);
+        CallLetters = PvrHelpers.GetNullTerminatedString(VarData, CallLettersOffset, DefaultStringEncoding);
+    }
+
+    public void SetRatings()
+    {
+#warning // Assuming Little Endian C++ source for bitfields, adjust if needed
+        PvrHelpers.ExtractRatingsLE(this.RatingsByte, out byte mpaa, out byte svld);
+        this.MpaaRating = mpaa;
+        this.SvldRating = svld;
+    }
+
+     public override string ToString()
+    {
+        string unionDataStr = ((PvrRecordType)this.PvrRecordType) switch {
+             PvrRecordType.INSTANCE_DATA => $"InstanceData[ID={InstanceData?.PlatformContentID}]",
+             PvrRecordType.SERIES_DATA => $"SeriesData[Name='{SeriesData?.AucSeriesName(DefaultStringEncoding)}']",
+             PvrRecordType.SYNC_N_GO_DATA => $"SyncData[File='{SyncData?.DvrFileName(DefaultStringEncoding)}']",
+             _ => "UnknownUnionData"
+         };
+         return $"PvrDbRec[ID={PvrId}, Type={(PvrRecordType)PvrRecordType}, Title='{Title}', Union={unionDataStr}]";
+    }
+}
+
+
+// --- !!! PLACEHOLDER: Legacy Structure Definition !!! ---
+#warning // This is a GUESS for the structure read when isVmsBox == false. Define accurately based on C++ code.
+// This structure is inferred from the C++ 'else' block handling (memcpy, offsets, string copies)
+// It might correspond to the PVR_LegacyDBRec mentioned earlier or some other format.
+[StructLayout(LayoutKind.Sequential, Pack=1)]
+public class PvrOriginalLegacyDbRec_PLACEHOLDER
+{
+    // --- GUESSING Fields based on usage in C++ 'else' block ---
+    public int PvrRecordType; // Read first to check type? Value unknown.
+    public ushort TitleOffset; // Needs ReadUInt16(reader, isCisco)
+    public ushort ShortDescriptionOffset;
+    public ushort FilenameRootOffset;
+    public ushort MoreInfoOffset;
+    public ushort CallLettersOffset;
+    public ushort DataLen; // Total VarData length
+    // --- ARE THERE OTHER FIXED FIELDS HERE before VarData? ---
+    // Example: Maybe PvrId, ProgramId etc are also here? Add them if needed.
+    public uint LegacyPvrId; // Example GUESS
+    public uint LegacyProgramId; // Example GUESS
+    // ... add other fixed fields read before VarData ...
+
+    // --- Calculate size based on ACTUAL fields ---
+    public static int FixedPartSize = PvrConstants.SizeOf_ui32 * 2 + PvrConstants.SizeOf_ui16 * 6 + PvrConstants.SizeOf_int ; // !! ADJUST THIS !!
+
+    // --- VarData (read separately) ---
+    public byte[] VarData;
+
+     // --- Extracted string properties ---
+     // We extract these during conversion to PvrDbRec
+}
+
+
+// --- Main Decoder Class ---
+public static class SrsDecoder
+{
+    // --- Custom Base64 Decoding Logic (cd64, DecodeTable, DecodeBlock, DecodeCustomBase64) ---
+    // (Copied from previous response - unchanged)
+    private const string Cd64 = "|$$$}rstuvwxyz{$$$$$$$>?@ABCDEFGHIJKLMNOPQRSTUVW$$$$$$XYZ[\\]^_`abcdefghijklmnopq";
+    private static readonly sbyte[] DecodeTable;
+    static SrsDecoder()
+    {
+        DecodeTable = new sbyte[256];
+        for (int i = 0; i < 256; i++) DecodeTable[i] = -1;
+        for (int i = 0; i < Cd64.Length; i++)
         {
-            Console.WriteLine($"PVR_ID: {record.pvr_id}, ProgramID: {record.programID}, SeriesID: {record.ui32SeriesID}");
+            char c = Cd64[i];
+            if (c != '$')
+            {
+                int originalCharCode = i + 43;
+                if (originalCharCode >= 0 && originalCharCode < 256)
+                {
+                     DecodeTable[originalCharCode] = (sbyte)(i - 61);
+                }
+            }
+        }
+    }
+    private static void DecodeBlock(byte[] input4, byte[] output3)
+    {
+        output3[0] = (byte)(input4[0] << 2 | input4[1] >> 4);
+        output3[1] = (byte)(input4[1] << 4 | input4[2] >> 2);
+        output3[2] = (byte)(((input4[2] << 6) & 0xc0) | input4[3]);
+    }
+    public static byte[] DecodeCustomBase64(string encodedString)
+    {
+        if (encodedString == null) throw new ArgumentNullException(nameof(encodedString));
+        int encodedLength = encodedString.Length;
+        using (MemoryStream ms = new MemoryStream(encodedLength))
+        {
+            byte[] input4 = new byte[4]; byte[] output3 = new byte[3];
+            int inputIndex = 0; int charCount = 0;
+            while (inputIndex < encodedLength)
+            {
+                charCount = 0; Array.Clear(input4, 0, 4);
+                for (int i = 0; i < 4 && inputIndex < encodedLength; i++)
+                {
+                    sbyte decodedValue = -1;
+                    while (inputIndex < encodedLength && decodedValue < 0)
+                    {
+                        char currentChar = encodedString[inputIndex++];
+                        if (currentChar >= 0 && currentChar < 256) decodedValue = DecodeTable[currentChar];
+                    }
+                    if (decodedValue >= 0) { input4[i] = (byte)decodedValue; charCount++; } else break;
+                }
+                if (charCount > 0) { DecodeBlock(input4, output3); for (int i = 0; i < charCount - 1; i++) ms.WriteByte(output3[i]); }
+                else if (inputIndex >= encodedLength) break;
+            } return ms.ToArray();
+        }
+    }
+    // --- End Base64 Logic ---
+
+
+    /// <summary>
+    /// Decodes the SRS data from a Base64 encoded string.
+    /// Attempts to handle both modern (VMS) and legacy formats.
+    /// </summary>
+    /// <param name="base64EncodedData">The custom Base64 encoded string.</param>
+    /// <param name="isLikelyCiscoDevice">Set true if legacy data might require byte swapping (based on C++ code hints)</param>
+    /// <returns>A list of decoded PvrDbRec objects.</returns>
+    public static List<PvrDbRec> DecodeSrsData(string base64EncodedData, bool isLikelyCiscoDevice = false)
+    {
+        byte[] binaryData = DecodeCustomBase64(base64EncodedData);
+        List<PvrDbRec> decodedRecords = new List<PvrDbRec>();
+
+#warning // Assuming legacy strings use ISO-8859-1 based on C++ hints. Verify!
+        Encoding legacyStringEncoding = Encoding.GetEncoding("ISO-8859-1");
+        Encoding utf8Encoding = Encoding.UTF8;
+
+        using (MemoryStream ms = new MemoryStream(binaryData))
+        using (BinaryReader reader = new BinaryReader(ms)) // Default encoding OK here
+        {
+            bool isVmsBox = false;
+            int platformId = 0; // Note: platformId isn't stored in PvrDbRec currently
+            int numSeries = 0;
+
+            // Check for "VMS" marker
+            if (ms.Length >= 4)
+            {
+                byte[] markerBytes = reader.ReadBytes(3);
+                string marker = Encoding.ASCII.GetString(markerBytes);
+                if (marker == "VMS")
+                {
+                    reader.ReadByte(); // Consume null terminator
+                    isVmsBox = true;
+                    platformId = PvrHelpers.ReadIntFromString(reader);
+                    numSeries = PvrHelpers.ReadIntFromString(reader);
+                }
+                 else { ms.Position = 0; isVmsBox = false; } // Rewind if no marker
+            }
+            else if (ms.Length > 0) { ms.Position = 0; isVmsBox = false; } // Too short for VMS header
+
+             // If not VMSBox, read numSeries differently (assuming binary int as per C++ atoi/sizeof(int) confusion)
+             if (!isVmsBox && ms.Length >= 4)
+             {
+                 try { numSeries = reader.ReadInt32(); } // Read as binary int
+                 catch { numSeries = 0; Console.WriteLine("#Warning: Failed to read legacy series count as Int32."); }
+             }
+             else if (!isVmsBox)
+             {
+                  numSeries = 0; // Cannot determine series count
+                  Console.WriteLine("#Warning: Non-VMS stream too short to read series count.");
+             }
+
+
+            Console.WriteLine($"Format: {(isVmsBox ? "VMS" : "Legacy")}, PlatformID: {platformId}, Series Count: {numSeries}");
+
+            // --- Main Loop for Reading Records ---
+            for (int i = 0; i < numSeries; i++)
+            {
+                 if (reader.BaseStream.Position >= reader.BaseStream.Length) {
+                     Console.WriteLine($"#Error: Unexpected end of stream when starting record {i + 1}/{numSeries}. Processed {decodedRecords.Count} records.");
+                     break;
+                 }
+                 long recordStartPos = reader.BaseStream.Position;
+
+                try
+                {
+                    if (isVmsBox)
+                    {
+                        // --- Read Modern PVR_DBRec Format ---
+                        var record = ReadPvrDbRec(reader);
+                        if (record != null) decodedRecords.Add(record);
+                        else break; // Error occurred in read function
+                    }
+                    else
+                    {
+                        // --- Read Legacy Format and CONVERT to PVR_DBRec ---
+                        #warning // Legacy conversion is speculative due to missing C++ definitions/logic
+                        var record = ConvertLegacyToPvrDbRec(reader, isLikelyCiscoDevice, legacyStringEncoding, utf8Encoding);
+                         if (record != null) decodedRecords.Add(record);
+                         else break; // Error occurred in conversion function
+                    }
+                }
+                catch (EndOfStreamException eof) {
+                    Console.WriteLine($"#Error: End of stream reached prematurely while reading record {i + 1} at position {reader.BaseStream.Position}. Processed {decodedRecords.Count} records. Error: {eof.Message}");
+                    break; // Stop processing
+                } catch (Exception ex) {
+                    Console.WriteLine($"#Error: Failed to parse record {i + 1} starting at position {recordStartPos}. Error: {ex.Message}\n{ex.StackTrace}");
+                    // Attempt to break cleanly
+                    break;
+                }
+            } // End for loop
+
+            if (reader.BaseStream.Position != reader.BaseStream.Length) {
+                Console.WriteLine($"#Warning: {reader.BaseStream.Length - reader.BaseStream.Position} bytes remaining at the end of the stream after processing {decodedRecords.Count} records.");
+            }
+        } // End using reader/ms
+
+        return decodedRecords;
+    }
+
+
+    // --- Read Method for Modern PVR_DBRec ---
+    private static PvrDbRec ReadPvrDbRec(BinaryReader reader)
+    {
+         var record = new PvrDbRec();
+         long startPos = reader.BaseStream.Position;
+
+         // Read fields BEFORE the union
+         record.PvrId = reader.ReadUInt32();
+         record.ProgramID = reader.ReadUInt32();
+         record.Ui32SeriesID = reader.ReadUInt32();
+         record.QuideStartSeconds = reader.ReadInt64();
+         record.ScheduleTime = reader.ReadInt64();
+
+         // Read/Skip Union Area
+         long unionStartPos = reader.BaseStream.Position;
+         byte[] unionBytes = reader.ReadBytes(PvrDbRec.UnionSize);
+         // Ensure reader is positioned correctly after union
+         reader.BaseStream.Seek(unionStartPos + PvrDbRec.UnionSize, SeekOrigin.Begin);
+
+         // Read fields AFTER the union
+         record.DataLen = reader.ReadUInt16();
+         record.TitleOffset = reader.ReadUInt16();
+         record.ShortDescriptionOffset = reader.ReadUInt16();
+         record.FilenameRootOffset = reader.ReadUInt16();
+         record.MoreInfoOffset = reader.ReadUInt16();
+         record.ServiceID = reader.ReadUInt16();
+         record.DispChannel = reader.ReadUInt16();
+         record.QuideRunningTime = reader.ReadUInt16();
+         record.Qualifiers = reader.ReadUInt16();
+         record.CallLettersOffset = reader.ReadUInt16();
+         record.PvrFlags = reader.ReadUInt16();
+         record.Category = reader.ReadByte();
+         record.EventFlags = reader.ReadByte();
+         record.ShowtimeFlags1 = reader.ReadByte();
+         record.RatingsByte = reader.ReadByte();
+         record.ContentAdvisory = reader.ReadByte();
+         record.PvrRecordType = reader.ReadByte();
+         record.EarlyMinutes = reader.ReadByte();
+         record.LateMinutes = reader.ReadByte();
+         record.RecordQuality = reader.ReadByte();
+         record.ClientIDBytes = reader.ReadBytes(PvrConstants.MAX_CLIENTID_LEN);
+         record.EventClientIdBytes = reader.ReadBytes(PvrConstants.MAX_CLIENTID_LEN);
+         record.UnusedS = reader.ReadUInt32();
+         record.Unused6 = reader.ReadUInt32();
+
+         // Process Union Data
+         ParseUnionData(record, unionBytes);
+
+         // Extract Bitfields
+         record.SetRatings();
+
+         // Read Variable Data
+         if (reader.BaseStream.Position + record.DataLen > reader.BaseStream.Length) {
+            Console.WriteLine($"#Error: Insufficient data for VarData. Needed: {record.DataLen}, Available: {reader.BaseStream.Length - reader.BaseStream.Position}.");
+            return null; // Indicate error
+         }
+         record.VarData = reader.ReadBytes(record.DataLen);
+
+         // Extract strings
+         record.ExtractStringsFromVarData();
+
+         return record;
+    }
+
+    // --- Parse Union Data Helper ---
+     private static void ParseUnionData(PvrDbRec record, byte[] unionBytes)
+     {
+         using (MemoryStream unionMs = new MemoryStream(unionBytes))
+         using (BinaryReader unionReader = new BinaryReader(unionMs))
+         {
+             switch ((PvrRecordType)record.PvrRecordType) // Use cast to enum
+             {
+                 case PvrRecordType.INSTANCE_DATA:
+                     record.InstanceData = PvrInstanceData.ReadFrom(unionReader); break;
+                 case PvrRecordType.SERIES_DATA:
+                     record.SeriesData = PvrSeriesData.ReadFrom(unionReader); break;
+                 case PvrRecordType.SYNC_N_GO_DATA:
+                      record.SyncData = PvrSyncNGoData.ReadFrom(unionReader); break;
+                 default:
+                      Console.WriteLine($"#Warning: Unknown PvrRecordType ({record.PvrRecordType}) encountered. Skipping union data parsing."); break;
+             }
+         }
+     }
+
+     // --- !!! SPECULATIVE: Legacy Conversion Method !!! ---
+     private static PvrDbRec ConvertLegacyToPvrDbRec(BinaryReader reader, bool isCisco, Encoding legacyEnc, Encoding targetEnc)
+     {
+#warning // This entire method is based on guesswork about the legacy format and conversion logic. Needs verification.
+         Console.WriteLine("#Notice: Attempting legacy conversion (speculative).");
+         long legacyStartPos = reader.BaseStream.Position;
+
+         // 1. Read the assumed legacy structure
+         var legacyRec = new PvrOriginalLegacyDbRec_PLACEHOLDER(); // Use the placeholder
+
+         // --- Read fixed legacy fields (GUESSWORK!) ---
+         // Apply endian swap using ReadUInt16 helper where C++ used DVR_CPY_SHORT
+         legacyRec.PvrRecordType = reader.ReadInt32(); // Assuming type is first? Or maybe PvrId? ADJUST!
+         legacyRec.LegacyPvrId = reader.ReadUInt32(); // GUESS
+         legacyRec.LegacyProgramId = reader.ReadUInt32(); // GUESS
+         legacyRec.TitleOffset = PvrHelpers.ReadUInt16(reader, isCisco);
+         legacyRec.ShortDescriptionOffset = PvrHelpers.ReadUInt16(reader, isCisco);
+         legacyRec.FilenameRootOffset = PvrHelpers.ReadUInt16(reader, isCisco);
+         legacyRec.MoreInfoOffset = PvrHelpers.ReadUInt16(reader, isCisco);
+         legacyRec.CallLettersOffset = PvrHelpers.ReadUInt16(reader, isCisco);
+         legacyRec.DataLen = PvrHelpers.ReadUInt16(reader, isCisco); // VarData length
+         // ... read any other fixed legacy fields ...
+         // Ensure reader position matches legacyRec.FixedPartSize after reading fixed fields
+         reader.BaseStream.Seek(legacyStartPos + PvrOriginalLegacyDbRec_PLACEHOLDER.FixedPartSize, SeekOrigin.Begin);
+
+         // 2. Read legacy VarData
+         if (reader.BaseStream.Position + legacyRec.DataLen > reader.BaseStream.Length) {
+            Console.WriteLine($"#Error: Insufficient data for Legacy VarData. Needed: {legacyRec.DataLen}, Available: {reader.BaseStream.Length - reader.BaseStream.Position}.");
+            return null; // Indicate error
+         }
+         legacyRec.VarData = reader.ReadBytes(legacyRec.DataLen);
+
+         // 3. Create and populate the new PvrDbRec
+         var newRec = new PvrDbRec();
+
+         // --- Populate common/known fields ---
+         newRec.PvrId = legacyRec.LegacyPvrId; // Copy from legacy if exists
+         newRec.ProgramID = legacyRec.LegacyProgramId; // Copy from legacy if exists
+         newRec.PvrRecordType = (byte)legacyRec.PvrRecordType; // Copy type
+         // ... copy other direct-mapped fields if any ...
+         // Assign defaults or leave nulls for fields not in legacy struct (e.g., union data initially)
+
+         // 4. Reconstruct VarData and Offsets
+         using (MemoryStream newVarDataStream = new MemoryStream())
+         using (BinaryWriter newVarDataWriter = new BinaryWriter(newVarDataStream)) // Use default encoding (UTF-8 usually)
+         {
+             // Process strings in order, converting and writing to new VarData
+             // Title (with potential ISO->UTF8 conversion)
+             string titleStr = PvrHelpers.GetNullTerminatedString(legacyRec.VarData, legacyRec.TitleOffset, legacyEnc);
+#warning // Check condition from C++ `if(((PVR_LegacyDBRec *)pBase64SrsData)->pvrRecordType != PVR_RT_TimebasedSeries )` - apply conversion conditionally
+             // Assuming PVR_RT_TimebasedSeries is NOT the type here for conversion based on C++ snippet
+             bool needsConversion = ((PvrRecordType)legacyRec.PvrRecordType != PvrRecordType.TIMEBASED_SERIES); // Use actual enum value
+             if (needsConversion) { titleStr = PvrHelpers.ConvertIsoToUtf8(titleStr); }
+
+             newRec.TitleOffset = (ushort)newVarDataStream.Position;
+             byte[] titleBytes = targetEnc.GetBytes(titleStr);
+             newVarDataWriter.Write(titleBytes);
+             newVarDataWriter.Write((byte)0); // Null terminate
+
+             // Short Description
+             string shortDescStr = PvrHelpers.GetNullTerminatedString(legacyRec.VarData, legacyRec.ShortDescriptionOffset, legacyEnc);
+             newRec.ShortDescriptionOffset = (ushort)newVarDataStream.Position;
+             byte[] shortDescBytes = targetEnc.GetBytes(shortDescStr);
+             newVarDataWriter.Write(shortDescBytes);
+             newVarDataWriter.Write((byte)0);
+
+             // Filename Root
+             string filenameStr = PvrHelpers.GetNullTerminatedString(legacyRec.VarData, legacyRec.FilenameRootOffset, legacyEnc);
+             newRec.FilenameRootOffset = (ushort)newVarDataStream.Position;
+             byte[] filenameBytes = targetEnc.GetBytes(filenameStr);
+             newVarDataWriter.Write(filenameBytes);
+             newVarDataWriter.Write((byte)0);
+
+             // More Info
+             string moreInfoStr = PvrHelpers.GetNullTerminatedString(legacyRec.VarData, legacyRec.MoreInfoOffset, legacyEnc);
+             newRec.MoreInfoOffset = (ushort)newVarDataStream.Position;
+             byte[] moreInfoBytes = targetEnc.GetBytes(moreInfoStr);
+             newVarDataWriter.Write(moreInfoBytes);
+             newVarDataWriter.Write((byte)0);
+
+             // Call Letters
+             string callLettersStr = PvrHelpers.GetNullTerminatedString(legacyRec.VarData, legacyRec.CallLettersOffset, legacyEnc);
+             newRec.CallLettersOffset = (ushort)newVarDataStream.Position;
+             byte[] callLettersBytes = targetEnc.GetBytes(callLettersStr);
+             newVarDataWriter.Write(callLettersBytes);
+             newVarDataWriter.Write((byte)0);
+
+             // Finalize new VarData
+             newRec.VarData = newVarDataStream.ToArray();
+             newRec.DataLen = (ushort)newRec.VarData.Length;
+         }
+
+         // 5. Populate remaining PvrDbRec fields (Defaults or based on legacy - e.g. union)
+         // The legacy C++ seemed to focus on series data. Populate SeriesData in union?
+         if ((PvrRecordType)newRec.PvrRecordType == PvrRecordType.SERIES_DATA || (PvrRecordType)newRec.PvrRecordType == PvrRecordType.TIMEBASED_SERIES) // Adjust condition
+         {
+             // Populate newRec.SeriesData based on legacyRec if possible, else defaults.
+             newRec.SeriesData = new PvrSeriesData(); // Create default or copy relevant fields
+             // Example: Copy series name if available in legacy struct (needs definition)
+             // if(legacyRec has series name field) { copy bytes }
+         }
+         // ... populate other fields like ClientID, Ratings, etc. if they exist in legacyRec ...
+         newRec.SetRatings(); // If legacyRec had ratings byte
+         newRec.ExtractStringsFromVarData(); // To populate string properties from new VarData
+
+
+         Console.WriteLine($"#Notice: Legacy record converted to PvrDbRec (ID: {newRec.PvrId}).");
+         return newRec;
+     }
+
+} // End SrsDecoder Class
+
+
+// --- Example Usage Class ---
+public class Example
+{
+    public static void Main(string[] args)
+    {
+        #error // !!! IMPORTANT: Replace ALL placeholder constants in PvrConstants class first !!!
+        #error // !!! IMPORTANT: Verify enum values in PvrRecordType enum !!!
+        #error // !!! IMPORTANT: Verify string encodings used in PvrDbRec and PvrHelpers !!!
+        #error // !!! IMPORTANT: Verify legacy struct definition PvrOriginalLegacyDbRec_PLACEHOLDER and conversion logic !!!
+
+        // Replace with your actual custom Base64 encoded string from the C++ system
+        string encodedSrsData = "YOUR_CUSTOM_BASE64_ENCODED_STRING_HERE";
+
+        Console.WriteLine("--- PVR SRS Data Decoder ---");
+        Console.WriteLine("Attempting to decode (replace placeholder string with real data):");
+        Console.WriteLine($"Input length: {encodedSrsData.Length}");
+        Console.WriteLine("---");
+
+        if (encodedSrsData == "YOUR_CUSTOM_BASE64_ENCODED_STRING_HERE" || encodedSrsData.Length < 10)
+        {
+             Console.WriteLine("#Error: Please replace the placeholder `encodedSrsData` with a real encoded string from your system.");
+             return;
+        }
+
+        try
+        {
+            // Set isLikelyCiscoDevice based on external info if needed for legacy path
+            bool possiblyCisco = false; // Example: false; or determine from unitAddress?
+
+            List<PvrDbRec> decodedRecords = SrsDecoder.DecodeSrsData(encodedSrsData, possiblyCisco);
+
+            Console.WriteLine($"\n--- Decoded {decodedRecords.Count} Records ---");
+            int count = 0;
+            foreach (var record in decodedRecords)
+            {
+                count++;
+                Console.WriteLine($"--- Record {count} (ID: {record.PvrId}) ---");
+                Console.WriteLine($" Type: {(PvrRecordType)record.PvrRecordType} ({record.PvrRecordType})");
+                Console.WriteLine($" Title: '{record.Title}' (Offset: {record.TitleOffset})");
+                Console.WriteLine($" VarData Len: {record.DataLen}");
+
+                if (record.InstanceData != null) Console.WriteLine($" Instance Platform ID: {record.InstanceData.PlatformContentID}");
+                if (record.SeriesData != null) Console.WriteLine($" Series Name: '{record.SeriesData.AucSeriesName(Encoding.UTF8)}'"); // Use correct encoding
+                if (record.SyncData != null) Console.WriteLine($" Sync Filename: '{record.SyncData.DvrFileName(Encoding.UTF8)}'"); // Use correct encoding
+
+                Console.WriteLine(); // Blank line between records
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"\n--- FATAL ERROR DURING DECODING ---");
+            Console.WriteLine(ex.ToString());
+            Console.ResetColor();
         }
     }
 }
