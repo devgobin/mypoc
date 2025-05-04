@@ -1,0 +1,451 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net; // For potential endian utilities if needed, though manual swap used
+using System.Text;
+
+/// <summary>
+/// Contains constants related to PVR structures based on C++ defines.
+/// </summary>
+public static class PvrConstants
+{
+    // Assuming these values based on provided C++ code/defines
+    public const int MAX_CLIENTID_LEN = 18;
+    public const int MAX_PGM_NAME_LEN = 100;
+    public const int MAX_PGM_DESC_LEN = 256;
+    public const int MAX_DVR_FILENAME_LEN = 36;
+    public const int MAX_TRANSFER_CLIENT = 1; // Affects nested arrays in SyncNGo
+    public const int MAX_TRNSD_CLIENTID_LEN = 64; // Affects nested arrays in SyncNGo
+    public const int kMaxAssetRootFilenameLength = 32; // Used in legacy vardata reconstruction
+
+    // PVR Record Types (using byte as per C++ struct)
+    public const byte PVR_RT_Instance = 0;
+    public const byte PVR_RT_TimebasedSeries = 1;
+    public const byte PVR_RT_Series = 2;
+    public const byte PVR_RT_KeywordSeries = 3; // Add handling if needed
+    public const byte PVR_RT_SyncNGo = 4;
+}
+
+/// <summary>
+/// Represents data specific to PVR_SeriesData (used within PvrSeriesEntry).
+/// </summary>
+public class PvrSeriesData
+{
+    public ushort NumberToKeep { get; set; }
+    public byte SeriesFlags { get; set; }
+    public byte DayMask { get; set; }
+    public byte MatchHour { get; set; }
+    public byte MatchMinute { get; set; }
+    public uint RecHistoryCause { get; set; } // Or unused1 depending on #ifdef DVRHISTORY_ENABLED
+    public uint Unused2 { get; set; }
+    public uint Unused3 { get; set; }
+    public byte[] AucSeriesName { get; set; } = new byte[PvrConstants.MAX_PGM_NAME_LEN];
+    public byte[] AucSeriesDescription { get; set; } = new byte[PvrConstants.MAX_PGM_DESC_LEN];
+
+    // Specify encoding when getting strings (e.g., ASCII, ISO-8859-1, UTF8?)
+    public string GetSeriesName(Encoding enc) => enc.GetString(AucSeriesName).TrimEnd('\0');
+    public string GetSeriesDescription(Encoding enc) => enc.GetString(AucSeriesDescription).TrimEnd('\0');
+
+    // Calculate size based on C++ struct layout (for skipping)
+    public static int CalculateSize() => 2 + 1 + 1 + 1 + 1 + 4 + 4 + 4 + PvrConstants.MAX_PGM_NAME_LEN + PvrConstants.MAX_PGM_DESC_LEN; // = 376 bytes
+}
+
+/// <summary>
+/// Represents data specific to PVR_InstanceData (used within PvrSeriesEntry).
+/// </summary>
+public class PvrInstanceData
+{
+    public long PlannedRecStart { get; set; } // time_t (8 bytes)
+    public uint PlannedRecDuration { get; set; } // ui32 (4 bytes)
+    public long EstDeletion { get; set; } // time_t (8 bytes)
+    public double RecStart { get; set; } // HIRES_Time (double = 8 bytes)
+    public double RecDuration { get; set; } // HIRES_Time (double = 8 bytes)
+    public double PbPosition { get; set; } // HIRES_Time (double = 8 bytes)
+    public uint PlatformContentID { get; set; } // ui32 (4 bytes)
+    public uint RecHistoryCause { get; set; } // ui32 or unused1 (4 bytes)
+    public uint Unused2 { get; set; } // ui32 (4 bytes)
+    public ushort InstanceFlags { get; set; } // ui16 (2 bytes)
+    public ushort Unused4 { get; set; } // ui16 (2 bytes)
+    public uint FromParentID { get; set; } // ui32 (4 bytes)
+
+    // Size = 8+4+8+8+8+8+4+4+4+2+2+4 = 68 bytes
+    public static int CalculateSize() => 8 + 4 + 8 + 8 + 8 + 8 + 4 + 4 + 4 + 2 + 2 + 4;
+}
+
+/// <summary>
+/// Represents data specific to PVR_SyncNGoData (used within PvrSeriesEntry).
+/// </summary>
+public class PvrSyncNGoData
+{
+    public byte[] DvrFileName { get; set; } = new byte[PvrConstants.MAX_DVR_FILENAME_LEN];
+    public byte[] TrnsdfFileName { get; set; } = new byte[PvrConstants.MAX_DVR_FILENAME_LEN];
+    public byte TranscodeType { get; set; } // ui8
+    public byte Resolution { get; set; } // ui8
+    public byte AudioLang { get; set; } // ui8
+    public byte TransdStatus { get; set; } // ui8
+    public ushort BitRate { get; set; } // ui16
+    public ushort SyncFlags { get; set; } // ui16
+    public bool BDvsEnabled { get; set; } // C++ bool (assume 1 byte)
+    public bool BAdaptionEnabled { get; set; } // C++ bool (assume 1 byte)
+    public ushort CopyCount { get; set; } // ui16
+    public uint Unused1 { get; set; } // ui32
+    public uint Unused2 { get; set; } // ui32
+    public byte[] AucProgName { get; set; } = new byte[PvrConstants.MAX_PGM_NAME_LEN];
+    // Flat storage for nested C arrays: char unused3[MAX_TRANSFER_CLIENT][MAX_TRNSD_CLIENTID_LEN];
+    public byte[] Unused3_Flat { get; set; } = new byte[PvrConstants.MAX_TRANSFER_CLIENT * PvrConstants.MAX_TRNSD_CLIENTID_LEN];
+    // Flat storage for nested C arrays: char unused4[MAX_TRANSFER_CLIENT][MAX_TRNSD_CLIENTID_LEN];
+    public byte[] Unused4_Flat { get; set; } = new byte[PvrConstants.MAX_TRANSFER_CLIENT * PvrConstants.MAX_TRNSD_CLIENTID_LEN];
+
+    public string GetDvrFileName(Encoding enc) => enc.GetString(DvrFileName).TrimEnd('\0');
+    public string GetTrnsdfFileName(Encoding enc) => enc.GetString(TrnsdfFileName).TrimEnd('\0');
+    public string GetAucProgName(Encoding enc) => enc.GetString(AucProgName).TrimEnd('\0');
+
+    // Calculate size (Assuming C++ bool is 1 byte)
+    public static int CalculateSize() =>
+           PvrConstants.MAX_DVR_FILENAME_LEN * 2 + // 72
+           1 + 1 + 1 + 1 + // 4
+           2 + 2 + // 4
+           1 + 1 + // 2 (Assuming bool = 1 byte)
+           2 + // 2
+           4 + 4 + // 8
+           PvrConstants.MAX_PGM_NAME_LEN + // 100
+           (PvrConstants.MAX_TRANSFER_CLIENT * PvrConstants.MAX_TRNSD_CLIENTID_LEN) * 2; // 1 * 64 * 2 = 128
+           // Total = 320 bytes
+}
+
+/// <summary>
+/// Represents the final decoded PVR Series entry, combining common fields
+/// and holding specific data based on the record type.
+/// </summary>
+public class PvrSeriesEntry
+{
+    // --- Common Fields ---
+    public uint PvrId { get; set; }
+    public uint ProgramId { get; set; }
+    public uint SeriesId { get; set; }
+    public long GuideStartSeconds { get; set; }
+    public long ScheduleTime { get; set; }
+
+    // --- Union Data (Populated based on PvrRecordType) ---
+    public PvrInstanceData InstanceData { get; set; }
+    public PvrSeriesData SeriesData { get; set; }
+    public PvrSyncNGoData SyncData { get; set; }
+
+    // --- Fields After Union ---
+    public ushort DataLen { get; set; } // Length of VarData byte array
+    public ushort TitleOffset { get; set; }
+    public ushort ShortDescriptionOffset { get; set; }
+    public ushort FilenameRootOffset { get; set; }
+    public ushort MoreInfoOffset { get; set; }
+    public ushort ServiceId { get; set; }
+    public ushort DispChannel { get; set; }
+    public ushort GuideRunningTime { get; set; }
+    public ushort Qualifiers { get; set; }
+    public ushort CallLettersOffset { get; set; }
+    public ushort PvrFlags { get; set; }
+    public byte Category { get; set; }
+    public byte EventFlags { get; set; }
+    public byte ShowtimeFlags1 { get; set; }
+    public byte MpaaRating { get; set; } // Extracted 4 bits
+    public byte SvldRating { get; set; } // Extracted 4 bits
+    public byte ContentAdvisory { get; set; }
+    public byte PvrRecordType { get; set; }
+    public byte EarlyMinutes { get; set; }
+    public byte LateMinutes { get; set; }
+    public byte RecordQuality { get; set; }
+
+    // --- Modern Specific Fields ---
+    public byte[] ClientId { get; set; }
+    public byte[] EventClientId { get; set; }
+    public uint Unused5 { get; set; }
+    public uint Unused6 { get; set; }
+
+    // --- Legacy Specific Fields ---
+    public byte ShowtimeFlags2 { get; set; }
+
+    // --- Variable Data ---
+    public byte[] VarData { get; set; }
+
+    // --- Accessors ---
+    private static readonly Encoding DefaultVarDataEncoding = Encoding.GetEncoding("ISO-8859-1");
+    private static readonly Encoding FixedArrayEncoding = Encoding.ASCII; // Assuming ASCII for IDs
+
+    public string GetTitle() => GetStringAtOffset(TitleOffset, DefaultVarDataEncoding);
+    public string GetShortDescription() => GetStringAtOffset(ShortDescriptionOffset, DefaultVarDataEncoding);
+    public string GetFilenameRoot() => GetStringAtOffset(FilenameRootOffset, DefaultVarDataEncoding);
+    public string GetMoreInfo() => GetStringAtOffset(MoreInfoOffset, DefaultVarDataEncoding);
+    public string GetCallLetters() => GetStringAtOffset(CallLettersOffset, DefaultVarDataEncoding);
+    public string GetClientId() => FixedArrayEncoding.GetString(ClientId ?? Array.Empty<byte>()).TrimEnd('\0');
+    public string GetEventClientId() => FixedArrayEncoding.GetString(EventClientId ?? Array.Empty<byte>()).TrimEnd('\0');
+
+    private string GetStringAtOffset(ushort offset, Encoding encoding)
+    {
+        if (VarData == null || offset >= VarData.Length) return string.Empty;
+        int len = Array.IndexOf(VarData, (byte)0, offset);
+        if (len == -1) len = VarData.Length;
+        int count = len - offset;
+        if (count <= 0) return string.Empty;
+        try { return encoding.GetString(VarData, offset, count); }
+        catch { return string.Empty; }
+    }
+}
+
+/// <summary>
+/// Provides methods to decode PVR series data from custom Base64 format.
+/// </summary>
+public static class SrsImporter
+{
+    // Encodings used
+    private static readonly Encoding DefaultStringEncoding = Encoding.GetEncoding("ISO-8859-1");
+    private static readonly Encoding Utf8Encoding = Encoding.UTF8;
+    private static readonly Encoding AsciiEncoding = Encoding.ASCII;
+
+    // Custom Base64 decoding map
+    private static readonly Dictionary<char, int> Base64DecodeMap = BuildDecodeMap();
+
+    private static Dictionary<char, int> BuildDecodeMap()
+    {
+        const string cd64 = "|$$$}rstuvwxyz{$$$$$$$>?@ABCDEFGHIJKLMNOPQRSTUVW$$$$$$XYZ[\\]^_`abcdefghijklmnopq";
+        var map = new Dictionary<char, int>();
+        for (int i = 0; i < cd64.Length; i++)
+        {
+            char c = cd64[i];
+            char inputChar = (char)(i + 43);
+            if (c != '$') { int val = c - 61; map[inputChar] = val - 1; }
+        }
+        return map;
+    }
+
+    // --- Primary Public Method ---
+    /// <summary>
+    /// Decodes a list of PVR series entries from the provided custom Base64 encoded string.
+    /// </summary>
+    /// <param name="base64DataString">The custom Base64 encoded string containing the series data payload.</param>
+    /// <param name="unitAddress">The unit address string, used to determine if the source is Cisco (for legacy endianness).</param>
+    /// <returns>A list of decoded PvrSeriesEntry objects.</returns>
+    public static List<PvrSeriesEntry> DecodeSeriesDataFromBase64(string base64DataString, string unitAddress)
+    {
+        List<PvrSeriesEntry> importedSeries = new List<PvrSeriesEntry>();
+        if (string.IsNullOrEmpty(base64DataString))
+        {
+            Console.Error.WriteLine("SRS-IMPORT Error: Input Base64 string is null or empty.");
+            return importedSeries;
+        }
+
+        byte[] decodedData = Base64DecodeCustom(base64DataString);
+        if (decodedData == null || decodedData.Length == 0)
+        {
+            Console.Error.WriteLine("SRS-IMPORT Error: Failed to decode Base64 data or data is empty.");
+            return importedSeries;
+        }
+
+        bool isCisco = (unitAddress != null && unitAddress.Length == 12);
+
+        try
+        {
+            using (MemoryStream decodedMs = new MemoryStream(decodedData))
+            using (BinaryReader decodedReader = new BinaryReader(decodedMs, AsciiEncoding)) // Use ASCII for VMS/int strings
+            {
+                bool isVmsBox = false;
+                uint platformId = 0;
+                int numSeries = 0;
+
+                // --- Read Header from Decoded Data (VMS marker, Platform ID, Series Count) ---
+                if (decodedReader.BaseStream.Length >= 3)
+                {
+                     byte[] vmsMarker = decodedReader.ReadBytes(3);
+                     if (AsciiEncoding.GetString(vmsMarker) == "VMS")
+                     {
+                         isVmsBox = true;
+                         if (decodedReader.BaseStream.Position < decodedReader.BaseStream.Length && decodedReader.ReadByte() != 0) { /* Warning */ }
+                         string platformIdStr = ReadNullTerminatedString(decodedReader, AsciiEncoding);
+                         uint.TryParse(platformIdStr, out platformId);
+                         string numSeriesStr = ReadNullTerminatedString(decodedReader, AsciiEncoding);
+                         int.TryParse(numSeriesStr, out numSeries);
+                     }
+                     else
+                     {
+                         isVmsBox = false;
+                         decodedReader.BaseStream.Position -= 3; // Rewind
+                         string numSeriesStr = ReadNullTerminatedString(decodedReader, AsciiEncoding);
+                         int.TryParse(numSeriesStr, out numSeries);
+                     }
+                 }
+
+                if (numSeries <= 0)
+                {
+                    Console.WriteLine("SRS-IMPORT Info: No series found in payload or invalid count.");
+                    return importedSeries;
+                }
+
+                Console.WriteLine($"SRS-IMPORT Info: Expecting {numSeries} series. Format={(isVmsBox ? "Modern (VMS)" : "Legacy")}, PlatformID={platformId}, IsCisco={isCisco}");
+
+                // --- Loop through each series entry in the stream ---
+                for (int i = 0; i < numSeries; i++)
+                {
+                    if (decodedReader.BaseStream.Position >= decodedReader.BaseStream.Length) {
+                         Console.Error.WriteLine($"SRS-IMPORT Error: Unexpected end of data stream after reading {i} of {numSeries} expected series.");
+                         break;
+                     }
+
+                    PvrSeriesEntry entry = new PvrSeriesEntry();
+                    long entryStartPos = decodedReader.BaseStream.Position;
+
+                    try
+                    {
+                        if (isVmsBox)
+                        {
+                            // Reads fields into entry, including VarData
+                            Read_PVR_DBRec_Fields(decodedReader, entry);
+                        }
+                        else
+                        {
+                            // Reads fields into entry, including original VarData
+                            Read_PVR_LegacyDBRec_Fields(decodedReader, entry, isCisco);
+                            // Overwrites entry.VarData and entry.DataLen with reconstructed values
+                            ReconstructLegacyVarData(entry);
+                        }
+                        importedSeries.Add(entry);
+                    }
+                    catch (EndOfStreamException eofEx) {
+                         Console.Error.WriteLine($"SRS-IMPORT Error: Hit end of stream while reading series {i + 1}/{numSeries} starting at offset {entryStartPos}. {eofEx.Message}");
+                         break; // Stop processing
+                    }
+                    catch (Exception ex) {
+                        Console.Error.WriteLine($"SRS-IMPORT Error: Failed to process series entry {i + 1}/{numSeries} starting at offset {entryStartPos}. Error: {ex.ToString()}");
+                        // Attempt to skip to next entry might be unreliable. Stop processing.
+                        break;
+                    }
+                } // End for loop
+            } // End using decodedReader
+        }
+        catch (Exception ex)
+        {
+             Console.Error.WriteLine($"SRS-IMPORT Fatal Error: An exception occurred during processing: {ex.ToString()}");
+        }
+
+        return importedSeries;
+    }
+
+
+    // --- Private Helper Methods ---
+
+    private static byte[] Base64DecodeCustom(string encoded)
+    {
+        // ...(Implementation from previous response)...
+        if (string.IsNullOrEmpty(encoded)) return Array.Empty<byte>();
+        List<byte> decodedBytes = new List<byte>((encoded.Length * 3) / 4);
+        byte[] inputBytes = AsciiEncoding.GetBytes(encoded);
+        byte[] buffer = new byte[4];
+        byte[] output = new byte[3];
+        int bufferIndex = 0;
+        int inputIndex = 0;
+        while (inputIndex < inputBytes.Length) {
+            byte currentByte = inputBytes[inputIndex++];
+            char currentChar = (char)currentByte;
+            if (Base64DecodeMap.TryGetValue(currentChar, out int val)) {
+                buffer[bufferIndex++] = (byte)val;
+                if (bufferIndex == 4) {
+                    output[0] = (byte)(buffer[0] << 2 | buffer[1] >> 4);
+                    output[1] = (byte)(buffer[1] << 4 | buffer[2] >> 2);
+                    output[2] = (byte)(((buffer[2] << 6) & 0xc0) | buffer[3]);
+                    decodedBytes.AddRange(output);
+                    bufferIndex = 0;
+                }
+            } else if (currentChar == '=') { break; }
+        }
+        if (bufferIndex > 0) {
+            for (int i = bufferIndex; i < 4; i++) buffer[i] = 0;
+            output[0] = (byte)(buffer[0] << 2 | buffer[1] >> 4);
+            output[1] = (byte)(buffer[1] << 4 | buffer[2] >> 2);
+            output[2] = (byte)(((buffer[2] << 6) & 0xc0) | buffer[3]);
+            int bytesToAdd = bufferIndex switch { 2 => 1, 3 => 2, _ => 0 };
+            for (int i = 0; i < bytesToAdd; i++) decodedBytes.Add(output[i]);
+        }
+        return decodedBytes.ToArray();
+    }
+
+    private static string ReadNullTerminatedString(BinaryReader reader, Encoding encoding)
+    {
+        // ...(Implementation from previous response)...
+        List<byte> bytes = new List<byte>(); byte b;
+        while (reader.BaseStream.Position < reader.BaseStream.Length) {
+             b = reader.ReadByte(); if (b == 0) break; bytes.Add(b);
+        } return encoding.GetString(bytes.ToArray());
+    }
+
+    private static string ConvertISO88591ToUTF8_Manual(byte[] iso88591Bytes)
+    {
+        // ...(Implementation from previous response)...
+        List<byte> utf8Bytes = new List<byte>(); foreach (byte b in iso88591Bytes) {
+            if (b <= 0x7F) { utf8Bytes.Add(b); } else if (b == 0x80) { utf8Bytes.Add(0xE2); utf8Bytes.Add(0x82); utf8Bytes.Add(0xAC); } else if (b >= 0x80) { utf8Bytes.Add((byte)(0xC0 | (b >> 6))); utf8Bytes.Add((byte)(0x80 | (b & 0x3F))); }
+        } return Utf8Encoding.GetString(utf8Bytes.ToArray());
+    }
+
+    private static ushort SwapBytes(ushort value)
+    {
+        return (ushort)((value >> 8) | (value << 8));
+    }
+
+    // Reads fields common to PVR_DBRec structure into entry object
+    private static void Read_PVR_DBRec_Fields(BinaryReader reader, PvrSeriesEntry entry)
+    {
+        // ...(Implementation from previous response)...
+        long startPos = reader.BaseStream.Position; entry.PvrId = reader.ReadUInt32(); entry.ProgramId = reader.ReadUInt32(); entry.SeriesId = reader.ReadUInt32(); entry.GuideStartSeconds = reader.ReadInt64(); entry.ScheduleTime = reader.ReadInt64(); long unionStartPos = reader.BaseStream.Position;
+        int instanceSize = PvrInstanceData.CalculateSize(); int seriesSize = PvrSeriesData.CalculateSize(); int syncSize = PvrSyncNGoData.CalculateSize(); int maxUnionSize = Math.Max(instanceSize, Math.Max(seriesSize, syncSize));
+        if (reader.BaseStream.Position + maxUnionSize > reader.BaseStream.Length) throw new EndOfStreamException("Not enough data for potential union."); reader.BaseStream.Seek(maxUnionSize, SeekOrigin.Current);
+        entry.DataLen = reader.ReadUInt16(); entry.TitleOffset = reader.ReadUInt16(); entry.ShortDescriptionOffset = reader.ReadUInt16(); entry.FilenameRootOffset = reader.ReadUInt16(); entry.MoreInfoOffset = reader.ReadUInt16(); entry.ServiceId = reader.ReadUInt16(); entry.DispChannel = reader.ReadUInt16(); entry.GuideRunningTime = reader.ReadUInt16(); entry.Qualifiers = reader.ReadUInt16(); entry.CallLettersOffset = reader.ReadUInt16(); entry.PvrFlags = reader.ReadUInt16(); entry.Category = reader.ReadByte(); entry.EventFlags = reader.ReadByte(); entry.ShowtimeFlags1 = reader.ReadByte();
+        byte ratingByte = reader.ReadByte(); entry.MpaaRating = (byte)(ratingByte & 0x0F); entry.SvldRating = (byte)((ratingByte >> 4) & 0x0F);
+        entry.ContentAdvisory = reader.ReadByte(); entry.PvrRecordType = reader.ReadByte(); entry.EarlyMinutes = reader.ReadByte(); entry.LateMinutes = reader.ReadByte(); entry.RecordQuality = reader.ReadByte(); entry.ClientId = reader.ReadBytes(PvrConstants.MAX_CLIENTID_LEN); entry.EventClientId = reader.ReadBytes(PvrConstants.MAX_CLIENTID_LEN); entry.Unused5 = reader.ReadUInt32(); entry.Unused6 = reader.ReadUInt32();
+        long endOfFixedPartPos = reader.BaseStream.Position; reader.BaseStream.Seek(unionStartPos, SeekOrigin.Begin); int actualUnionSize = 0;
+        switch (entry.PvrRecordType) {
+            case PvrConstants.PVR_RT_Series: actualUnionSize = PvrSeriesData.CalculateSize(); entry.SeriesData = new PvrSeriesData(); entry.SeriesData.NumberToKeep = reader.ReadUInt16(); entry.SeriesData.SeriesFlags = reader.ReadByte(); entry.SeriesData.DayMask = reader.ReadByte(); entry.SeriesData.MatchHour = reader.ReadByte(); entry.SeriesData.MatchMinute = reader.ReadByte(); entry.SeriesData.RecHistoryCause = reader.ReadUInt32(); entry.SeriesData.Unused2 = reader.ReadUInt32(); entry.SeriesData.Unused3 = reader.ReadUInt32(); reader.Read(entry.SeriesData.AucSeriesName, 0, PvrConstants.MAX_PGM_NAME_LEN); reader.Read(entry.SeriesData.AucSeriesDescription, 0, PvrConstants.MAX_PGM_DESC_LEN); break;
+            case PvrConstants.PVR_RT_Instance: actualUnionSize = PvrInstanceData.CalculateSize(); entry.InstanceData = new PvrInstanceData(); entry.InstanceData.PlannedRecStart = reader.ReadInt64(); entry.InstanceData.PlannedRecDuration = reader.ReadUInt32(); entry.InstanceData.EstDeletion = reader.ReadInt64(); entry.InstanceData.RecStart = reader.ReadDouble(); entry.InstanceData.RecDuration = reader.ReadDouble(); entry.InstanceData.PbPosition = reader.ReadDouble(); entry.InstanceData.PlatformContentID = reader.ReadUInt32(); entry.InstanceData.RecHistoryCause = reader.ReadUInt32(); entry.InstanceData.Unused2 = reader.ReadUInt32(); entry.InstanceData.InstanceFlags = reader.ReadUInt16(); entry.InstanceData.Unused4 = reader.ReadUInt16(); entry.InstanceData.FromParentID = reader.ReadUInt32(); break;
+            case PvrConstants.PVR_RT_SyncNGo: actualUnionSize = PvrSyncNGoData.CalculateSize(); entry.SyncData = new PvrSyncNGoData(); reader.Read(entry.SyncData.DvrFileName, 0, PvrConstants.MAX_DVR_FILENAME_LEN); reader.Read(entry.SyncData.TrnsdfFileName, 0, PvrConstants.MAX_DVR_FILENAME_LEN); entry.SyncData.TranscodeType = reader.ReadByte(); entry.SyncData.Resolution = reader.ReadByte(); entry.SyncData.AudioLang = reader.ReadByte(); entry.SyncData.TransdStatus = reader.ReadByte(); entry.SyncData.BitRate = reader.ReadUInt16(); entry.SyncData.SyncFlags = reader.ReadUInt16(); entry.SyncData.BDvsEnabled = reader.ReadByte() != 0; entry.SyncData.BAdaptionEnabled = reader.ReadByte() != 0; entry.SyncData.CopyCount = reader.ReadUInt16(); entry.SyncData.Unused1 = reader.ReadUInt32(); entry.SyncData.Unused2 = reader.ReadUInt32(); reader.Read(entry.SyncData.AucProgName, 0, PvrConstants.MAX_PGM_NAME_LEN); reader.Read(entry.SyncData.Unused3_Flat, 0, PvrConstants.MAX_TRANSFER_CLIENT * PvrConstants.MAX_TRNSD_CLIENTID_LEN); reader.Read(entry.SyncData.Unused4_Flat, 0, PvrConstants.MAX_TRANSFER_CLIENT * PvrConstants.MAX_TRNSD_CLIENTID_LEN); break;
+            default: Console.WriteLine($"Warning: Unknown PVR Record Type {entry.PvrRecordType}. Skipping union data by seeking {maxUnionSize} bytes."); reader.BaseStream.Seek(maxUnionSize, SeekOrigin.Current); break;
+        }
+        reader.BaseStream.Seek(endOfFixedPartPos, SeekOrigin.Begin); // Position after fixed struct part
+        if (entry.DataLen > 0) { if (reader.BaseStream.Position + entry.DataLen <= reader.BaseStream.Length) { entry.VarData = reader.ReadBytes(entry.DataLen); } else { Console.Error.WriteLine($"SRS-IMPORT Error: Not enough data for VarData (PVR ID: {entry.PvrId})."); entry.VarData = Array.Empty<byte>(); throw new EndOfStreamException($"Incomplete VarData for PVR ID {entry.PvrId}"); } } else { entry.VarData = Array.Empty<byte>(); }
+    }
+
+    // Reads fields common to PVR_LegacyDBRec structure into entry object
+    private static void Read_PVR_LegacyDBRec_Fields(BinaryReader reader, PvrSeriesEntry entry, bool isCisco)
+    {
+        // ...(Implementation from previous response, includes isCisco swapping)...
+         entry.PvrId = reader.ReadUInt32(); entry.ProgramId = reader.ReadUInt32(); entry.SeriesId = reader.ReadUInt32(); entry.GuideStartSeconds = reader.ReadInt64(); entry.ScheduleTime = reader.ReadInt64();
+         long unionStartPos = reader.BaseStream.Position; int instanceSize = PvrInstanceData.CalculateSize(); int seriesSize = PvrSeriesData.CalculateSize(); int maxLegacyUnionSize = Math.Max(instanceSize, seriesSize);
+         if (reader.BaseStream.Position + maxLegacyUnionSize > reader.BaseStream.Length) throw new EndOfStreamException("Not enough data for potential legacy union."); reader.BaseStream.Seek(maxLegacyUnionSize, SeekOrigin.Current);
+         entry.DataLen = reader.ReadUInt16(); entry.TitleOffset = reader.ReadUInt16(); entry.ShortDescriptionOffset = reader.ReadUInt16(); entry.FilenameRootOffset = reader.ReadUInt16(); entry.MoreInfoOffset = reader.ReadUInt16(); entry.ServiceId = reader.ReadUInt16(); entry.DispChannel = reader.ReadUInt16(); entry.GuideRunningTime = reader.ReadUInt16(); entry.Qualifiers = reader.ReadUInt16(); entry.CallLettersOffset = reader.ReadUInt16(); entry.PvrFlags = reader.ReadUInt16(); entry.Category = reader.ReadByte(); entry.EventFlags = reader.ReadByte(); entry.ShowtimeFlags1 = reader.ReadByte(); entry.ShowtimeFlags2 = reader.ReadByte();
+         byte ratingByte = reader.ReadByte(); entry.MpaaRating = (byte)(ratingByte & 0x0F); entry.SvldRating = (byte)((ratingByte >> 4) & 0x0F);
+         entry.ContentAdvisory = reader.ReadByte(); entry.PvrRecordType = reader.ReadByte(); entry.EarlyMinutes = reader.ReadByte(); entry.LateMinutes = reader.ReadByte(); entry.RecordQuality = reader.ReadByte();
+         long endOfFixedPartPos = reader.BaseStream.Position; reader.BaseStream.Seek(unionStartPos, SeekOrigin.Begin); int actualUnionSize = 0;
+         switch (entry.PvrRecordType) {
+             case PvrConstants.PVR_RT_Series: actualUnionSize = PvrSeriesData.CalculateSize(); entry.SeriesData = new PvrSeriesData(); entry.SeriesData.NumberToKeep = reader.ReadUInt16(); entry.SeriesData.SeriesFlags = reader.ReadByte(); entry.SeriesData.DayMask = reader.ReadByte(); entry.SeriesData.MatchHour = reader.ReadByte(); entry.SeriesData.MatchMinute = reader.ReadByte(); entry.SeriesData.RecHistoryCause = reader.ReadUInt32(); entry.SeriesData.Unused2 = reader.ReadUInt32(); entry.SeriesData.Unused3 = reader.ReadUInt32(); reader.Read(entry.SeriesData.AucSeriesName, 0, PvrConstants.MAX_PGM_NAME_LEN); reader.Read(entry.SeriesData.AucSeriesDescription, 0, PvrConstants.MAX_PGM_DESC_LEN); if (isCisco) { entry.SeriesData.NumberToKeep = SwapBytes(entry.SeriesData.NumberToKeep); } break;
+             case PvrConstants.PVR_RT_Instance: actualUnionSize = PvrInstanceData.CalculateSize(); entry.InstanceData = new PvrInstanceData(); entry.InstanceData.PlannedRecStart = reader.ReadInt64(); entry.InstanceData.PlannedRecDuration = reader.ReadUInt32(); entry.InstanceData.EstDeletion = reader.ReadInt64(); entry.InstanceData.RecStart = reader.ReadDouble(); entry.InstanceData.RecDuration = reader.ReadDouble(); entry.InstanceData.PbPosition = reader.ReadDouble(); entry.InstanceData.PlatformContentID = reader.ReadUInt32(); entry.InstanceData.RecHistoryCause = reader.ReadUInt32(); entry.InstanceData.Unused2 = reader.ReadUInt32(); entry.InstanceData.InstanceFlags = reader.ReadUInt16(); entry.InstanceData.Unused4 = reader.ReadUInt16(); entry.InstanceData.FromParentID = reader.ReadUInt32(); if (isCisco) { entry.InstanceData.InstanceFlags = SwapBytes(entry.InstanceData.InstanceFlags); entry.InstanceData.Unused4 = SwapBytes(entry.InstanceData.Unused4); } break;
+             default: Console.WriteLine($"Warning: Unknown PVR Record Type {entry.PvrRecordType} for legacy entry. Skipping union data by seeking {maxLegacyUnionSize} bytes."); reader.BaseStream.Seek(maxLegacyUnionSize, SeekOrigin.Current); break;
+         }
+         reader.BaseStream.Seek(endOfFixedPartPos, SeekOrigin.Begin); // Position after fixed struct part
+         if (isCisco) { entry.DataLen = SwapBytes(entry.DataLen); entry.TitleOffset = SwapBytes(entry.TitleOffset); entry.ShortDescriptionOffset = SwapBytes(entry.ShortDescriptionOffset); entry.FilenameRootOffset = SwapBytes(entry.FilenameRootOffset); entry.MoreInfoOffset = SwapBytes(entry.MoreInfoOffset); entry.ServiceId = SwapBytes(entry.ServiceId); entry.DispChannel = SwapBytes(entry.DispChannel); entry.GuideRunningTime = SwapBytes(entry.GuideRunningTime); entry.Qualifiers = SwapBytes(entry.Qualifiers); entry.CallLettersOffset = SwapBytes(entry.CallLettersOffset); entry.PvrFlags = SwapBytes(entry.PvrFlags); }
+         ushort originalDataLen = entry.DataLen; if (originalDataLen > 0) { if (reader.BaseStream.Position + originalDataLen <= reader.BaseStream.Length) { entry.VarData = reader.ReadBytes(originalDataLen); } else { Console.Error.WriteLine($"SRS-IMPORT Error: Not enough data for Legacy VarData (PVR ID: {entry.PvrId})."); entry.VarData = Array.Empty<byte>(); throw new EndOfStreamException($"Incomplete Legacy VarData for PVR ID {entry.PvrId}"); } } else { entry.VarData = Array.Empty<byte>(); }
+    }
+
+    // Reconstructs VarData for Legacy format entries
+    private static void ReconstructLegacyVarData(PvrSeriesEntry entry) // Removed isCisco param, offsets already swapped
+    {
+        // ...(Implementation from previous response)...
+        byte[] originalVarData = entry.VarData; if (originalVarData == null || originalVarData.Length == 0) { entry.DataLen = 0; entry.VarData = Array.Empty<byte>(); return; }
+        using (MemoryStream newVarDataMs = new MemoryStream()) using (BinaryWriter newVarDataWriter = new BinaryWriter(newVarDataMs)) {
+            Func<ushort, byte[]> getOriginalStringBytes = (offset) => { if (offset >= originalVarData.Length) return Array.Empty<byte>(); int len = Array.IndexOf(originalVarData, (byte)0, offset); if (len == -1) len = originalVarData.Length; int count = len - offset; if (count <= 0) return Array.Empty<byte>(); byte[] strBytes = new byte[count]; Array.Copy(originalVarData, offset, strBytes, 0, count); return strBytes; };
+            byte[] titleBytes = getOriginalStringBytes(entry.TitleOffset); Encoding titleWriteEncoding; string titleString;
+            if (entry.PvrRecordType != PvrConstants.PVR_RT_TimebasedSeries) { titleString = ConvertISO88591ToUTF8_Manual(titleBytes); titleWriteEncoding = Utf8Encoding; } else { titleString = DefaultStringEncoding.GetString(titleBytes); titleWriteEncoding = DefaultStringEncoding; }
+            entry.TitleOffset = (ushort)newVarDataMs.Position; newVarDataWriter.Write(titleWriteEncoding.GetBytes(titleString)); newVarDataWriter.Write((byte)0);
+            entry.ShortDescriptionOffset = (ushort)newVarDataMs.Position; byte[] shortDescBytes = getOriginalStringBytes(entry.ShortDescriptionOffset); newVarDataWriter.Write(shortDescBytes); newVarDataWriter.Write((byte)0);
+            entry.FilenameRootOffset = (ushort)newVarDataMs.Position; byte[] filenameBytes = getOriginalStringBytes(entry.FilenameRootOffset); newVarDataWriter.Write(filenameBytes); newVarDataWriter.Write((byte)0);
+            entry.MoreInfoOffset = (ushort)newVarDataMs.Position; byte[] moreInfoBytes = getOriginalStringBytes(entry.MoreInfoOffset); newVarDataWriter.Write(moreInfoBytes); newVarDataWriter.Write((byte)0);
+            entry.CallLettersOffset = (ushort)newVarDataMs.Position; byte[] callLettersBytes = getOriginalStringBytes(entry.CallLettersOffset); newVarDataWriter.Write(callLettersBytes); newVarDataWriter.Write((byte)0);
+            entry.VarData = newVarDataMs.ToArray(); entry.DataLen = (ushort)entry.VarData.Length;
+        }
+    }
+
+} // End class SrsImporter
