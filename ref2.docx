@@ -1,18 +1,206 @@
-from pynput.keyboard import Key, Controller
-import time
+using System;
+using System.Runtime.InteropServices;
+using System.Text;
 
-keyboard = Controller()
+public static class PvrDataExtractor
+{
+    private static readonly byte[] cd64 = Encoding.ASCII.GetBytes("|$$$}rstuvwxyz{$$$$$$$>?@ABCDEFGHIJKLMNOPQRSTUVW$$$$$$XYZ[\\]^_`abcdefghijklmnopq");
 
-def press_key(key):
-    """Simulates pressing a single key."""
-    keyboard.press(key)
-    keyboard.release(key)
-    time.sleep(0.5)  # Add a small delay for the key press to register
+    public static string ExtractSeriesData(string base64Data)
+    {
+        byte[] encodedBytes = Encoding.ASCII.GetBytes(base64Data);
+        byte[] decodedBytes = CustomBase64Decode(encodedBytes);
+        if (decodedBytes == null || decodedBytes.Length == 0)
+            return string.Empty;
 
-def press_down():
-    """Simulates pressing the down arrow key."""
-    press_key(Key.down)
+        unsafe
+        {
+            fixed (byte* pStart = decodedBytes)
+            {
+                byte* p = pStart;
 
-def press_enter():
-    """Simulates pressing the enter key."""
-    press_key(Key.enter)
+                // Validate VMS header
+                if (Encoding.ASCII.GetString(p, 3) != "VMS")
+                    return "Invalid Header";
+
+                p += 4;
+
+                uint platformId = *(uint*)p;
+                p += sizeof(uint);
+
+                uint numSeries = *(uint*)p;
+                p += sizeof(uint);
+
+                for (int i = 0; i < numSeries; i++)
+                {
+                    if ((p + sizeof(PVR_DBRec)) > (pStart + decodedBytes.Length))
+                        break;
+
+                    PVR_DBRec* rec = (PVR_DBRec*)p;
+                    p += sizeof(PVR_DBRec);
+
+                    // Read vardata
+                    byte* pVarData = p;
+                    p += rec->dataLen;
+
+                    // Example: extract ClientID
+                    string clientId = GetFixedString(rec->ClientID, 18);
+                    string eventClientId = GetFixedString(rec->eventClientId, 18);
+
+                    Console.WriteLine($"Record {i + 1}: ClientID={clientId}, EventClientID={eventClientId}, Type={rec->pvrRecordType}, DataLen={rec->dataLen}");
+
+                    // Optional: Parse union data based on pvrRecordType
+                    if (rec->pvrRecordType == 0) // PVR_RT_Instance
+                    {
+                        PVR_InstanceData* data = (PVR_InstanceData*)pVarData;
+                        Console.WriteLine($"  Instance start: {data->planned_RecStart}, duration: {data->planned_RecDuration}");
+                    }
+                    else if (rec->pvrRecordType == 2) // PVR_RT_Series
+                    {
+                        PVR_SeriesData* data = (PVR_SeriesData*)pVarData;
+                        string seriesName = GetFixedString(data->aucSeriesName, 100);
+                        Console.WriteLine($"  Series name: {seriesName}");
+                    }
+                    else if (rec->pvrRecordType == 4) // PVR_RT_SyncNGo
+                    {
+                        PVR_SyncNGoData* data = (PVR_SyncNGoData*)pVarData;
+                        string progName = GetFixedString(data->aucProgName, 100);
+                        Console.WriteLine($"  SyncNGo Program: {progName}");
+                    }
+                }
+            }
+        }
+
+        return "Success";
+    }
+
+    private static byte[] CustomBase64Decode(byte[] input)
+    {
+        int codeLength = input.Length;
+        int len = codeLength - codeLength / 4;
+        byte[] outData = new byte[len];
+        int j = 0, k = 0;
+
+        byte[] inBuf = new byte[4];
+        byte[] outBuf = new byte[3];
+
+        while (k < codeLength)
+        {
+            int i = 0;
+            int thisLen = 0;
+
+            while (i < 4 && k < codeLength)
+            {
+                byte v = 0;
+                while (k < codeLength && v == 0)
+                {
+                    byte c = input[k++];
+                    if (c < 43 || c > 122)
+                        continue;
+
+                    v = cd64[c - 43];
+                    if (v != '$')
+                        v = (byte)(v - 61);
+                    else
+                        v = 0;
+                }
+
+                if (k <= codeLength)
+                {
+                    inBuf[i++] = (byte)(v - 1);
+                    thisLen++;
+                }
+            }
+
+            if (thisLen > 0)
+            {
+                DecodeBlock(inBuf, outBuf);
+                for (int n = 0; n < thisLen - 1; n++)
+                    outData[j++] = outBuf[n];
+            }
+        }
+
+        Array.Resize(ref outData, j);
+        return outData;
+    }
+
+    private static void DecodeBlock(byte[] input, byte[] output)
+    {
+        output[0] = (byte)((input[0] << 2) | (input[1] >> 4));
+        output[1] = (byte)((input[1] << 4) | (input[2] >> 2));
+        output[2] = (byte)(((input[2] << 6) & 0xc0) | input[3]);
+    }
+
+    private static unsafe string GetFixedString(byte* buffer, int maxLen)
+    {
+        int length = 0;
+        while (length < maxLen && buffer[length] != 0)
+            length++;
+
+        return Encoding.ASCII.GetString(buffer, length);
+    }
+
+    // Structs with C-compatible layout
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct PVR_DBRec
+    {
+        public uint pvr_id, programID, ui32SeriesID, quideStartSeconds, scheduleTime;
+        public ushort dataLen;
+        public ushort title, shortDescription, filenameRoot, moreInfo, serviceID, dispChannel, quideRunningTime;
+        public ushort qualifiers, callLetters, pvrFlags;
+        public byte category, eventFlags, showtimeFlags;
+        public byte ratingByte; // mpaaRating:4, svldRating:4
+        public byte contentAdvisory, pvrRecordType, earlyMinutes, lateMinutes, recordQuality;
+        public fixed byte ClientID[18];
+        public fixed byte eventClientId[18];
+        public uint unusedS, unused6;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct PVR_SeriesData
+    {
+        public ushort numbgrToKeep;
+        public byte seriesFlags, dayMask, matchHour, matchMinute;
+        public uint ReCHistoryCause, unused2, unused3;
+        public fixed byte aucSeriesName[100];
+        public fixed byte aucSeriesDescription[256];
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct PVR_SyncNGoData
+    {
+        public fixed byte dvrFileName[36];
+        public fixed byte trnsdfFileName[36];
+        public byte transcodeType, resolution, audiolang, transdStatus;
+        public ushort bitRate, syncFlags;
+        public bool bDVSEnabled, bAdaptionEnabled;
+        public ushort copyCount;
+        public uint unused1, unused2;
+        public fixed byte aucProgName[100];
+        public fixed byte unused3[64];
+        public fixed byte unused4[64];
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct HIRES_Time
+    {
+        public double Value;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct PVR_InstanceData
+    {
+        public uint planned_RecStart;
+        public uint planned_RecDuration;
+        public uint estDeletion;
+        public double recStart;
+        public double recDuration;
+        public double pbPosition;
+        public uint platformContentID;
+        public uint RecHistoryCause;
+        public uint unused2;
+        public ushort instanceFlags;
+        public ushort unused4;
+        public uint fromParentID;
+    }
+}
