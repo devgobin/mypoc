@@ -1,32 +1,215 @@
-#include <winver.h>
+using System;
+using System.Runtime.InteropServices;
+using System.Text;
 
-VS_VERSION_INFO VERSIONINFO
-FILEVERSION 2, 0, 0, 0
-PRODUCTVERSION 2, 0, 0, 0
-FILEFLAGSMASK 0x3fL
-#ifdef _DEBUG
-FILEFLAGS VS_FF_DEBUG
-#else
-FILEFLAGS 0x0L
-#endif
-FILEOS VOS_NT_WINDOWS32
-FILETYPE VFT_DLL
-FILESUBTYPE VFT2_UNKNOWN
-BEGIN
-BLOCK "StringFileInfo"
-BEGIN
-BLOCK "040904b0"
-BEGIN
-VALUE "CompanyName", "Your Company"
-VALUE "FileDescription", "Your C++/CLI Bridge"
-VALUE "FileVersion", "2.0.0.0"
-VALUE "ProductVersion", "2.0.0.0"
-VALUE "InternalName", "YourLibrary.dll"
-VALUE "OriginalFilename", "YourLibrary.dll"
-END
-END
-BLOCK "VarFileInfo"
-BEGIN
-VALUE "Translation", 0x409, 1200
-END
-END
+public static class PvrDecoder
+{
+    private static readonly char[] cd64 = "|$$$}rstuvwxyz{$$$$$$$>?@ABCDEFGHIJKLMNOPQRSTUVW$$$$$$XYZ[\\]^_`abcdefghijklmnopq".ToCharArray();
+
+    public static int GetDataLength(int codeLength) => codeLength - codeLength / 4;
+
+    private static void DecodeBlock(byte[] input, byte[] output)
+    {
+        output[0] = (byte)((input[0] << 2) | (input[1] >> 4));
+        output[1] = (byte)((input[1] << 4) | (input[2] >> 2));
+        output[2] = (byte)(((input[2] << 6) & 0xc0) | input[3]);
+    }
+
+    public static byte[] Base64Decode(string input)
+    {
+        int codeLength = input.Length;
+        int estimatedLength = GetDataLength(codeLength);
+        byte[] outputData = new byte[estimatedLength];
+        byte[] inputBuffer = new byte[4];
+        byte[] outputBuffer = new byte[3];
+
+        int k = 0, j = 0;
+
+        while (k < codeLength)
+        {
+            int len = 0;
+            for (int i = 0; i < 4 && k < codeLength; i++)
+            {
+                byte v = 0;
+                while (k < codeLength && v == 0)
+                {
+                    char ch = input[k++];
+                    if (ch < 43 || ch > 122)
+                        continue;
+                    v = (byte)cd64[ch - 43];
+                    if (v != 0)
+                    {
+                        v = (byte)(v == '$' ? 0 : v - 61);
+                    }
+                }
+                if (v != 0)
+                {
+                    inputBuffer[i] = (byte)(v - 1);
+                    len++;
+                }
+                else
+                {
+                    inputBuffer[i] = 0;
+                }
+            }
+
+            if (len > 0)
+            {
+                DecodeBlock(inputBuffer, outputBuffer);
+                for (int i = 0; i < len - 1; i++)
+                {
+                    outputData[j++] = outputBuffer[i];
+                }
+            }
+        }
+
+        Array.Resize(ref outputData, j);
+        return outputData;
+    }
+
+    public static string ExtractSeriesData(string base64Encoded, int base64Length)
+    {
+        base64Encoded = File.ReadAllText("C:\\Users\\gobis\\OneDrive\\Desktop\\sd.txt");
+
+        byte[] binData = Base64Decode(base64Encoded);
+        int offset = 0;
+        string vms = Encoding.ASCII.GetString(binData, offset, 3);
+        offset += 4; // Skip VMS\0
+
+        if (vms != "VMS")
+            return string.Empty;
+
+        uint platformId = BitConverter.ToUInt32(binData, offset);
+        offset += sizeof(uint);
+
+        uint numSeries = BitConverter.ToUInt32(binData, offset);
+        offset += sizeof(uint);
+
+        for (int i = 0; i < numSeries; i++)
+        {
+            if (offset + Marshal.SizeOf<PVR_DBRec>() > binData.Length)
+                break;
+
+            PVR_DBRec rec = ByteArrayToStructure<PVR_DBRec>(binData, offset);
+            offset += Marshal.SizeOf<PVR_DBRec>();
+            offset += rec.dataLen;
+        }
+
+        return "Success";
+    }
+
+    private static T ByteArrayToStructure<T>(byte[] bytes, int offset) where T : struct
+    {
+        GCHandle handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+        try
+        {
+            IntPtr ptr = Marshal.UnsafeAddrOfPinnedArrayElement(bytes, offset);
+            return Marshal.PtrToStructure<T>(ptr);
+        }
+        finally
+        {
+            handle.Free();
+        }
+    }
+
+
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct PVR_InstanceData
+    {
+        public uint planned_RecStart;
+        public uint planned_RecDuration;
+        public uint estDeletion;
+        public double recStart;
+        public double recDuration;
+        public double pbPosition;
+        public uint platformContentID;
+        public uint RecHistoryCause;
+        public uint unused2;
+        public ushort instanceFlags;
+        public ushort unused4;
+        public uint fromParentID;
+    }
+
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct PVR_SeriesData
+    {
+        public ushort numbgrToKeep;
+        public byte seriesFlags;
+        public byte dayMask;
+        public byte matchHour;
+        public byte matchMinute;
+        public uint ReCHistoryCause;
+        public uint unused2;
+        public uint unused3;
+        public fixed byte aucSeriesName[64];
+        public fixed byte aucSeriesDescription[256];
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct PVR_SyncNGoData
+    {
+        public fixed byte dvrFileName[128];
+        public fixed byte trnsdfFileName[128];
+        public byte transcodeType;
+        public byte resolution;
+        public byte audiolang;
+        public byte transdStatus;
+        public ushort bitRate;
+        public ushort syncFlags;
+        public bool bDVSEnabled;
+        public bool bAdaptionEnabled;
+        public ushort copyCount;
+        public uint unused1;
+        public uint unused2;
+        public fixed byte aucProgName[64];
+        public fixed byte unused3[128];
+        public fixed byte unused4[128];
+    }
+
+    [StructLayout(LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct PVR_Union
+    {
+        [FieldOffset(0)] public PVR_InstanceData instanceData;
+        [FieldOffset(0)] public PVR_SeriesData seriesData;
+        [FieldOffset(0)] public PVR_SyncNGoData syncData;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct PVR_DBRec
+    {
+        public uint pvr_id;
+        public uint programID;
+        public uint ui32SeriesID;
+        public uint quideStartSeconds;
+        public uint scheduleTime;
+        public PVR_Union pvrData;
+        public ushort dataLen;
+        public ushort title;
+        public ushort shortDescription;
+        public ushort filenameRoot;
+        public ushort moreInfo;
+        public ushort serviceID;
+        public ushort dispChannel;
+        public ushort quideRunningTime;
+        public ushort qualifiers;
+        public ushort callLetters;
+        public ushort pvrFlags;
+        public byte category;
+        public byte eventFlags;
+        public byte showtimeFlags;
+        public byte ratings;
+        public byte contentAdvisory;
+        public byte pvrRecordType;
+        public byte earlyMinutes;
+        public byte lateMinutes;
+        public byte recordQuality;
+        public fixed byte ClientID[32];
+        public fixed byte eventClientId[32];
+        public uint unusedS;
+        public uint unused6;
+        public byte vardata;
+    }
+
+}
