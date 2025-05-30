@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
-public static class PvrDecoder
+public static unsafe class PvrDecoder
 {
     private static readonly char[] cd64 = "|$$$}rstuvwxyz{$$$$$$$>?@ABCDEFGHIJKLMNOPQRSTUVW$$$$$$XYZ[\\]^_`abcdefghijklmnopq".ToCharArray();
 
@@ -67,52 +67,101 @@ public static class PvrDecoder
         return outputData;
     }
 
-    public static string ExtractSeriesData(string base64Encoded, int base64Length)
+    public static string ExtractSeriesData(string base64Encoded)
     {
-        base64Encoded = File.ReadAllText("C:\\Users\\gobis\\OneDrive\\Desktop\\sd.txt");
-
         byte[] binData = Base64Decode(base64Encoded);
         int offset = 0;
+
+        if (binData.Length < 4)
+            return string.Empty;
+
         string vms = Encoding.ASCII.GetString(binData, offset, 3);
-        offset += 4; // Skip VMS\0
+        offset += 4; // Skip "VMS" + null terminator
 
         if (vms != "VMS")
             return string.Empty;
 
-        uint platformId = BitConverter.ToUInt32(binData, offset);
-        offset += sizeof(uint);
+        // Read platformId as null-terminated ASCII string
+        string platformIdStr = ReadNullTerminatedString(binData, ref offset);
+        if (!uint.TryParse(platformIdStr, out uint platformId))
+            return string.Empty;
 
-        uint numSeries = BitConverter.ToUInt32(binData, offset);
-        offset += sizeof(uint);
+        // Read numSeries as null-terminated ASCII string
+        string numSeriesStr = ReadNullTerminatedString(binData, ref offset);
+        if (!uint.TryParse(numSeriesStr, out uint numSeries))
+            return string.Empty;
 
         for (int i = 0; i < numSeries; i++)
         {
-            if (offset + Marshal.SizeOf<PVR_DBRec>() > binData.Length)
+            if (offset + sizeof(PVR_DBRec) > binData.Length)
                 break;
 
-            PVR_DBRec rec = ByteArrayToStructure<PVR_DBRec>(binData, offset);
-            offset += Marshal.SizeOf<PVR_DBRec>();
-            offset += rec.dataLen;
+            fixed (byte* p = &binData[offset])
+            {
+                PVR_DBRec* rec = (PVR_DBRec*)p;
+                offset += sizeof(PVR_DBRec);
+
+                // Move offset by rec->dataLen bytes for additional variable data after struct
+                offset += rec->dataLen;
+            }
         }
 
         return "Success";
     }
 
-    private static T ByteArrayToStructure<T>(byte[] bytes, int offset) where T : struct
+    private static string ReadNullTerminatedString(byte[] data, ref int offset)
     {
-        GCHandle handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
-        try
-        {
-            IntPtr ptr = Marshal.UnsafeAddrOfPinnedArrayElement(bytes, offset);
-            return Marshal.PtrToStructure<T>(ptr);
-        }
-        finally
-        {
-            handle.Free();
-        }
+        int start = offset;
+        while (offset < data.Length && data[offset] != 0)
+            offset++;
+        string result = Encoding.ASCII.GetString(data, start, offset - start);
+        offset++; // Skip null terminator
+        return result;
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public unsafe struct PVR_DBRec
+    {
+        public uint pvr_id;
+        public uint programID;
+        public uint ui32SeriesID;
+        public uint quideStartSeconds;
+        public uint scheduleTime;
+        public PVR_Union pvrData;
+        public ushort dataLen;
+        public ushort title;
+        public ushort shortDescription;
+        public ushort filenameRoot;
+        public ushort moreInfo;
+        public ushort serviceID;
+        public ushort dispChannel;
+        public ushort quideRunningTime;
+        public ushort qualifiers;
+        public ushort callLetters;
+        public ushort pvrFlags;
+        public byte category;
+        public byte eventFlags;
+        public byte showtimeFlags;
+        public byte ratings; // combined mpaaRating + svldRating
+        public byte contentAdvisory;
+        public byte pvrRecordType;
+        public byte earlyMinutes;
+        public byte lateMinutes;
+        public byte recordQuality;
+        public fixed byte ClientID[32];
+        public fixed byte eventClientId[32];
+        public uint unusedS;
+        public uint unused6;
+        public byte vardata; // flexible array member (start)
+    }
 
+    [StructLayout(LayoutKind.Explicit, Pack = 1)]
+    public unsafe struct PVR_Union
+    {
+        [FieldOffset(0)] public PVR_InstanceData instanceData;
+        [FieldOffset(0)] public PVR_SeriesData seriesData;
+        [FieldOffset(0)] public PVR_SyncNGoData syncData;
+    }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public unsafe struct PVR_InstanceData
@@ -130,7 +179,6 @@ public static class PvrDecoder
         public ushort unused4;
         public uint fromParentID;
     }
-
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public unsafe struct PVR_SeriesData
@@ -167,49 +215,4 @@ public static class PvrDecoder
         public fixed byte unused3[128];
         public fixed byte unused4[128];
     }
-
-    [StructLayout(LayoutKind.Explicit, Pack = 1)]
-    public unsafe struct PVR_Union
-    {
-        [FieldOffset(0)] public PVR_InstanceData instanceData;
-        [FieldOffset(0)] public PVR_SeriesData seriesData;
-        [FieldOffset(0)] public PVR_SyncNGoData syncData;
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public unsafe struct PVR_DBRec
-    {
-        public uint pvr_id;
-        public uint programID;
-        public uint ui32SeriesID;
-        public uint quideStartSeconds;
-        public uint scheduleTime;
-        public PVR_Union pvrData;
-        public ushort dataLen;
-        public ushort title;
-        public ushort shortDescription;
-        public ushort filenameRoot;
-        public ushort moreInfo;
-        public ushort serviceID;
-        public ushort dispChannel;
-        public ushort quideRunningTime;
-        public ushort qualifiers;
-        public ushort callLetters;
-        public ushort pvrFlags;
-        public byte category;
-        public byte eventFlags;
-        public byte showtimeFlags;
-        public byte ratings;
-        public byte contentAdvisory;
-        public byte pvrRecordType;
-        public byte earlyMinutes;
-        public byte lateMinutes;
-        public byte recordQuality;
-        public fixed byte ClientID[32];
-        public fixed byte eventClientId[32];
-        public uint unusedS;
-        public uint unused6;
-        public byte vardata;
-    }
-
 }
