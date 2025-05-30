@@ -2,205 +2,128 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
-public static class PvrDataExtractor
+public unsafe class PvrDecoder
 {
-    private static readonly byte[] cd64 = Encoding.ASCII.GetBytes("|$$$}rstuvwxyz{$$$$$$$>?@ABCDEFGHIJKLMNOPQRSTUVW$$$$$$XYZ[\\]^_`abcdefghijklmnopq");
+    // The base64 decoder and cd64 table are omitted for brevity; use your working one.
 
-    public static string ExtractSeriesData(string base64Data)
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct PVR_DBRecFixed
     {
-        byte[] encodedBytes = Encoding.ASCII.GetBytes(base64Data);
-        byte[] decodedBytes = CustomBase64Decode(encodedBytes);
-        if (decodedBytes == null || decodedBytes.Length == 0)
-            return string.Empty;
+        public uint pvr_id;
+        public uint programID;
+        public uint ui32SeriesID;
+        public uint quideStartSeconds;
+        public uint scheduleTime;
+        public PVR_Union pvrData;
+        public ushort dataLen;     // Length of vardata trailing bytes
+        public ushort title;
+        public ushort shortDescription;
+        public ushort filenameRoot;
+        public ushort moreInfo;
+        public ushort serviceID;
+        public ushort dispChannel;
+        public ushort quideRunningTime;
+        public ushort qualifiers;
+        public ushort callLetters;
+        public ushort pvrFlags;
+        public byte category;
+        public byte eventFlags;
+        public byte showtimeFlags;
+        public byte ratings;
+        public byte contentAdvisory;
+        public byte pvrRecordType;
+        public byte earlyMinutes;
+        public byte lateMinutes;
+        public byte recordQuality;
+        public fixed byte ClientID[32];
+        public fixed byte eventClientId[32];
+        public uint unusedS;
+        public uint unused6;
+        // NO vardata field here, since it's variable length
+    }
 
-        unsafe
+    [StructLayout(LayoutKind.Explicit, Pack = 1)]
+    public struct PVR_Union
+    {
+        [FieldOffset(0)] public PVR_InstanceData instanceData;
+        [FieldOffset(0)] public PVR_SeriesData seriesData;
+        [FieldOffset(0)] public PVR_SyncNGoData syncData;
+    }
+
+    // Your other structs (PVR_InstanceData, PVR_SeriesData, PVR_SyncNGoData) here...
+
+    public static void ParseData(byte[] binData)
+    {
+        int offset = 0;
+
+        // Check "VMS" header
+        if (binData.Length < 4) throw new Exception("Data too short");
+
+        string vms = Encoding.ASCII.GetString(binData, offset, 3);
+        offset += 4; // Skip VMS + NULL byte
+
+        if (vms != "VMS") throw new Exception("Invalid header");
+
+        if (binData.Length < offset + 8)
+            throw new Exception("Not enough data for platformId and numSeries");
+
+        uint platformId = BitConverter.ToUInt32(binData, offset);
+        offset += 4;
+
+        uint numSeries = BitConverter.ToUInt32(binData, offset);
+        offset += 4;
+
+        Console.WriteLine($"PlatformID: {platformId}, NumSeries: {numSeries}");
+
+        int fixedSize = Marshal.SizeOf<PVR_DBRecFixed>();
+
+        for (int i = 0; i < numSeries; i++)
         {
-            fixed (byte* pStart = decodedBytes)
+            if (offset + fixedSize > binData.Length)
             {
-                byte* p = pStart;
-
-                // Validate VMS header
-                if (Encoding.ASCII.GetString(p, 3) != "VMS")
-                    return "Invalid Header";
-
-                p += 4;
-
-                uint platformId = *(uint*)p;
-                p += sizeof(uint);
-
-                uint numSeries = *(uint*)p;
-                p += sizeof(uint);
-
-                for (int i = 0; i < numSeries; i++)
-                {
-                    if ((p + sizeof(PVR_DBRec)) > (pStart + decodedBytes.Length))
-                        break;
-
-                    PVR_DBRec* rec = (PVR_DBRec*)p;
-                    p += sizeof(PVR_DBRec);
-
-                    // Read vardata
-                    byte* pVarData = p;
-                    p += rec->dataLen;
-
-                    // Example: extract ClientID
-                    string clientId = GetFixedString(rec->ClientID, 18);
-                    string eventClientId = GetFixedString(rec->eventClientId, 18);
-
-                    Console.WriteLine($"Record {i + 1}: ClientID={clientId}, EventClientID={eventClientId}, Type={rec->pvrRecordType}, DataLen={rec->dataLen}");
-
-                    // Optional: Parse union data based on pvrRecordType
-                    if (rec->pvrRecordType == 0) // PVR_RT_Instance
-                    {
-                        PVR_InstanceData* data = (PVR_InstanceData*)pVarData;
-                        Console.WriteLine($"  Instance start: {data->planned_RecStart}, duration: {data->planned_RecDuration}");
-                    }
-                    else if (rec->pvrRecordType == 2) // PVR_RT_Series
-                    {
-                        PVR_SeriesData* data = (PVR_SeriesData*)pVarData;
-                        string seriesName = GetFixedString(data->aucSeriesName, 100);
-                        Console.WriteLine($"  Series name: {seriesName}");
-                    }
-                    else if (rec->pvrRecordType == 4) // PVR_RT_SyncNGo
-                    {
-                        PVR_SyncNGoData* data = (PVR_SyncNGoData*)pVarData;
-                        string progName = GetFixedString(data->aucProgName, 100);
-                        Console.WriteLine($"  SyncNGo Program: {progName}");
-                    }
-                }
+                Console.WriteLine("Not enough data for fixed struct");
+                break;
             }
+
+            // Read fixed part
+            PVR_DBRecFixed recFixed;
+            GCHandle handle = GCHandle.Alloc(binData, GCHandleType.Pinned);
+            try
+            {
+                IntPtr ptr = IntPtr.Add(handle.AddrOfPinnedObject(), offset);
+                recFixed = Marshal.PtrToStructure<PVR_DBRecFixed>(ptr);
+            }
+            finally
+            {
+                handle.Free();
+            }
+
+            offset += fixedSize;
+
+            // Now read variable vardata
+            int dataLen = recFixed.dataLen;
+
+            if (offset + dataLen > binData.Length)
+            {
+                Console.WriteLine("Not enough data for vardata");
+                break;
+            }
+
+            byte[] vardata = new byte[dataLen];
+            Array.Copy(binData, offset, vardata, 0, dataLen);
+
+            offset += dataLen;
+
+            Console.WriteLine($"Record {i + 1}: pvr_id={recFixed.pvr_id}, dataLen={dataLen}");
+            // TODO: Further decode vardata or recFixed.pvrData union based on recFixed.pvrRecordType
+
+            // Example: if you want to parse vardata as a string (just for illustration):
+            // string varDataStr = Encoding.ASCII.GetString(vardata);
+            // Console.WriteLine($"Vardata string: {varDataStr}");
         }
 
-        return "Success";
+        Console.WriteLine($"Total bytes parsed: {offset} / {binData.Length}");
     }
 
-    private static byte[] CustomBase64Decode(byte[] input)
-    {
-        int codeLength = input.Length;
-        int len = codeLength - codeLength / 4;
-        byte[] outData = new byte[len];
-        int j = 0, k = 0;
-
-        byte[] inBuf = new byte[4];
-        byte[] outBuf = new byte[3];
-
-        while (k < codeLength)
-        {
-            int i = 0;
-            int thisLen = 0;
-
-            while (i < 4 && k < codeLength)
-            {
-                byte v = 0;
-                while (k < codeLength && v == 0)
-                {
-                    byte c = input[k++];
-                    if (c < 43 || c > 122)
-                        continue;
-
-                    v = cd64[c - 43];
-                    if (v != '$')
-                        v = (byte)(v - 61);
-                    else
-                        v = 0;
-                }
-
-                if (k <= codeLength)
-                {
-                    inBuf[i++] = (byte)(v - 1);
-                    thisLen++;
-                }
-            }
-
-            if (thisLen > 0)
-            {
-                DecodeBlock(inBuf, outBuf);
-                for (int n = 0; n < thisLen - 1; n++)
-                    outData[j++] = outBuf[n];
-            }
-        }
-
-        Array.Resize(ref outData, j);
-        return outData;
-    }
-
-    private static void DecodeBlock(byte[] input, byte[] output)
-    {
-        output[0] = (byte)((input[0] << 2) | (input[1] >> 4));
-        output[1] = (byte)((input[1] << 4) | (input[2] >> 2));
-        output[2] = (byte)(((input[2] << 6) & 0xc0) | input[3]);
-    }
-
-    private static unsafe string GetFixedString(byte* buffer, int maxLen)
-    {
-        int length = 0;
-        while (length < maxLen && buffer[length] != 0)
-            length++;
-
-        return Encoding.ASCII.GetString(buffer, length);
-    }
-
-    // Structs with C-compatible layout
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public unsafe struct PVR_DBRec
-    {
-        public uint pvr_id, programID, ui32SeriesID, quideStartSeconds, scheduleTime;
-        public ushort dataLen;
-        public ushort title, shortDescription, filenameRoot, moreInfo, serviceID, dispChannel, quideRunningTime;
-        public ushort qualifiers, callLetters, pvrFlags;
-        public byte category, eventFlags, showtimeFlags;
-        public byte ratingByte; // mpaaRating:4, svldRating:4
-        public byte contentAdvisory, pvrRecordType, earlyMinutes, lateMinutes, recordQuality;
-        public fixed byte ClientID[18];
-        public fixed byte eventClientId[18];
-        public uint unusedS, unused6;
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public unsafe struct PVR_SeriesData
-    {
-        public ushort numbgrToKeep;
-        public byte seriesFlags, dayMask, matchHour, matchMinute;
-        public uint ReCHistoryCause, unused2, unused3;
-        public fixed byte aucSeriesName[100];
-        public fixed byte aucSeriesDescription[256];
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public unsafe struct PVR_SyncNGoData
-    {
-        public fixed byte dvrFileName[36];
-        public fixed byte trnsdfFileName[36];
-        public byte transcodeType, resolution, audiolang, transdStatus;
-        public ushort bitRate, syncFlags;
-        public bool bDVSEnabled, bAdaptionEnabled;
-        public ushort copyCount;
-        public uint unused1, unused2;
-        public fixed byte aucProgName[100];
-        public fixed byte unused3[64];
-        public fixed byte unused4[64];
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct HIRES_Time
-    {
-        public double Value;
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public unsafe struct PVR_InstanceData
-    {
-        public uint planned_RecStart;
-        public uint planned_RecDuration;
-        public uint estDeletion;
-        public double recStart;
-        public double recDuration;
-        public double pbPosition;
-        public uint platformContentID;
-        public uint RecHistoryCause;
-        public uint unused2;
-        public ushort instanceFlags;
-        public ushort unused4;
-        public uint fromParentID;
-    }
+    // Your base64 decode function here (or pass pre-decoded byte[] data)
 }
