@@ -1,3 +1,37 @@
+const fs = require('fs');
+const path = require('path');
+
+const binDir = path.join(__dirname, 'node_modules', '.bin');
+const ngPath = path.join(binDir, 'ng');
+const ngRealPath = path.join(binDir, 'ng-real');
+
+// Only patch if not already patched
+if (!fs.existsSync(ngRealPath)) {
+  try {
+    // Rename the original ng binary
+    fs.renameSync(ngPath, ngRealPath);
+
+    // Create Bash wrapper
+    const wrapper = `#!/bin/bash
+npx ng-real "$@"
+if [[ "$1" == "build" ]]; then
+  echo ">>> Postbuild: Running move-build.js"
+  node move-build.js
+fi
+`;
+
+    fs.writeFileSync(ngPath, wrapper, { mode: 0o755 });
+    console.log("✅ ng CLI patched successfully to run move-build.js after build.");
+  } catch (err) {
+    console.error("❌ Failed to patch ng CLI:", err);
+    process.exit(1);
+  }
+} else {
+  console.log("ℹ️ ng CLI already patched.");
+}
+
+
+
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
